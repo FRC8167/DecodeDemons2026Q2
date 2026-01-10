@@ -6,21 +6,15 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
-import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
-import org.firstinspires.ftc.teamcode.Commands.FeederCommand;
-import org.firstinspires.ftc.teamcode.Commands.GateCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
-import org.firstinspires.ftc.teamcode.SubSystems.Feeder;
 import org.firstinspires.ftc.teamcode.SubSystems.Gate;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -129,37 +123,37 @@ private final Pose startPose = MirrorUtility.mirror(new Pose(64+2, 9, Math.toRad
                                 ),
                                 //shoot first ball
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
                                 ),
                                 new ShooterSpinUpCommand(robot.shooter, 3850),
                                 //shoot second ball
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 2000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 2000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000)
                                 ),
                                 //move to first spike while shutting off intake, feeders, and shooter
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, shootToGPPSpikePath, true),
-                                        new GateCommand(robot.gate, Gate.GateState.OPEN),
+//                                        new GateCommand(robot.gate, Gate.GateState.OPEN),
                                         new ShooterSpinUpCommand(robot.shooter,0.0),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 250),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 250),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
                                         new IntakeCommand(robot.intake, Intake.MotorState.STOP,250)
                                 ),
                                 //gobble up the balls on spike1
-                                new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
+//                                new ParallelCommandGroup(
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000),
                                         new FollowPathCommand( robot.follower, eatGPPPath, true).setGlobalMaxPower(0.75)
                                 ),
 
-                                new GateCommand(robot.gate, Gate.GateState.CLOSED),
+//                                new GateCommand(robot.gate, Gate.GateState.CLOSED),
 
                                 new ParallelCommandGroup(
 
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
                                         new IntakeCommand(robot.intake, Intake.MotorState.STOP,  250),
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true).setGlobalMaxPower(1.0),
                                         new ShooterSpinUpCommand(robot.shooter, 3850)
@@ -168,14 +162,14 @@ private final Pose startPose = MirrorUtility.mirror(new Pose(64+2, 9, Math.toRad
 
                                 //                      //shoot both balls and fix this later
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
                                 ),
                                 new ShooterSpinUpCommand(robot.shooter, 3850),
 
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1750),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1750),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1750),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1750),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 1750)
                                 )   ,
 
@@ -183,53 +177,53 @@ private final Pose startPose = MirrorUtility.mirror(new Pose(64+2, 9, Math.toRad
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, shootToPGPSpikePath, true).setGlobalMaxPower(1.0),
                                         new ShooterSpinUpCommand(robot.shooter,0.0),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,100),
-                                        new GateCommand(robot.gate, Gate.GateState.OPEN)
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,100)
+//                                        new GateCommand(robot.gate, Gate.GateState.OPEN)
                                 ),
 
                                 //gobble up spike2 balls
                                 new ParallelCommandGroup(
                                         new FollowPathCommand( robot.follower, eatPGPPath, true).setGlobalMaxPower(0.75),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000)
                                 ),
-                                new GateCommand(robot.gate, Gate.GateState.CLOSED),
+//                                new GateCommand(robot.gate, Gate.GateState.CLOSED),
                                 //prepare and move to shoot position
                                 new ParallelCommandGroup(
 
                                         new FollowPathCommand(robot.follower, endPGPToShootPath, true).setGlobalMaxPower(1.0),
                                         new ShooterSpinUpCommand(robot.shooter,3850),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
                                         new IntakeCommand(robot.intake, Intake.MotorState.STOP,100)
                                 ),
                                 //shoot and fix this later
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
                                 ),
                                 new ShooterSpinUpCommand(robot.shooter, 3850),
 
                                 //shoot second ball
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 2000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 2000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2000)
                                 ),
                                 //park outside of launch zone and power down subsystems
                                 new ParallelCommandGroup(
-                                        new GateCommand(robot.gate, Gate.GateState.OPEN),
+//                                        new GateCommand(robot.gate, Gate.GateState.OPEN),
                                         new FollowPathCommand(robot.follower, shootToGPPSpikePath, true).setGlobalMaxPower(1.0),
                                         new ShooterSpinUpCommand(robot.shooter,0.0),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
                                         new IntakeCommand(robot.intake, Intake.MotorState.STOP,100)
                                 )
 
                         )
-                )
+
         );
     }
 

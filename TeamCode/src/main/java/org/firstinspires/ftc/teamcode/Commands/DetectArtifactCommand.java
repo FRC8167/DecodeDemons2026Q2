@@ -36,13 +36,25 @@ public class DetectArtifactCommand extends CommandBase {
     @Override
     public void execute() {
 
-        String detected = colorMatch.detectColor();
+        ColorMatch.ArtifactColor detected =
+                colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
 
         switch (detected) {
-            case "GREEN":  currentColor = RGBLight.LightColor.GREEN; break;
-            case "PURPLE": currentColor = RGBLight.LightColor.VIOLET; break;
-            default:       currentColor = RGBLight.LightColor.BLUE; break;
+            case GREEN:
+                currentColor = RGBLight.LightColor.GREEN;
+                break;
+            case PURPLE:
+                currentColor = RGBLight.LightColor.VIOLET;
+                break;
+            case RED:
+                currentColor = RGBLight.LightColor.RED;
+                break;
+            case UNKNOWN:
+            default:
+                currentColor = RGBLight.LightColor.BLUE;
+                break;
         }
+
 
 
         if (robot.shooter.atTargetVelocity()) {

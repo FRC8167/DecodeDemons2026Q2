@@ -12,13 +12,14 @@ public class Intake extends SubsystemBase{
 
     private boolean isRunning;
 
-    private Double fSpeed = 1.0;
-    private Double rSpeed = -0.7;
+    private Double fSpeed = 0.5;
+    private Double rSpeed = -0.5;
     public MotorState motorstate = MotorState.STOP;
 
 
     public Intake (MotorEx intakeMotor){
         this.intakeMotor = intakeMotor;
+        intakeMotor.setInverted(true);
         off();
     }
 

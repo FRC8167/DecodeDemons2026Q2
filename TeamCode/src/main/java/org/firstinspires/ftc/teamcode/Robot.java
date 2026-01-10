@@ -4,9 +4,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
-import com.seattlesolvers.solverslib.hardware.motors.CRServo;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -14,10 +12,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
-import org.firstinspires.ftc.teamcode.SubSystems.Feeder;
-import org.firstinspires.ftc.teamcode.SubSystems.Gate;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
+import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
@@ -68,8 +66,12 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
     public MotorEx intakeMotor;
     public MotorEx shooterMotor;
+    public MotorEx spindexerMotor;
 
-    public SensorColor sensorColor;
+//    public SensorColor sensorColor;
+    public SensorColor slot0Sensor;
+    public SensorColor slot1Sensor;
+    public SensorColor slot2Sensor;
     public Follower follower;
 
     public WebcamName webCam1;
@@ -83,10 +85,13 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
     public Intake intake;
     public Shooter shooter;
+    public Juggler juggler;
     public SensorColor colorSensor;
+
     public Vision vision;
-    public Feeder feederF, feederR;
-    public Gate gate;
+//    public Feeder feederF, feederR;
+//    public Gate gate;
+    public Popper popper;
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
 
@@ -104,17 +109,24 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         intakeMotor = new MotorEx(hardwareMap, "Intake").setCachingTolerance(0.01);
         shooterMotor = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
+        spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
 
-        CRServo feederServoF = new CRServo(hardwareMap, "feederServoF");
-        CRServo feederServoR = new CRServo(hardwareMap, "feederServoR");
+//        CRServo feederServoF = new CRServo(hardwareMap, "feederServoF");
+//        CRServo feederServoR = new CRServo(hardwareMap, "feederServoR");
+        ServoEx popperServo = new ServoEx(hardwareMap, "popperServo");
 
-        ServoEx gateServo = new ServoEx(hardwareMap, "gateServo");
+//        ServoEx gateServo = new ServoEx(hardwareMap, "gateServo");
 
         ServoEx rgbServo = new ServoEx(hardwareMap, "rgbServo");
 
         webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
         //limelight = hwMap.get(Limelight3A.class, "limelight");  //dreaming
-        sensorColor = new SensorColor(hardwareMap, "sensorColor");
+        //sensorColor = new SensorColor(hardwareMap, "slot1Color");
+        slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
+        slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
+        slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
+
+
 
 
 
@@ -127,13 +139,15 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         //Instantiate Subsystems
         mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         intake  = new Intake(intakeMotor);
-        feederF  = new Feeder(feederServoF);
-        feederR = new Feeder(feederServoR);
+//        feederF  = new Feeder(feederServoF);
+//        feederR = new Feeder(feederServoR);
+        popper= new Popper(popperServo);
         shooter = new Shooter(shooterMotor);
+        juggler = new Juggler(spindexerMotor);
         vision  = new Vision(webCam1);
         rgbLight = new RGBLight(rgbServo);
-        colorMatch = new ColorMatch(sensorColor);
-        gate = new Gate(gateServo);
+        colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
+//        gate = new Gate(gateServo);
 
 
 
@@ -143,7 +157,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         rgbLight.setDefaultCommand(detectArtifactCommand);
 
         //Register Subsystems
-        register(mecanumDrive, intake, shooter, feederF, feederR, vision, rgbLight, colorMatch, gate);
+        register(mecanumDrive, intake, shooter, popper, vision, rgbLight, colorMatch, juggler);
 
         if (OP_MODE_TYPE.equals(OpModeType.AUTO)) {
             initHasMovement();

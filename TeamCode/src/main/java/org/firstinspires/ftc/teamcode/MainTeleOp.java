@@ -3,10 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -16,19 +13,19 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
-import org.firstinspires.ftc.teamcode.Commands.FeederCommand;
-import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootMotifCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
-import org.firstinspires.ftc.teamcode.SubSystems.Feeder;
-import org.firstinspires.ftc.teamcode.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
+import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
@@ -42,6 +39,8 @@ public class MainTeleOp extends CommandOpMode {
     private final Robot robot = Robot.getInstance();
     static TelemetryManager telemetryM;
     Pose currentPose;
+    private ShootMotifCommand shootMotifCommand;
+
 
 
     private Pose startPose;
@@ -91,42 +90,52 @@ public class MainTeleOp extends CommandOpMode {
                 .whenReleased(new ShooterSpinUpCommand(robot.shooter, 0.0));
 
 
-        operator.getGamepadButton(GamepadKeys.Button.BACK)
-                .whileHeld(new ShooterSpinUpCommand(robot.shooter, -1000.0))
-                .whenReleased(new ShooterSpinUpCommand(robot.shooter, 0.0));
+//        operator.getGamepadButton(GamepadKeys.Button.BACK)
+//                .whileHeld(new ShooterSpinUpCommand(robot.shooter, -1000.0))
+//                .whenReleased(new ShooterSpinUpCommand(robot.shooter, 0.0));
 
 
         operator.getGamepadButton(GamepadKeys.Button.A)
-                .whenPressed(
-                        new ParallelCommandGroup(
-                                new InstantCommand(robot.intake::forward),
-                                new InstantCommand(robot.feederF::forwardTogal)
-                        )
-
-                );
-
+                .whenPressed(new InstantCommand(robot.intake::forward));
 
         operator.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new SequentialCommandGroup(
-                        new InstantCommand(robot.intake::reverse),
-                        new InstantCommand(robot.feederF::reverseTogal
-                        )));
-
-
-        operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(() -> robot.feederR.feed(Feeder.FeederState.FORWARD)))
-                .whenReleased(new InstantCommand(() -> robot.feederR.feed(Feeder.FeederState.STOP)));
-
-
-        operator.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(new InstantCommand(() -> robot.feederR.feed(Feeder.FeederState.REVERSE)))
-                .whenReleased(new InstantCommand(() -> robot.feederR.feed(Feeder.FeederState.STOP)));
-
-        operator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).
-                whenPressed(new InstantCommand(robot.gate::open, robot.gate));
+                .whenPressed(new InstantCommand(robot.intake::reverse));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).
-                whenPressed(new InstantCommand(robot.gate::close, robot.gate));
+                whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CW));
+
+        operator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).
+                whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CCW));
+
+        operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                new InstantCommand(()->robot.popper.set(Popper.PopperState.KICK)),
+                                new WaitCommand(500),
+                                new InstantCommand(()->robot.popper.set(Popper.PopperState.RESET))
+                        )
+                );
+
+        shootMotifCommand = new ShootMotifCommand(
+                robot.juggler,
+                robot.popper,
+                robot.colorMatch,
+                robot.vision
+        );
+
+        operator.getGamepadButton(GamepadKeys.Button.Y)
+                .whenPressed(shootMotifCommand);
+
+        operator.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new InstantCommand(shootMotifCommand::skipNext));
+
+
+
+
+
+
+
+
 
         /* ******************************************************************************* */
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
@@ -148,38 +157,22 @@ public class MainTeleOp extends CommandOpMode {
                 whenPressed(
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
-                                        //close gate
-                                        new InstantCommand(robot.gate::close, robot.gate),
                                         //spin up the shooter
                                         new ShooterSpinUpCommand(robot.shooter, 3850),
                                         //drive to alliance-specific code
                                         new DriveToPoseCommand(robot.getShootPose(), driver)
 //                                        new FollowPathCommand(robot.follower, createDrivePath(robot.getShootPose()), true)
                                 ),
-                                //shoot first ball
-                                new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
-                                ),
+
                                 new ShooterSpinUpCommand(robot.shooter, 3850),
                                 //shoot second ball
-                                new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 2000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2000)
-                                ),
-                                //cleanup
-                                new ParallelCommandGroup(
-                                        new InstantCommand(robot.gate::open, robot.gate),
-                                        new ShooterSpinUpCommand(robot.shooter, 0),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP, 100)
-
-                                ),
+                                new ShooterSpinUpCommand(robot.shooter, 0),
                                 new InstantCommand(()->robot.follower.breakFollowing())
+
                         )
                 );
+
+
 
 
 
@@ -193,6 +186,7 @@ public class MainTeleOp extends CommandOpMode {
         robot.follower.update();
         robot.autoEndPose = robot.follower.getPose();
         AprilTagDetection tag = robot.vision.getFirstTargetTag();
+        telemetry.addData("ShootMotif", shootMotifCommand.getStatus());
 
 
         if (tag != null) {
@@ -223,8 +217,14 @@ public class MainTeleOp extends CommandOpMode {
 
         telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
         telemetry.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
+        telemetry.addData("Juggler counts", robot.juggler.getCurrentPosition());
 
-        telemetry.addData("FeederState?", robot.feederF.getState());
+
+
+        telemetry.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
+        telemetry.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
+        telemetry.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
+//        telemetry.update();
         telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
 
         telemetryM.update(telemetry);

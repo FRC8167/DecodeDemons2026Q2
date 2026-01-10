@@ -97,7 +97,7 @@ public class Vision extends SubsystemBase {
 
     public void disableAprilTagDetection() {
         if (visionPortal != null){
-        visionPortal.setProcessorEnabled(aprilTag, false);
+            visionPortal.setProcessorEnabled(aprilTag, false);
         }
     }
 
@@ -151,13 +151,55 @@ public class Vision extends SubsystemBase {
         }
     }
 
+//    public String[] getMotifPattern() {
+//        AprilTagDetection tag = getFirstTargetTag();
+//        if (tag == null) return null;
+//
+//        switch (tag.id) {
+//            case 21: return new String[]{"GREEN", "PURPLE", "PURPLE"}; // GPP
+//            case 22: return new String[]{"PURPLE", "GREEN", "PURPLE"}; // PGP
+//            case 23: return new String[]{"PURPLE", "PURPLE", "GREEN"}; // PPG
+//            default: return null; // Goals don't define motif
+//        }
+//    }
+
+    public ColorMatch.ArtifactColor[] getMotifPattern() {
+        AprilTagDetection tag = getFirstTargetTag();
+        if (tag == null) return null;
+
+        switch (tag.id) {
+            case 21:
+                return new ColorMatch.ArtifactColor[]{
+                        ColorMatch.ArtifactColor.GREEN,
+                        ColorMatch.ArtifactColor.PURPLE,
+                        ColorMatch.ArtifactColor.PURPLE
+                };
+            case 22:
+                return new ColorMatch.ArtifactColor[]{
+                        ColorMatch.ArtifactColor.PURPLE,
+                        ColorMatch.ArtifactColor.GREEN,
+                        ColorMatch.ArtifactColor.PURPLE
+                };
+            case 23:
+                return new ColorMatch.ArtifactColor[]{
+                        ColorMatch.ArtifactColor.PURPLE,
+                        ColorMatch.ArtifactColor.PURPLE,
+                        ColorMatch.ArtifactColor.GREEN
+                };
+            default:
+                return null;
+        }
+    }
+
+
+
     public double getDistanceToGoal() {
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 20  || detection.id == 24) {
                 return (detection.ftcPose.range);
             }
         }
-        return 0;
+        return Double.NaN; //what is Dave?
     }
 
 

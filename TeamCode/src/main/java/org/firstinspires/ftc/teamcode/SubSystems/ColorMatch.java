@@ -1,58 +1,119 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
 
-import org.firstinspires.ftc.teamcode.Cogintilities.TeamConstants;
+import java.util.EnumMap;
 
 public class ColorMatch extends SubsystemBase {
 
-SensorColor sensorColor
-        ;
+    private final EnumMap<Slot, SensorColor> sensors = new EnumMap<>(Slot.class);
 
-
-    public ColorMatch(SensorColor sensorColor) {
-        this.sensorColor = sensorColor;
+    public ColorMatch(
+            SensorColor slot0Sensor,
+            SensorColor slot1Sensor,
+            SensorColor slot2Sensor
+    ) {
+        sensors.put(Slot.SLOT_0, slot0Sensor);
+        sensors.put(Slot.SLOT_1, slot1Sensor);
+        sensors.put(Slot.SLOT_2, slot2Sensor);
     }
 
-    //Get the raw RGB Values
-    public int[] myRGB() {
-        int r = sensorColor.red();
-        int g = sensorColor.green();
-        int b = sensorColor.blue();
-        return new int[]{r, g, b};
+
+    public enum Slot {
+        SLOT_0,
+        SLOT_1,
+        SLOT_2
     }
 
-    //use library function to convert RGB to hue, saturation, and value
-    public float[] getHSV() {
-        int r = sensorColor.red();
-        int g = sensorColor.green();
-        int b = sensorColor.blue();
+
+    public enum ArtifactColor {
+        RED,
+        GREEN,
+        PURPLE,
+        UNKNOWN
+    }
+
+
+    public enum SpindexerPattern {
+        GPP,   // slot0=GREEN, slot1=PURPLE, slot2=PURPLE
+        PGP,   // slot0=PURPLE, slot1=GREEN, slot2=PURPLE
+        PPG,   // slot0=PURPLE, slot1=PURPLE, slot2=GREEN
+        INVALID
+    }
+
+
+    public float[] getHSV(Slot slot) {
+        SensorColor sensor = sensors.get(slot);
+        if (sensor == null) {
+            return new float[]{0, 0, 0};
+        }
+        int r = sensor.red();
+        int g = sensor.green();
+        int b = sensor.blue();
         float[] hsv = new float[3];
         android.graphics.Color.RGBToHSV(r, g, b, hsv);
         return hsv;
     }
 
-    //Detect the color
-    public String detectColor() {
-        float[] hsv = getHSV();
+
+    public ArtifactColor detectColor(Slot slot) {
+        float[] hsv = getHSV(slot);
         float hue = hsv[0];
         float sat = hsv[1];
         float val = hsv[2];
-
-        if (sat < 0.2 || val < 0.2) return "UNKNOWN";
-
-        String detectedColor = "UNKNOWN";
-
-            if (hue < 30 || hue > 330) {
-                detectedColor = "RED";
-            } else if (hue > 70 && hue < 160  && hue!=120) {
-                detectedColor = "GREEN";
-            } else if (hue > 220 && hue < 300)
-                detectedColor = "PURPLE";
-
-        return detectedColor;
+        if (sat < 0.2 || val < 0.2) return ArtifactColor.UNKNOWN;
+        if (hue < 30 || hue > 330) return ArtifactColor.RED;
+        if (hue > 70 && hue < 160) return ArtifactColor.GREEN;
+        if (hue > 220 && hue < 300) return ArtifactColor.PURPLE;
+        return ArtifactColor.UNKNOWN;
     }
+
+
+    public static class SlotColors {
+        public final ArtifactColor slot0;
+        public final ArtifactColor slot1;
+        public final ArtifactColor slot2;
+
+        public SlotColors(ArtifactColor slot0,
+                          ArtifactColor slot1,
+                          ArtifactColor slot2) {
+            this.slot0 = slot0;
+            this.slot1 = slot1;
+            this.slot2 = slot2;
+        }
+    }
+
+
+    public SlotColors getSlotColors() {
+        return new SlotColors(
+                detectColor(Slot.SLOT_0),
+                detectColor(Slot.SLOT_1),
+                detectColor(Slot.SLOT_2)
+        );
+    }
+
+
+    public SpindexerPattern spindexerPattern(SlotColors colors) {
+        if (colors.slot0 == ArtifactColor.GREEN &&
+                colors.slot1 == ArtifactColor.PURPLE &&
+                colors.slot2 == ArtifactColor.PURPLE) return SpindexerPattern.GPP;
+        if (colors.slot0 == ArtifactColor.PURPLE &&
+                colors.slot1 == ArtifactColor.GREEN &&
+                colors.slot2 == ArtifactColor.PURPLE) return SpindexerPattern.PGP;
+        if (colors.slot0 == ArtifactColor.PURPLE &&
+                colors.slot1 == ArtifactColor.PURPLE &&
+                colors.slot2 == ArtifactColor.GREEN) return SpindexerPattern.PPG;
+        return SpindexerPattern.INVALID;
+    }
+
+    public int findSlotWithColor(ArtifactColor targetColor) {
+        SlotColors slots = getSlotColors();
+        if (slots.slot0 == targetColor) return 0;
+        if (slots.slot1 == targetColor) return 1;
+        if (slots.slot2 == targetColor) return 2;
+        return -1; // not found
+    }
+
 
 }

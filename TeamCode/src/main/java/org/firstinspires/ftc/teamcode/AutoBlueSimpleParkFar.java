@@ -6,20 +6,15 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
-import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
-import org.firstinspires.ftc.teamcode.Commands.FeederCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
-import org.firstinspires.ftc.teamcode.SubSystems.Feeder;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -86,22 +81,22 @@ public class AutoBlueSimpleParkFar extends CommandOpMode {
                                 ),
                                 //shoot first ball
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
                                 ),
                                 new WaitCommand(250),
                                 //shoot second ball
                                 new ParallelCommandGroup(
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
+//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000)
                                 ),
                                 //move to park
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, shootToParkPath, true),
                                         new ShooterSpinUpCommand(robot.shooter,0.0),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 250),
-                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 250),
+//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
                                         new IntakeCommand(robot.intake, Intake.MotorState.STOP,250)
                                 )
 
