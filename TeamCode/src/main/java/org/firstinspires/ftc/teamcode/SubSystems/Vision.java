@@ -151,6 +151,12 @@ public class Vision extends SubsystemBase {
         }
     }
 
+    public String getMotifPatternString() {
+        ColorMatch.ArtifactColor[] pattern = getMotifPattern();
+        if (pattern == null) return "None";
+
+        return pattern[0] + " - " + pattern[1] + " - " + pattern[2];
+    }
 
 
     public ColorMatch.ArtifactColor[] getMotifPattern() {
@@ -191,6 +197,24 @@ public class Vision extends SubsystemBase {
         }
         return Double.NaN; //what is Dave?
     }
+
+
+    private ColorMatch.ArtifactColor[] latchedMotif = null;
+
+    public void latchMotifFromTagIfEmpty() {
+        if (latchedMotif != null) return;
+
+        ColorMatch.ArtifactColor[] detected = getMotifPattern();
+        if (detected != null) {
+            latchedMotif = detected;
+        }
+    }
+
+    public ColorMatch.ArtifactColor[] getLatchedMotif() {
+        return latchedMotif;
+    }
+
+
 
 
     @Override

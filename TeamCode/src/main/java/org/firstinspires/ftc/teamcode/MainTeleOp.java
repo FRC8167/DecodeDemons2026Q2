@@ -124,6 +124,12 @@ public class MainTeleOp extends CommandOpMode {
                 robot.vision
         );
 
+        operator.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new InstantCommand(() -> {
+                    robot.vision.latchMotifFromTagIfEmpty();
+                }));
+
+
         operator.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(shootMotifCommand);
 
@@ -208,6 +214,8 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);
         telemetry.addData("FollowerH", Math.round(Math.toDegrees(robot.follower.getPose().getHeading()) * 100) / 100.0);
         telemetry.addData("Distance to Goal", robot.vision.getDistanceToGoal());
+        telemetryM.addData("Obelisk Motif", robot.vision.getMotifPatternString());
+
 
         telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
         telemetry.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
@@ -215,12 +223,14 @@ public class MainTeleOp extends CommandOpMode {
 
 
 
-        telemetry.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
-        telemetry.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
-        telemetry.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
+        telemetryM.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
+        telemetryM.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
+        telemetryM.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
 //        telemetry.update();
         telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
+        
 
+//        telemetry.update();
         telemetryM.update(telemetry);
 
     }
