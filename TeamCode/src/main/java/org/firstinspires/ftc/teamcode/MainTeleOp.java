@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
+import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootMotifCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
@@ -142,41 +143,34 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(robot.mecanumDrive::enableSnailDrive))
                 .whenReleased(new InstantCommand(robot.mecanumDrive::disableSnailDrive));
 
-
-//        driver.getGamepadButton(GamepadKeys.Button.X).
-//                whenPressed(new InstantCommand(robot.gate::open, robot.gate));
-//
-//        driver.getGamepadButton(GamepadKeys.Button.Y).
-//                whenPressed(new InstantCommand(robot.gate::close, robot.gate));
+        //must be HELD DOWN to hold the position
+        //operator can still use anything
+        //once driver releases and moves joystick, the hold ends
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
 
         driver.getGamepadButton(GamepadKeys.Button.BACK)
                 .whenPressed(new CancelPedroCommand());
 
 
-        driver.getGamepadButton(GamepadKeys.Button.B).
-                whenPressed(
+        driver.getGamepadButton(GamepadKeys.Button.B)
+                .whenPressed(
                         new SequentialCommandGroup(
+                                //Spin up shooter while driving to far shoot pose
                                 new ParallelCommandGroup(
-                                        //spin up the shooter
                                         new ShooterSpinUpCommand(robot.shooter, 3850),
-                                        //drive to alliance-specific code
                                         new DriveToPoseCommand(robot.getShootPose(), driver)
-//                                        new FollowPathCommand(robot.follower, createDrivePath(robot.getShootPose()), true)
                                 ),
-
-                                new ShooterSpinUpCommand(robot.shooter, 3850),
-                                //shoot second ball
+                                //Hold the pose as defensive strategy
+                                new HoldPoseCommand(robot.getShootPose(), driver),
+                                //Motif shoot command
+                                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision),
+                                //Spin down shooter
                                 new ShooterSpinUpCommand(robot.shooter, 0),
-                                new InstantCommand(()->robot.follower.breakFollowing())
-
+                                //End the path hold
+                                new InstantCommand(() -> robot.follower.breakFollowing())
                         )
                 );
-
-
-
-
-
-//        driver.getGamepadButton(GamepadKeys.Button.Y). shoot far
 
     }
 

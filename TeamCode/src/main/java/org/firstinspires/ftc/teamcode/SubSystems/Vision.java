@@ -151,17 +151,7 @@ public class Vision extends SubsystemBase {
         }
     }
 
-//    public String[] getMotifPattern() {
-//        AprilTagDetection tag = getFirstTargetTag();
-//        if (tag == null) return null;
-//
-//        switch (tag.id) {
-//            case 21: return new String[]{"GREEN", "PURPLE", "PURPLE"}; // GPP
-//            case 22: return new String[]{"PURPLE", "GREEN", "PURPLE"}; // PGP
-//            case 23: return new String[]{"PURPLE", "PURPLE", "GREEN"}; // PPG
-//            default: return null; // Goals don't define motif
-//        }
-//    }
+
 
     public ColorMatch.ArtifactColor[] getMotifPattern() {
         AprilTagDetection tag = getFirstTargetTag();
