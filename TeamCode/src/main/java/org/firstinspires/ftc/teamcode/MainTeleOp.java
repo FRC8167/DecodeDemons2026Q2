@@ -40,7 +40,9 @@ public class MainTeleOp extends CommandOpMode {
     private final Robot robot = Robot.getInstance();
     static TelemetryManager telemetryM;
     Pose currentPose;
-    private ShootMotifCommand shootMotifCommand;
+//    private ShootMotifCommand shootMotifCommand;
+//    ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
+
 
 
 
@@ -67,7 +69,7 @@ public class MainTeleOp extends CommandOpMode {
         } else {
             startPose = robot.autoEndPose;
         }
-        //added 12-22
+
         robot.mecanumDrive.setDefaultCommand(new DriveCommand(robot.mecanumDrive, gamepad1));
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -117,24 +119,25 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
-        shootMotifCommand = new ShootMotifCommand(
-                robot.juggler,
-                robot.popper,
-                robot.colorMatch,
-                robot.vision
-        );
+
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new InstantCommand(() -> {
-                    robot.vision.latchMotifFromTagIfEmpty();
-                }));
+                .whenPressed(new InstantCommand(robot.vision::latchMotif));
+
 
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(shootMotifCommand);
+                .whenPressed(
+                        new ParallelCommandGroup(
+                                new ShooterSmartSpinUpCommand(robot.shooter, robot.vision),
+                                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision)
+                        )
+                );
 
-        operator.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new InstantCommand(shootMotifCommand::skipNext));
+
+
+//        operator.getGamepadButton(GamepadKeys.Button.X)
+//                .whenPressed(new InstantCommand(shootMotifCommand::skipNext));
 
 
 
@@ -186,7 +189,7 @@ public class MainTeleOp extends CommandOpMode {
         robot.follower.update();
         robot.autoEndPose = robot.follower.getPose();
         AprilTagDetection tag = robot.vision.getFirstTargetTag();
-        telemetry.addData("ShootMotif", shootMotifCommand.getStatus());
+
 
 
         if (tag != null) {
@@ -199,14 +202,6 @@ public class MainTeleOp extends CommandOpMode {
         }
 
 
-//       if (gamepad2.right_trigger > 0.3) {
-//           robot.feederR.feed(Feeder.FeederState.FORWARD);
-//           robot.feederF.feed(Feeder.FeederState.FORWARD);
-//
-//       }else{
-//           robot.feederR.feed(Feeder.FeederState.STOP);
-//           robot.feederF.feed(Feeder.FeederState.STOP);
-//       }
 
 
         telemetry.addData("autoEndPose", robot.autoEndPose.toString());
@@ -214,7 +209,19 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);
         telemetry.addData("FollowerH", Math.round(Math.toDegrees(robot.follower.getPose().getHeading()) * 100) / 100.0);
         telemetry.addData("Distance to Goal", robot.vision.getDistanceToGoal());
-        telemetryM.addData("Obelisk Motif", robot.vision.getMotifPatternString());
+
+        ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
+
+        if (motif != null) {
+            telemetryM.addData(
+                    "Obelisk Motif",
+                    motif[0] + " - " + motif[1] + " - " + motif[2]
+            );
+        } else {
+            telemetryM.addData("Obelisk Motif", "Not latched");
+        }
+//        telemetryM.addData("Obelisk Motif", robot.vision.getLatchedMotifString());
+
 
 
         telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
@@ -226,11 +233,7 @@ public class MainTeleOp extends CommandOpMode {
         telemetryM.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
         telemetryM.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
         telemetryM.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
-//        telemetry.update();
         telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
-        
-
-//        telemetry.update();
         telemetryM.update(telemetry);
 
     }

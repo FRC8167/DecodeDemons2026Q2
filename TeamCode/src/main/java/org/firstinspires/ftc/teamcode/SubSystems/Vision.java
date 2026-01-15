@@ -151,12 +151,15 @@ public class Vision extends SubsystemBase {
         }
     }
 
-    public String getMotifPatternString() {
-        ColorMatch.ArtifactColor[] pattern = getMotifPattern();
-        if (pattern == null) return "None";
+//    public String getMotifPatternString() {
+//        ColorMatch.ArtifactColor[] pattern = getMotifPattern();
+//        if (pattern == null) return "None";
+//
+//        return pattern[0] + " - " + pattern[1] + " - " + pattern[2];
+//    }
+private ColorMatch.ArtifactColor[] latchedMotif = null;
 
-        return pattern[0] + " - " + pattern[1] + " - " + pattern[2];
-    }
+
 
 
     public ColorMatch.ArtifactColor[] getMotifPattern() {
@@ -164,28 +167,17 @@ public class Vision extends SubsystemBase {
         if (tag == null) return null;
 
         switch (tag.id) {
-            case 21:
-                return new ColorMatch.ArtifactColor[]{
-                        ColorMatch.ArtifactColor.GREEN,
-                        ColorMatch.ArtifactColor.PURPLE,
-                        ColorMatch.ArtifactColor.PURPLE
-                };
-            case 22:
-                return new ColorMatch.ArtifactColor[]{
-                        ColorMatch.ArtifactColor.PURPLE,
-                        ColorMatch.ArtifactColor.GREEN,
-                        ColorMatch.ArtifactColor.PURPLE
-                };
-            case 23:
-                return new ColorMatch.ArtifactColor[]{
-                        ColorMatch.ArtifactColor.PURPLE,
-                        ColorMatch.ArtifactColor.PURPLE,
-                        ColorMatch.ArtifactColor.GREEN
-                };
+            case 21:  // GPP
+                return new ColorMatch.ArtifactColor[] {ColorMatch.ArtifactColor.GREEN, ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.PURPLE};
+            case 22:  // PGP
+                return new ColorMatch.ArtifactColor[] {ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.GREEN, ColorMatch.ArtifactColor.PURPLE};
+            case 23:  // PPG
+                return new ColorMatch.ArtifactColor[] {ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.GREEN};
             default:
                 return null;
         }
     }
+
 
 
 
@@ -198,17 +190,18 @@ public class Vision extends SubsystemBase {
         return Double.NaN; //what is Dave?
     }
 
-
-    private ColorMatch.ArtifactColor[] latchedMotif = null;
-
-    public void latchMotifFromTagIfEmpty() {
-        if (latchedMotif != null) return;
-
-        ColorMatch.ArtifactColor[] detected = getMotifPattern();
-        if (detected != null) {
-            latchedMotif = detected;
+    public void latchMotif() {
+        ColorMatch.ArtifactColor[] current = getMotifPattern();
+        if (current != null) {
+            latchedMotif = current.clone();
         }
     }
+
+    public String getLatchedMotifString() {
+        if (latchedMotif == null) return "Not latched";
+        return latchedMotif[0] + " - " + latchedMotif[1] + " - " + latchedMotif[2];
+    }
+
 
     public ColorMatch.ArtifactColor[] getLatchedMotif() {
         return latchedMotif;

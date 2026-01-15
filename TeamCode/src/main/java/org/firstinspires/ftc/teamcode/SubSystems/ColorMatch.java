@@ -35,13 +35,6 @@ public class ColorMatch extends SubsystemBase {
     }
 
 
-    public enum SpindexerPattern {
-        GPP,   // slot0=GREEN, slot1=PURPLE, slot2=PURPLE
-        PGP,   // slot0=PURPLE, slot1=GREEN, slot2=PURPLE
-        PPG,   // slot0=PURPLE, slot1=PURPLE, slot2=GREEN
-        INVALID
-    }
-
 
     public float[] getHSV(Slot slot) {
         SensorColor sensor = sensors.get(slot);
@@ -62,7 +55,8 @@ public class ColorMatch extends SubsystemBase {
         float hue = hsv[0];
         float sat = hsv[1];
         float val = hsv[2];
-        if (sat < 0.2 || val < 0.2) return ArtifactColor.UNKNOWN;
+        if (val < 0.15 || sat < 0.35) {return ArtifactColor.UNKNOWN;}
+//        if (sat < 0.2 || val < 0.2) return ArtifactColor.UNKNOWN;
         if (hue < 30 || hue > 330) return ArtifactColor.RED;
         if (hue > 70 && hue < 160) return ArtifactColor.GREEN;
         if (hue > 220 && hue < 300) return ArtifactColor.PURPLE;
@@ -93,19 +87,6 @@ public class ColorMatch extends SubsystemBase {
         );
     }
 
-
-    public SpindexerPattern spindexerPattern(SlotColors colors) {
-        if (colors.slot0 == ArtifactColor.GREEN &&
-                colors.slot1 == ArtifactColor.PURPLE &&
-                colors.slot2 == ArtifactColor.PURPLE) return SpindexerPattern.GPP;
-        if (colors.slot0 == ArtifactColor.PURPLE &&
-                colors.slot1 == ArtifactColor.GREEN &&
-                colors.slot2 == ArtifactColor.PURPLE) return SpindexerPattern.PGP;
-        if (colors.slot0 == ArtifactColor.PURPLE &&
-                colors.slot1 == ArtifactColor.PURPLE &&
-                colors.slot2 == ArtifactColor.GREEN) return SpindexerPattern.PPG;
-        return SpindexerPattern.INVALID;
-    }
 
     public int findSlotWithColor(ArtifactColor targetColor) {
         SlotColors slots = getSlotColors();

@@ -6,6 +6,7 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
@@ -104,6 +105,8 @@ public class AutoBlueClose extends CommandOpMode {
                                         new FollowPathCommand(robot.follower, path1, true),
                                         new ShooterSpinUpCommand(robot.shooter, 3400)
                                 ),
+//                                new InstantCommand(() -> robot.vision.latchMotifFromTagIfEmpty()),
+
                                 //shoot first artifact
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),

@@ -100,6 +100,8 @@ public class AutoBlueFar extends CommandOpMode {
                 new DetectArtifactCommand(robot.rgbLight, robot.colorMatch)
         );
 
+//        robot.vision.latchMotifFromTagIfEmpty();
+
         schedule(
                 new SequentialCommandGroup(
                     new ParallelCommandGroup(
