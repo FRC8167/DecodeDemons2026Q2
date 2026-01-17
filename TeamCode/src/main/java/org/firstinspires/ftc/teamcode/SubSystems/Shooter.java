@@ -32,12 +32,12 @@ public class Shooter extends SubsystemBase {
     public static final InterpLUT distanceToRPM;
         static{
             distanceToRPM = new InterpLUT();
-            distanceToRPM.add(57.0, 3200.0);
-            distanceToRPM.add(71.5, 3500);
-            distanceToRPM.add(90.0, 3650.0);
-            distanceToRPM.add(96.0, 3700.0);
-            distanceToRPM.add(115.0, 3900.0);
-            distanceToRPM.add(138.0, 4100.0);
+            distanceToRPM.add(42.0, 2650.0);
+            distanceToRPM.add(69.0, 2950.0);
+            distanceToRPM.add(94.0, 3250.0);
+            distanceToRPM.add(99.0, 3300.0);
+            distanceToRPM.add(120.0, 3575.0);
+
             //in and RPM
             distanceToRPM.createLUT();
         }
@@ -64,12 +64,17 @@ public class Shooter extends SubsystemBase {
 
         @Override
         public void periodic() {
+            double output = 0;
+
             shooterPID.setPIDF(kp, ki, kd, kv);
             shooterPID.setTolerance(convertRPMToTicksPerSec(tolerance));
 
-            double currentVelocity = shooterMotor.getVelocity();
-            double output = shooterPID.calculate(currentVelocity, ticksPerSec);
-
+            if(shooterPID.getSetPoint() < 10)  {
+                output = 0;
+            } else {
+                double currentVelocity = shooterMotor.getVelocity();
+                output = shooterPID.calculate(currentVelocity, ticksPerSec);
+            }
             shooterMotor.set(output);
         }
 
@@ -90,19 +95,23 @@ public class Shooter extends SubsystemBase {
             return shooterPID.atSetPoint();
         }
 
+        public double getTargetSpeed() {
+            return shooterPID.getSetPoint();
+        }
+
         public double getRPM() {
             return convertTicksPerSecToRPM(shooterMotor.getVelocity());
         }
 
         public void smartVelocity(double ATdistance) {
             double targetRPM = 0.0;
-            if (ATdistance > 57 && ATdistance <=138){
+            if (ATdistance > 42 && ATdistance < 120){
                 targetRPM = distanceToRPM.get(ATdistance);
 
             }
             else
             {
-                targetRPM = 4200;
+                targetRPM = 3575;
             }
             ticksPerSec = convertRPMToTicksPerSec(targetRPM);
             shooterPID.setSetPoint(ticksPerSec);

@@ -5,6 +5,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootMotifCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
@@ -29,6 +31,8 @@ import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import kotlin.time.Instant;
 
 @Configurable
 //@Disabled
@@ -44,12 +48,12 @@ public class MainTeleOp extends CommandOpMode {
 //    private ShootMotifCommand shootMotifCommand;
 //    ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
 
-
+    public static double current_velocity = 3200;
+    public double increment = 25;
 
 
     private Pose startPose;
 //    private Pose autoEndPose;
-
 
 
     @Override
@@ -130,17 +134,17 @@ public class MainTeleOp extends CommandOpMode {
 
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(
-                        new ParallelCommandGroup(
-                                new ShooterSmartSpinUpCommand(robot.shooter, robot.vision),
-                                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision)
-                        )
+                .whenPressed(new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
+//                        new ParallelCommandGroup(
+//                                new ShooterSmartSpinUpCommand(robot.shooter, robot.vision),
+//                                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision)
+//                        )
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.X)
                 .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(Juggler.Direction.CW), robot.juggler))
                 .whenReleased(new InstantCommand(() -> robot.juggler.Snap(), robot.juggler));
-        
+
 
 
         /* ******************************************************************************* */
@@ -151,6 +155,15 @@ public class MainTeleOp extends CommandOpMode {
         //must be HELD DOWN to hold the position
         //operator can still use anything
         //once driver releases and moves joystick, the hold ends
+
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(()->robot.popper.set(Popper.PopperState.KICK)));
+
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new InstantCommand(()->robot.popper.set(Popper.PopperState.RESET)));
+
+
+
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
 
@@ -177,6 +190,9 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
+        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(
+            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
+
     }
 
     @Override
@@ -188,6 +204,7 @@ public class MainTeleOp extends CommandOpMode {
 
 
 
+
         if (tag != null) {
             telemetry.addLine("Target Tag Detected!");
             telemetry.addData("ID", tag.id);
@@ -196,8 +213,6 @@ public class MainTeleOp extends CommandOpMode {
         } else {
             telemetry.addLine("No target tags (20–24) detected.");
         }
-
-
 
 
         telemetry.addData("autoEndPose", robot.autoEndPose.toString());
@@ -230,6 +245,7 @@ public class MainTeleOp extends CommandOpMode {
         telemetryM.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
         telemetryM.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
         telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
+        telemetryM.addData("Current Velocity", current_velocity);
         telemetryM.update(telemetry);
 
     }
