@@ -67,6 +67,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public MotorEx intakeMotor;
     public MotorEx shooterMotor;
     public MotorEx spindexerMotor;
+    public ServoEx popperServoL;
+    public ServoEx popperServoR;
 
 //    public SensorColor sensorColor;
     public SensorColor slot0Sensor;
@@ -113,7 +115,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
 //        CRServo feederServoF = new CRServo(hardwareMap, "feederServoF");
 //        CRServo feederServoR = new CRServo(hardwareMap, "feederServoR");
-        ServoEx popperServo = new ServoEx(hardwareMap, "popperServo");
+        ServoEx popperServoL = new ServoEx(hardwareMap, "popperServoL");
+        ServoEx popperServoR = new ServoEx(hardwareMap, "popperServoR");
 
 //        ServoEx gateServo = new ServoEx(hardwareMap, "gateServo");
 
@@ -141,7 +144,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         intake  = new Intake(intakeMotor);
 //        feederF  = new Feeder(feederServoF);
 //        feederR = new Feeder(feederServoR);
-        popper= new Popper(popperServo);
+        popper= new Popper(popperServoL, popperServoR);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
         vision  = new Vision(webCam1);

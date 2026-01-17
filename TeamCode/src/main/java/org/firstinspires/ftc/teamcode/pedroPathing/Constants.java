@@ -17,13 +17,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
     //mass of 15 is a placeholder
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .forwardZeroPowerAcceleration(-35.97131831366841)
-            .lateralZeroPowerAcceleration(-58.03295303491395 )
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, .03, 0.025))
+            .forwardZeroPowerAcceleration(-31.364065107587948)
+            .lateralZeroPowerAcceleration(-52.51019036867055)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.3, 0, .03, 0.025))
             .headingPIDFCoefficients(new PIDFCoefficients(0.7, 0.0, 0.002, 0.025))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(.006, 0.0, .0006, 0.6, 0.01))
             .centripetalScaling(.0005)
-            .mass(8.0);
+            .mass(5.3);
 
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
@@ -41,8 +41,8 @@ public class Constants {
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .xVelocity(65.13840370478593)
-            .yVelocity(56.13486895223302)
+            .xVelocity(82.72882608729086)
+            .yVelocity(68.53790859913263)
             .rightFrontMotorName("RightFront")  //TODO check these names                                             c
             .rightRearMotorName("RightRear")
             .leftRearMotorName("LeftRear")
@@ -58,6 +58,6 @@ public class Constants {
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")  //change name?
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)  //TODO verify or REVERSE
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)  //TODO verify or REVERSE
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);  //TODO verify or REVERSE
 }

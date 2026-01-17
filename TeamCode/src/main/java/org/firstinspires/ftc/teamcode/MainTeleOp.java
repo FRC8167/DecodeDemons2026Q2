@@ -119,6 +119,8 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
+        operator.getGamepadButton(GamepadKeys.Button.START)
+                .whenPressed(new InstantCommand(() -> robot.popper.midServo()));
 
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
@@ -226,7 +228,7 @@ public class MainTeleOp extends CommandOpMode {
 
         telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
         telemetry.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
-        telemetry.addData("Juggler counts", robot.juggler.getCurrentPosition());
+//        telemetry.addData("Juggler counts", robot.juggler.getCurrentPosition());
 
 
 
