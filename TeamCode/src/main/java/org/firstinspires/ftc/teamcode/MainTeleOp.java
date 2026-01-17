@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -79,7 +80,7 @@ public class MainTeleOp extends CommandOpMode {
         robot.follower.setStartingPose(startPose);
         robot.follower.update();
         //only schedule perpetually running commands
-        schedule(new DriveCommand(robot.mecanumDrive, gamepad1));
+//        schedule(new DriveCommand(robot.mecanumDrive, gamepad1));
         schedule(new VisionCommand(robot.vision));
         schedule(new DetectArtifactCommand(robot.rgbLight, robot.colorMatch)); //, robot.shooter));
 
@@ -136,17 +137,10 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
-
-
-//        operator.getGamepadButton(GamepadKeys.Button.X)
-//                .whenPressed(new InstantCommand(shootMotifCommand::skipNext));
-
-
-
-
-
-
-
+        operator.getGamepadButton(GamepadKeys.Button.X)
+                .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(Juggler.Direction.CW), robot.juggler))
+                .whenReleased(new InstantCommand(() -> robot.juggler.Snap(), robot.juggler));
+        
 
 
         /* ******************************************************************************* */
