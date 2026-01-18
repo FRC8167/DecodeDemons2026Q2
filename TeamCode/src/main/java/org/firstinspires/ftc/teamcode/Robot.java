@@ -147,6 +147,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         popper= new Popper(popperServoL, popperServoR);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
+        spindexerMotor.resetEncoder();  //added 01-18
         vision  = new Vision(webCam1);
         rgbLight = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);

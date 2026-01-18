@@ -135,10 +135,6 @@ public class MainTeleOp extends CommandOpMode {
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
-//                        new ParallelCommandGroup(
-//                                new ShooterSmartSpinUpCommand(robot.shooter, robot.vision),
-//                                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision)
-//                        )
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.X)

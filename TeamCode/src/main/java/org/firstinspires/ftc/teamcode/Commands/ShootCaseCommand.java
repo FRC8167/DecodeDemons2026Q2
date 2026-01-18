@@ -31,6 +31,7 @@ public class ShootCaseCommand extends CommandBase {
         this.shooter = shooter;
         this.colorMatch = colorMatch;
         this.vision = vision;
+        addRequirements(juggler, popper, shooter);
     }
 
     @Override
@@ -53,8 +54,21 @@ public class ShootCaseCommand extends CommandBase {
 
         switch (key) {
 
-            case "MPPGJGPP":
-            case "MGPPJPPG":
+            case "MPGPJGPP":  //weirdest case
+                return new SequentialCommandGroup(
+                        new ShooterSmartSpinUpCommand(shooter, vision),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
+                        new PopandResetCommand(popper),
+                        // Spin shooter down shooter
+                        new ShooterSpinUpCommand(shooter, 0.0)
+                );
+
+            case "MPPGJGPP":  //could also work all CW
+            case "MGPPJPPG":  //must be CCW
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
@@ -67,7 +81,8 @@ public class ShootCaseCommand extends CommandBase {
                         new ShooterSpinUpCommand(shooter, 0.0)
                 );
 
-            case "MPPGJPGP":
+            case "MPPGJPGP":   //one ready to go and must be CCW after
+            case "MPGPJPPG":  //same as above
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
                         // Shoot then rotate CW and shoot repeated 2 times
@@ -80,7 +95,7 @@ public class ShootCaseCommand extends CommandBase {
                         new ShooterSpinUpCommand(shooter, 0.0)
                 );
 
-            case "MGPPJPGP":
+            case "MGPPJPGP":  //must be CW
                 return new SequentialCommandGroup(
                         // Spin up shooter at start of sequence
                         new ShooterSmartSpinUpCommand(shooter, vision),
@@ -97,10 +112,10 @@ public class ShootCaseCommand extends CommandBase {
 
 
 
-            case "MPPGJPPG":
-            case "MPGPJPGP":
-            case "MGPPJGPP":
-            case "UNKNOWN":
+            case "MPPGJPPG":  //one ready and all CW subsequent must be CW
+            case "MPGPJPGP":  //same as above
+            case "MGPPJGPP":  //same as above
+            case "UNKNOWN":  //could be CCW as well
             default:
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
