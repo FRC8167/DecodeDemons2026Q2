@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
@@ -91,6 +93,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public SensorColor colorSensor;
 
     public Vision vision;
+    public LimeLightVision limey;
+
 //    public Feeder feederF, feederR;
 //    public Gate gate;
     public Popper popper;
@@ -129,10 +133,6 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
         slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
 
-
-
-
-
         ctrlHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : ctrlHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
@@ -148,7 +148,10 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
         spindexerMotor.resetEncoder();  //added 01-18
+
         vision  = new Vision(webCam1);
+//        limey = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
+
         rgbLight = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
 //        gate = new Gate(gateServo);
