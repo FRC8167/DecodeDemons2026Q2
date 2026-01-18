@@ -111,7 +111,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         //Instantiate Subsystems
         mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         intake  = new Intake(intakeMotor);
-        popper= new Popper(popperServoL, popperServoR);
+        popper  = new Popper(popperServoL, popperServoR);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
         vision  = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
