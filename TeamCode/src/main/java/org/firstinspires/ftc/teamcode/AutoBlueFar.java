@@ -8,17 +8,19 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.ParallelDeadlineGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootMotifCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
-import org.firstinspires.ftc.teamcode.SubSystems.Gate;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
@@ -28,6 +30,8 @@ public class AutoBlueFar extends CommandOpMode {
     Robot robot = Robot.getInstance();
 
     private ElapsedTime timer;
+
+
     private final Pose startPose = new Pose(64, 9, Math.toRadians(90));
     private final Pose rotatedPose = new Pose(56, 12, Math.toRadians(117.5));
     private final Pose artifactsGPPPose = new Pose(56, 35.0, Math.toRadians(180));
@@ -81,7 +85,6 @@ public class AutoBlueFar extends CommandOpMode {
     public void initialize() {
         Robot.OP_MODE_TYPE = Robot.OpModeType.AUTO;
         robot.setAlliance(Robot.Alliance.BLUE);
-
         timer = new ElapsedTime();
         timer.reset();
 
@@ -93,74 +96,71 @@ public class AutoBlueFar extends CommandOpMode {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        buildPaths();
-//        robot.vision.setDefaultCommand(
-//                new VisionCommand(robot.vision)
-//        );
-//
-//        robot.colorMatch.setDefaultCommand(
-//                new DetectArtifactCommand(robot.rgbLight, robot.colorMatch)
-//        );
 
-//        robot.vision.latchMotifFromTagIfEmpty();
+
+        buildPaths();
+
+
 
         schedule(
-                new SequentialCommandGroup(
-                    new ParallelCommandGroup(
-//                    new ShooterSpinUpCommand(robot.shooter, 3850),
-                    new FollowPathCommand(robot.follower, rotateToShootPath, true)
-                    ),
-                //shoot the three pre-loaded balls as a motif
-//                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision),
+            new ParallelCommandGroup(
+                new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
+                new VisionCommand(robot.vision),
+                    new SequentialCommandGroup(
+                            new WaitCommand(250),
+                            new InstantCommand(() -> {
+                                if (robot.vision.getMotifPattern() != null) {
+                                    robot.rgbLight.setColor(RGBLight.LightColor.PINK);
+                                } else {
+                                    robot.rgbLight.setColor(RGBLight.LightColor.RED);
+                                }
+                            }),
+                            new FollowPathCommand(robot.follower, rotateToShootPath, true),
+                        //shoot pre-loaded artifacts
+                        new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                        //move to spike 1
+                        new FollowPathCommand(robot.follower, shootToGPPSpikePath, true),
+                        //gobble up the balls on spike 1
+//                        new ParallelCommandGroup(
+//                            new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000),
+//                            new FollowPathCommand( robot.follower, eatGPPPath, true).setGlobalMaxPower(0.75),
+//                            new InstantCommand(()->robot.juggler.rotateTwoSlots(Juggler.Direction.CW))
+//                        ),  //try the slow rotate????
+                        new ParallelDeadlineGroup(
+                             //first command controls timing
+                             new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2000),
+                             new FollowPathCommand(robot.follower, eatGPPPath, true).setGlobalMaxPower(0.75),
+                             new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
+                        ),
 
-                //drive to first spike and shut down shooter
-                new ParallelCommandGroup(
-                    new FollowPathCommand(robot.follower, shootToGPPSpikePath, true)
-//                    new ShooterSpinUpCommand(robot.shooter,0.0)
-                ),
-                //gobble up all three balls on spike1
-                new ParallelCommandGroup(
-                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000),
-                    new FollowPathCommand( robot.follower, eatGPPPath, true).setGlobalMaxPower(0.75),
-                    new InstantCommand(()->robot.juggler.rotateTwoSlots(Juggler.Direction.CW))
-                ),
+                        //move to shoot position and shut down intake
+                        new ParallelCommandGroup(
+                            new IntakeCommand(robot.intake, Intake.MotorState.STOP,  250),
+                            new FollowPathCommand(robot.follower, endGPPToShootPath, true).setGlobalMaxPower(1.0)
+                      ),
+                        //shoot the artifacts from spike 1
+                        new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
-                //move to shoot position, shut down intake, spin up shooter
-                new ParallelCommandGroup(
-                    new IntakeCommand(robot.intake, Intake.MotorState.STOP,  250),
-                    new FollowPathCommand(robot.follower, endGPPToShootPath, true).setGlobalMaxPower(1.0)
-//                    new ShooterSpinUpCommand(robot.shooter, 3850)
-                ),
-                //shoot all three balls from spike1
-//                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision),
+                        //move to spike 2
+                        new FollowPathCommand(robot.follower, shootToPGPSpikePath, true).setGlobalMaxPower(1.0)),
 
-                //drive to spike2 and turn off shooter
-                new ParallelCommandGroup(
-                    new FollowPathCommand(robot.follower, shootToPGPSpikePath, true).setGlobalMaxPower(1.0)
-//                    new ShooterSpinUpCommand(robot.shooter,0.0)
-                ),
+                        //gobble up spike 2 balls
+                        new ParallelCommandGroup(
+                            new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000),
+                            new FollowPathCommand( robot.follower, eatPGPPath, true).setGlobalMaxPower(0.75)
+                            ),
 
-                //gobble up spike2 balls
-                new ParallelCommandGroup(
-                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000),
-                    new FollowPathCommand( robot.follower, eatPGPPath, true).setGlobalMaxPower(0.75)
-                    ),
+                        //move to shoot position and shut down intake
+                        new ParallelCommandGroup(
+                            new IntakeCommand(robot.intake, Intake.MotorState.STOP,100),
+                            new FollowPathCommand(robot.follower, endPGPToShootPath, true).setGlobalMaxPower(1.0)
+                        ),
 
-                //move to shoot position, shut down intake, spin up shooter
-                new ParallelCommandGroup(
-                    new IntakeCommand(robot.intake, Intake.MotorState.STOP,100),
-                    new FollowPathCommand(robot.follower, endPGPToShootPath, true).setGlobalMaxPower(1.0)
-//                    new ShooterSpinUpCommand(robot.shooter,3850)
-                    ),
+                        //shoot the artifacts from spike 2
+                      new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
-                //shoot all three balls
-//                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision),
-
-                //park outside of launch zone and power down subsystems
-                new ParallelCommandGroup(
-                   new FollowPathCommand(robot.follower, shootToGPPSpikePath, true).setGlobalMaxPower(1.0)
-//                   new ShooterSpinUpCommand(robot.shooter,0.0)
-                )
+                      //park outside of launch zone
+                      new FollowPathCommand(robot.follower, shootToGPPSpikePath, true).setGlobalMaxPower(1.0)
             )
 
         );

@@ -21,12 +21,6 @@ public class HoldPoseCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        robot.follower.setStartingPose(holdPose);
-        robot.follower.update();
-    }
-
-    @Override
-    public void execute() {
         robot.follower.followPath(
                 robot.follower.pathBuilder()
                         .addPath(new BezierLine(robot.follower.getPose(), holdPose))
@@ -37,6 +31,11 @@ public class HoldPoseCommand extends CommandBase {
                         .build(),
                 true
         );
+    }
+
+    @Override
+    public void execute() {
+
         robot.follower.update();
     }
 

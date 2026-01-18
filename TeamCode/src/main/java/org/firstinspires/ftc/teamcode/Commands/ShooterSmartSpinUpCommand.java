@@ -14,6 +14,7 @@ public class ShooterSmartSpinUpCommand extends CommandBase {
     public ShooterSmartSpinUpCommand(Shooter shooterSubsystem, Vision vision) {
         this.shooter = shooterSubsystem;
         this.vision = vision;
+        addRequirements(shooter);
     }
 
     @Override

@@ -91,8 +91,6 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public SensorColor colorSensor;
 
     public Vision vision;
-//    public Feeder feederF, feederR;
-//    public Gate gate;
     public Popper popper;
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
@@ -113,18 +111,17 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         shooterMotor = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
         spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
 
-//        CRServo feederServoF = new CRServo(hardwareMap, "feederServoF");
-//        CRServo feederServoR = new CRServo(hardwareMap, "feederServoR");
+
         ServoEx popperServoL = new ServoEx(hardwareMap, "popperServoL");
         ServoEx popperServoR = new ServoEx(hardwareMap, "popperServoR");
 
-//        ServoEx gateServo = new ServoEx(hardwareMap, "gateServo");
+
 
         ServoEx rgbServo = new ServoEx(hardwareMap, "rgbServo");
 
         webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
         //limelight = hwMap.get(Limelight3A.class, "limelight");  //dreaming
-        //sensorColor = new SensorColor(hardwareMap, "slot1Color");
+
         slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
         slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
         slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
@@ -142,8 +139,6 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         //Instantiate Subsystems
         mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         intake  = new Intake(intakeMotor);
-//        feederF  = new Feeder(feederServoF);
-//        feederR = new Feeder(feederServoR);
         popper= new Popper(popperServoL, popperServoR);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);

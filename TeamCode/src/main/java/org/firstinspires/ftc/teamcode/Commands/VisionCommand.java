@@ -9,7 +9,7 @@ public class VisionCommand extends CommandBase {
 
     public VisionCommand(Vision vision) {
         this.vision = vision;
-        addRequirements(vision);
+//        addRequirements(vision);
     }
 
     @Override

@@ -45,8 +45,6 @@ public class MainTeleOp extends CommandOpMode {
     private final Robot robot = Robot.getInstance();
     static TelemetryManager telemetryM;
     Pose currentPose;
-//    private ShootMotifCommand shootMotifCommand;
-//    ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
 
     public static double current_velocity = 3200;
     public double increment = 25;
@@ -83,10 +81,8 @@ public class MainTeleOp extends CommandOpMode {
         Pose startPose = robot.autoEndPose != null ? robot.autoEndPose : new Pose(24, 24, 0);
         robot.follower.setStartingPose(startPose);
         robot.follower.update();
-        //only schedule perpetually running commands
-//        schedule(new DriveCommand(robot.mecanumDrive, gamepad1));
         schedule(new VisionCommand(robot.vision));
-        schedule(new DetectArtifactCommand(robot.rgbLight, robot.colorMatch)); //, robot.shooter));
+        schedule(new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, gamepad2)); //, robot.shooter));
 
         driver = new GamepadEx(gamepad1);
         operator = new GamepadEx(gamepad2);
@@ -143,7 +139,8 @@ public class MainTeleOp extends CommandOpMode {
 
 
 
-        /* ******************************************************************************* */
+        //******DRIVER CONTROLS*****
+
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new InstantCommand(robot.mecanumDrive::enableSnailDrive))
                 .whenReleased(new InstantCommand(robot.mecanumDrive::disableSnailDrive));
@@ -166,23 +163,23 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.BACK)
                 .whenPressed(new CancelPedroCommand());
 
-
+        //driver-assisted shoot command
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(
                         new SequentialCommandGroup(
-                                //Spin up shooter while driving to far shoot pose
+                                new DriveToPoseCommand(robot.getShootPose(), driver),
                                 new ParallelCommandGroup(
-                                        new ShooterSpinUpCommand(robot.shooter, 3850),
-                                        new DriveToPoseCommand(robot.getShootPose(), driver)
+                                    //Hold the pose as defensive strategy
+                                    new HoldPoseCommand(robot.getShootPose(), driver),
+                                    //Motif shoot command
+                                    new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
                                 ),
-                                //Hold the pose as defensive strategy
-                                new HoldPoseCommand(robot.getShootPose(), driver),
-                                //Motif shoot command
-                                new ShootMotifCommand(robot.juggler, robot.popper, robot.colorMatch, robot.vision),
-                                //Spin down shooter
-                                new ShooterSpinUpCommand(robot.shooter, 0),
-                                //End the path hold
-                                new InstantCommand(() -> robot.follower.breakFollowing())
+                                new ParallelCommandGroup(
+                                    //Spin down shooter
+                                    new ShooterSpinUpCommand(robot.shooter, 0),
+                                    //End the path hold
+                                    new InstantCommand(() -> robot.follower.breakFollowing())
+                                )
                         )
                 );
 
@@ -257,23 +254,7 @@ public class MainTeleOp extends CommandOpMode {
     }
 
 
-//    PathChain createDrivePath(Pose targetPose) {
-//
-//        currentPose =robot.follower.getPose();
-//
-////        endPGPToShootPath= robot.follower.pathBuilder()
-////                .addPath(new BezierLine(collectPGPPose, shootFarPose))
-////                .setConstantHeadingInterpolation(Math.toRadians(-66))
-////                .build();
-//
-//        PathChain pathToShoot = robot.follower.pathBuilder()
-//                .addPath(new BezierLine(currentPose, robot.getShootPose()))
-//                .setConstantHeadingInterpolation(Math.toRadians(robot.getShootPose().getHeading())
-//                )
-//                .build();
-//
-//        return pathToShoot;
-//    }
+
 
 }
 
