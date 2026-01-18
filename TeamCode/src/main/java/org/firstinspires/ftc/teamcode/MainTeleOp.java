@@ -196,8 +196,6 @@ public class MainTeleOp extends CommandOpMode {
         AprilTagDetection tag = robot.vision.getFirstTargetTag();
 
 
-
-
         if (tag != null) {
             telemetry.addLine("Target Tag Detected!");
             telemetry.addData("ID", tag.id);

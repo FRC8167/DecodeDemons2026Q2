@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
@@ -91,6 +93,10 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public SensorColor colorSensor;
 
     public Vision vision;
+    public LimeLightVision limey;
+
+//    public Feeder feederF, feederR;
+//    public Gate gate;
     public Popper popper;
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
@@ -111,24 +117,21 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         shooterMotor = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
         spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
 
-
+//        CRServo feederServoF = new CRServo(hardwareMap, "feederServoF");
+//        CRServo feederServoR = new CRServo(hardwareMap, "feederServoR");
         ServoEx popperServoL = new ServoEx(hardwareMap, "popperServoL");
         ServoEx popperServoR = new ServoEx(hardwareMap, "popperServoR");
 
-
+//        ServoEx gateServo = new ServoEx(hardwareMap, "gateServo");
 
         ServoEx rgbServo = new ServoEx(hardwareMap, "rgbServo");
 
         webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
         //limelight = hwMap.get(Limelight3A.class, "limelight");  //dreaming
-
+        //sensorColor = new SensorColor(hardwareMap, "slot1Color");
         slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
         slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
         slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
-
-
-
-
 
         ctrlHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : ctrlHubs) {
@@ -139,11 +142,16 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         //Instantiate Subsystems
         mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         intake  = new Intake(intakeMotor);
+//        feederF  = new Feeder(feederServoF);
+//        feederR = new Feeder(feederServoR);
         popper= new Popper(popperServoL, popperServoR);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
         spindexerMotor.resetEncoder();  //added 01-18
+
         vision  = new Vision(webCam1);
+//        limey = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
+
         rgbLight = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
 //        gate = new Gate(gateServo);

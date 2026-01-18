@@ -15,7 +15,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 @Configurable
-@TeleOp(name="TeleOp_Look", group="Competition")
+@TeleOp(name="TeleOp_Look", group="TestOps")
 public class Telop_LookUpTable extends OpMode {
 
     private final Robot robot = Robot.getInstance();

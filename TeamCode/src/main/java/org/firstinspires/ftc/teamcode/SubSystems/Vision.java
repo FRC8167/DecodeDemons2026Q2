@@ -160,8 +160,6 @@ public class Vision extends SubsystemBase {
 private ColorMatch.ArtifactColor[] latchedMotif = null;
 
 
-
-
     public ColorMatch.ArtifactColor[] getMotifPattern() {
         AprilTagDetection tag = getFirstTargetTag();
         if (tag == null) return null;
@@ -179,8 +177,6 @@ private ColorMatch.ArtifactColor[] latchedMotif = null;
     }
 
 
-
-
     public double getDistanceToGoal() {
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 20  || detection.id == 24) {
@@ -190,16 +186,12 @@ private ColorMatch.ArtifactColor[] latchedMotif = null;
         return Double.NaN; //what is Dave?
     }
 
+
     public void latchMotif() {
         ColorMatch.ArtifactColor[] current = getMotifPattern();
         if (current != null) {
             latchedMotif = current.clone();
         }
-    }
-
-    public String getLatchedMotifString() {
-        if (latchedMotif == null) return "Not latched";
-        return latchedMotif[0] + " - " + latchedMotif[1] + " - " + latchedMotif[2];
     }
 
 
@@ -208,11 +200,5 @@ private ColorMatch.ArtifactColor[] latchedMotif = null;
     }
 
 
-
-
-    @Override
-    public void periodic() {
-        scanForAprilTags();
-    }
 
 }
