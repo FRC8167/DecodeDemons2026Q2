@@ -160,7 +160,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         //Set default command for RGBLight using the registered colorMatch
         DetectArtifactCommand detectArtifactCommand =
-                new DetectArtifactCommand(rgbLight, colorMatch); //, shooter);
+                new DetectArtifactCommand(rgbLight, colorMatch, null); //, shooter);
         rgbLight.setDefaultCommand(detectArtifactCommand);
 
         //Register Subsystems

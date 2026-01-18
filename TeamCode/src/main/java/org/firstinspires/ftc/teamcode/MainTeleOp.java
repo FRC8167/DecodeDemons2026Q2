@@ -163,7 +163,7 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.BACK)
                 .whenPressed(new CancelPedroCommand());
 
-        //driver-assisted shoot command
+        //driver-assisted shoot commands
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(
                         new SequentialCommandGroup(
@@ -183,8 +183,19 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
-        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(
-            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
+        driver.getGamepadButton(GamepadKeys.Button.A)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                new DriveToPoseCommand(robot.getShootPose(), driver),
+                                //Hold the pose as defensive strategy
+                                 new HoldPoseCommand(robot.getShootPose(), driver)
+                                )
+
+                );
+
+
+//        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(
+//            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
 
     }
 
