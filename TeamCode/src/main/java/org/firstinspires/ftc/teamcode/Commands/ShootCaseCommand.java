@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.Commands;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
-import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
@@ -19,15 +17,7 @@ public class ShootCaseCommand extends CommandBase {
     private final ColorMatch colorMatch;
     private final Vision vision;
 
-    private String caseKey;
-    private int step;
-    private boolean rotating = false;
-    private boolean popping = false;
-    private boolean spinningUp = false;
-
-    private final ElapsedTime timer = new ElapsedTime();
-    private static final long POP_TIME_MS = 500;
-    private static final long SPINUP_TIME_MS = 400; // time to reach target RPM
+    private SequentialCommandGroup sequence;
 
     public ShootCaseCommand(
             Juggler juggler,
@@ -41,167 +31,93 @@ public class ShootCaseCommand extends CommandBase {
         this.shooter = shooter;
         this.colorMatch = colorMatch;
         this.vision = vision;
-
-        addRequirements(juggler, popper);
     }
 
     @Override
     public void initialize() {
         ColorMatch.ArtifactColor[] motif = vision.getLatchedMotif();
-        caseKey = buildCaseKey(motif, colorMatch);
+        String caseKey = buildCaseKey(motif, colorMatch);
 
-        if (caseKey.contains("U")) {
-            caseKey = "UNKNOWN";
-        }
+        if (caseKey.contains("U")) {caseKey = "UNKNOWN";}
+        sequence = buildSequence(caseKey);
+        sequence.schedule();
 
-        step = 0;
-        rotating = false;
-        popping = false;
-
-        popper.set(Popper.PopperState.RESET);
-        timer.reset();
     }
-
-    @Override
-    public void execute() {
-
-        switch (caseKey) {
-            //stack cases when branches are duplicates
-            case "MPGPJPGP":
-            case "MPPGJPPG":
-            case "MGPPJGPP":
-                // motif and slots already match
-                runSteps(
-                        () -> justPop(),  // first ball
-                        () -> rotateThenPop(Juggler.Direction.CW),  // second ball
-                        () -> rotateThenPop(Juggler.Direction.CW)  // third ball
-                );
-                break;
-
-            case "MPGPJPPG":
-            case "MPPGJPGP":
-                runSteps(
-                        () -> justPop(),
-                        () -> rotateThenPop(Juggler.Direction.CCW),
-                        () -> rotateThenPop(Juggler.Direction.CCW)
-                );
-                break;
-
-            case "MPGPJGPP":
-                runSteps(
-                        () -> rotateThenPop(Juggler.Direction.CCW),
-                        () -> rotateThenPop(Juggler.Direction.CW),
-                        () -> rotateThenPop(Juggler.Direction.CW)
-                );
-                break;
-
-            case "MPPGJGPP":
-            case "MGPPJPGP":
-                new SequentialCommandGroup(
-                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
-                        new ShooterSmartSpinUpCommand(shooter, vision),
-                        new PopandResetCommand(popper),
-                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
-                        new ShooterSmartSpinUpCommand(shooter, vision),
-                        new PopandResetCommand(popper),
-                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
-                        new ShooterSmartSpinUpCommand(shooter, vision),
-                        new PopandResetCommand(popper),
-                        new ShooterSpinUpCommand(shooter,
-                                0.0)
-                );
-                break;
-
-            case "MGPPJPPG":
-            case "UNKNOWN":
-                runSteps(
-                        () -> rotateThenPop(Juggler.Direction.CW),
-                        () -> rotateThenPop(Juggler.Direction.CW),
-                        () -> rotateThenPop(Juggler.Direction.CW)
-                );
-                break;
-        }
-    }
-
-    private void runSteps(Runnable s0, Runnable s1, Runnable s2) {
-        if (step == 0) s0.run();
-        else if (step == 1) s1.run();
-        else if (step == 2) s2.run();
-    }
-
-
-    private void justPop() {
-
-        //Spin up shooter
-        if (!spinningUp) {
-            shooter.setVelocity(3850);  // start shooter motor
-            spinningUp = true;
-            return;
-        }
-        // Wait until shooter at target velocity
-        if (!shooter.atTargetVelocity()) return;
-
-        // Cycle the poppers
-        if (!popping) {
-            popper.set(Popper.PopperState.KICK);
-            timer.reset();
-            popping = true;
-            return;
-        }
-        //Wait a 1/2 second and then reset poppers
-        if (timer.milliseconds() < POP_TIME_MS) return;
-        //Reset poppers and stop shooter
-        popper.set(Popper.PopperState.RESET);
-        shooter.stop();
-        //shooter.setVelocity(0);
-        //Finish the cycle
-        spinningUp = false;
-        popping = false;
-        step+=1;
-    }
-
-
-    private void rotateThenPop(Juggler.Direction dir) {
-        if (!rotating) {
-            juggler.rotateOneSlot(dir);
-            rotating = true;
-//            return;
-        }
-        if (juggler.atTarget()) rotating = false;
-
-        //Spin up shooter
-        if (!spinningUp) {
-            shooter.setVelocity(3850);  // start shooter motor
-            spinningUp = true;
-        }
-        // Wait until shooter at target velocity
-//        if (!shooter.atTargetVelocity()) return;
-
-        // Cycle the poppers
-        if(!popping){
-//        if (shooter.atTargetVelocity() && !popping) {
-            popper.set(Popper.PopperState.KICK);
-            timer.reset();
-            popping = true;
-        }
-        //Wait a 1/2 second and then reset poppers
-        if (timer.milliseconds() < POP_TIME_MS) return;
-
-        //Reset poppers and stop shooter
-        popper.set(Popper.PopperState.RESET);
-        shooter.stop();
-        //shooter.setVelocity(0);
-        //Finish the cycle
-        spinningUp = false;
-        popping = false;
-        step+=1;
-    }
-
 
     @Override
     public boolean isFinished() {
-        return step >= 3;
+        return true;
     }
+
+    private SequentialCommandGroup buildSequence(String key) {
+
+        switch (key) {
+
+            case "MPPGJGPP":
+            case "MGPPJPPG":
+                return new SequentialCommandGroup(
+                        new ShooterSmartSpinUpCommand(shooter, vision),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
+                        new PopandResetCommand(popper),
+                        // Spin shooter down shooter
+                        new ShooterSpinUpCommand(shooter, 0.0)
+                );
+
+            case "MPPGJPGP":
+                return new SequentialCommandGroup(
+                        new ShooterSmartSpinUpCommand(shooter, vision),
+                        // Shoot then rotate CW and shoot repeated 2 times
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
+                        new PopandResetCommand(popper),
+                        // Spin shooter down shooter
+                        new ShooterSpinUpCommand(shooter, 0.0)
+                );
+
+            case "MGPPJPGP":
+                return new SequentialCommandGroup(
+                        // Spin up shooter at start of sequence
+                        new ShooterSmartSpinUpCommand(shooter, vision),
+                        // Rotate CW and shoot repeated 3 times
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
+                        new PopandResetCommand(popper),
+                        // Spin shooter down shooter
+                        new ShooterSpinUpCommand(shooter, 0.0)
+                );
+
+
+
+            case "MPPGJPPG":
+            case "MPGPJPGP":
+            case "MGPPJGPP":
+            case "UNKNOWN":
+            default:
+                return new SequentialCommandGroup(
+                        new ShooterSmartSpinUpCommand(shooter, vision),
+                        // Shoot then rotate CW and shoot repeated 2 times
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
+                        new PopandResetCommand(popper),
+                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
+                        new PopandResetCommand(popper),
+                        // Spin shooter down shooter
+                        new ShooterSpinUpCommand(shooter, 0.0)
+                );
+        }
+    }
+
+
+
 
     private String buildCaseKey(
             ColorMatch.ArtifactColor[] motif,
