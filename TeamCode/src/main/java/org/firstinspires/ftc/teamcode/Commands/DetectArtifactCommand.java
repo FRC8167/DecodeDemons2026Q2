@@ -2,29 +2,34 @@ package org.firstinspires.ftc.teamcode.Commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Gamepad;
+
+
 
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
-import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
+
 
 public class DetectArtifactCommand extends CommandBase {
 
     private final RGBLight rgbLight;
     private final ColorMatch colorMatch;
-    //private final Shooter shooter;
+    private final Gamepad operator;
     Robot robot = Robot.getInstance();
 
     private final ElapsedTime flashTimer = new ElapsedTime();
     private final double flashInterval = 0.5; // seconds
 
     private boolean lightOn = true;
+    private boolean hasRumbled = false;
+
     private RGBLight.LightColor currentColor = RGBLight.LightColor.OFF;
 
-    public DetectArtifactCommand(RGBLight rgbLight, ColorMatch colorMatch) { //, Shooter shooter) {
+    public DetectArtifactCommand(RGBLight rgbLight, ColorMatch colorMatch, Gamepad operator) { //, Shooter shooter) {
         this.rgbLight = rgbLight;
         this.colorMatch = colorMatch;
-        //this.shooter = shooter;
+        this.operator = operator;
         addRequirements(rgbLight); // only RGBLight is a hardware subsystem
     }
 
@@ -35,8 +40,7 @@ public class DetectArtifactCommand extends CommandBase {
 
     @Override
     public void execute() {
-
-        ColorMatch.ArtifactColor detected =
+                ColorMatch.ArtifactColor detected =
                 colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
 
         switch (detected) {
@@ -46,33 +50,42 @@ public class DetectArtifactCommand extends CommandBase {
             case PURPLE:
                 currentColor = RGBLight.LightColor.VIOLET;
                 break;
-            case RED:
-                currentColor = RGBLight.LightColor.RED;
-                break;
-            case UNKNOWN:
             default:
                 currentColor = RGBLight.LightColor.BLUE;
                 break;
         }
 
-
-
         if (robot.shooter.atTargetVelocity()) {
-            // flash LED
-            if (flashTimer.seconds() >= flashInterval) {
-                lightOn = !lightOn; // toggle
-                flashTimer.reset();
+
+            if (Robot.OP_MODE_TYPE == Robot.OpModeType.AUTO) {
+                // AUTO: flash LED
+                if (flashTimer.seconds() >= flashInterval) {
+                    lightOn = !lightOn;
+                    flashTimer.reset();
+                }
+
+            } else {
+                // TELEOP: rumble once + solid LED
+                if (!hasRumbled && operator != null) {
+                    operator.rumble(200);
+                    hasRumbled = true;
+                }
+                lightOn = true;
             }
+
             if (lightOn) {
                 rgbLight.setColor(currentColor);
             } else {
                 rgbLight.off();
             }
+
         } else {
-            // LED solid
+            // Shooter not ready → solid color, reset rumble latch
             rgbLight.setColor(currentColor);
+            hasRumbled = false;
         }
     }
+
 
     @Override
     public boolean isFinished() {

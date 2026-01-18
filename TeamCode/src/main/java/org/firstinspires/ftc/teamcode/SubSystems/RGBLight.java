@@ -20,6 +20,7 @@ public class RGBLight extends SubsystemBase {
     public static final double BLUE_POS  = 0.611;
     public static final double INDIGO_POS= 0.666;
     public static final double VIOLET_POS= 0.722;
+    public static final double PINK_POS = 0.75;
     public static final double WHITE_POS = 1.000;
 
     public enum LightColor {
@@ -33,6 +34,7 @@ public class RGBLight extends SubsystemBase {
         BLUE,
         INDIGO,
         VIOLET,
+        PINK,
         WHITE
     }
 
@@ -56,6 +58,7 @@ public class RGBLight extends SubsystemBase {
             case BLUE:    return BLUE_POS;
             case INDIGO:  return INDIGO_POS;
             case VIOLET:  return VIOLET_POS;
+            case PINK:    return PINK_POS;
             case WHITE:   return WHITE_POS;
             case OFF:
             default:      return OFF_POS;
