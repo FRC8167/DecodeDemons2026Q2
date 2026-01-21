@@ -27,8 +27,6 @@ public class Shooter extends SubsystemBase {
         public static double tolerance= 100.0;  //RPMs
 
 
-
-
     public static final InterpLUT distanceToRPM;
         static{
             distanceToRPM = new InterpLUT();
@@ -60,6 +58,7 @@ public class Shooter extends SubsystemBase {
 
         public void stop() {
             targetRPM = 0;
+            shooterPID.setSetPoint(0.0);
         }
 
         @Override
@@ -69,10 +68,10 @@ public class Shooter extends SubsystemBase {
             shooterPID.setPIDF(kp, ki, kd, kv);
             shooterPID.setTolerance(convertRPMToTicksPerSec(tolerance));
 
-            if(shooterPID.getSetPoint() < 10)  {
+            double currentVelocity = shooterMotor.getVelocity();
+            if(shooterPID.getSetPoint() < 1)  {
                 output = 0;
             } else {
-                double currentVelocity = shooterMotor.getVelocity();
                 output = shooterPID.calculate(currentVelocity, ticksPerSec);
             }
             shooterMotor.set(output);

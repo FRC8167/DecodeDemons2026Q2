@@ -17,11 +17,13 @@ public class ShooterSpinUpCommand extends CommandBase {
     @Override
     public void initialize() {
 //        shooterSubsystemTest.setVelocity(0.0);
+        shooter.setVelocity(targetRPM);
+
     }
+
 
     @Override
     public void execute() {
-        shooter.setVelocity(targetRPM);
     }
 
     @Override

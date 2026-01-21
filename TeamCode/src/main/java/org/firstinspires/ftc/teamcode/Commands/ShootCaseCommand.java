@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Commands;
 
-import com.seattlesolvers.solverslib.command.CommandBase;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
@@ -9,15 +9,13 @@ import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 
-public class ShootCaseCommand extends CommandBase {
+public class ShootCaseCommand extends SequentialCommandGroup {
 
     private final Juggler juggler;
     private final Popper popper;
     private final Shooter shooter;
     private final ColorMatch colorMatch;
     private final Vision vision;
-
-    private SequentialCommandGroup sequence;
 
     public ShootCaseCommand(
             Juggler juggler,
@@ -31,30 +29,36 @@ public class ShootCaseCommand extends CommandBase {
         this.shooter = shooter;
         this.colorMatch = colorMatch;
         this.vision = vision;
-        addRequirements(juggler, popper, shooter);
-    }
 
-    @Override
-    public void initialize() {
+        // Attempt to read the motif
         ColorMatch.ArtifactColor[] motif = vision.getLatchedMotif();
+
+        // If motif is missing, schedule a jiggle to help the sensor
+        if (motif == null || motif.length < 3) {
+
+            // Retry reading after jiggle
+            motif = vision.getLatchedMotif();
+        }
+
+
+        int attempts = 0;
+        // Build case key safely
         String caseKey = buildCaseKey(motif, colorMatch);
 
-        if (caseKey.contains("U")) {caseKey = "UNKNOWN";}
-        sequence = buildSequence(caseKey);
-        sequence.schedule();
+//        while (attempts < 2 && caseKey.contains("U")) {
+//
+//                caseKey = "UNKNOWN";
+//                new JiggleCommand(juggler).schedule();
+//                attempts += 1;
+//            }
 
-    }
-
-    @Override
-    public boolean isFinished() {
-        return true;
+        addCommands(buildSequence(caseKey));
     }
 
     private SequentialCommandGroup buildSequence(String key) {
-
         switch (key) {
 
-            case "MPGPJGPP":  //weirdest case
+            case "MPGPJGPP":
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
@@ -63,12 +67,11 @@ public class ShootCaseCommand extends CommandBase {
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
                         new PopandResetCommand(popper),
-                        // Spin shooter down shooter
                         new ShooterSpinUpCommand(shooter, 0.0)
                 );
 
-            case "MPPGJGPP":  //could also work all CW
-            case "MGPPJPPG":  //must be CCW
+            case "MPPGJGPP":
+            case "MGPPJPPG":
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
@@ -77,69 +80,61 @@ public class ShootCaseCommand extends CommandBase {
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
                         new PopandResetCommand(popper),
-                        // Spin shooter down shooter
                         new ShooterSpinUpCommand(shooter, 0.0)
                 );
 
-            case "MPPGJPGP":   //one ready to go and must be CCW after
-            case "MPGPJPPG":  //same as above
+            case "MPPGJPGP":
+            case "MPGPJPPG":
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
-                        // Shoot then rotate CW and shoot repeated 2 times
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1),
                         new PopandResetCommand(popper),
-                        // Spin shooter down shooter
                         new ShooterSpinUpCommand(shooter, 0.0)
                 );
 
-            case "MGPPJPGP":  //must be CW
+            case "MGPPJPGP":
                 return new SequentialCommandGroup(
-                        // Spin up shooter at start of sequence
                         new ShooterSmartSpinUpCommand(shooter, vision),
-                        // Rotate CW and shoot repeated 3 times
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
                         new PopandResetCommand(popper),
-                        // Spin shooter down shooter
                         new ShooterSpinUpCommand(shooter, 0.0)
                 );
 
-
-
-            case "MPPGJPPG":  //one ready and all CW subsequent must be CW
-            case "MPGPJPGP":  //same as above
-            case "MGPPJGPP":  //same as above
-            case "UNKNOWN":  //could be CCW as well
+            case "MPPGJPPG":
+            case "MPGPJPGP":
+            case "MGPPJGPP":
+            case "UNKNOWN":
             default:
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
-                        // Shoot then rotate CW and shoot repeated 2 times
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
                         new PopandResetCommand(popper),
                         new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1),
                         new PopandResetCommand(popper),
-                        // Spin shooter down shooter
-                        new ShooterSpinUpCommand(shooter, 0.0)
+                        new InstantCommand(shooter::stop)
                 );
         }
     }
 
-
-
-
     private String buildCaseKey(
             ColorMatch.ArtifactColor[] motif,
             ColorMatch colorMatch
-    ) {
-        StringBuilder sb = new StringBuilder("M");
 
+    ) {
+        if (motif == null || motif.length < 3) {
+
+            return "UNKNOWN";
+        }
+
+        StringBuilder sb = new StringBuilder("M");
         for (ColorMatch.ArtifactColor c : motif) {
             sb.append(colorToChar(c));
         }
@@ -159,4 +154,6 @@ public class ShootCaseCommand extends CommandBase {
             default:     return 'U';
         }
     }
+
+
 }

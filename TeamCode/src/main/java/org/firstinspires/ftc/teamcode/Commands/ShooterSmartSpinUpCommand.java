@@ -34,7 +34,7 @@ public class ShooterSmartSpinUpCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-            shooter.stop();
+//            shooter.stop();
 
     }
 }

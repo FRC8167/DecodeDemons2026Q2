@@ -28,17 +28,14 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @Autonomous(name="AutoBlueFar", preselectTeleOp = "MainTeleOp", group="Competition")
 public class AutoBlueFar extends CommandOpMode {
     Robot robot = Robot.getInstance();
-
     private ElapsedTime timer;
-
-
     private final Pose startPose = new Pose(64, 9, Math.toRadians(90));
-    private final Pose rotatedPose = new Pose(56, 12, Math.toRadians(117.5));
+    private final Pose rotatedPose = new Pose(56, 12, Math.toRadians(140));
     private final Pose artifactsGPPPose = new Pose(56, 35.0, Math.toRadians(180));
-    private final Pose collectGPPPose = new Pose(12, 35.0, Math.toRadians(180));
+    private final Pose collectGPPPose = new Pose(18, 35.0, Math.toRadians(180));
     private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(117.5));
     private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
-    private final Pose collectPGPPose = new Pose(12, 60, Math.toRadians(180));
+    private final Pose collectPGPPose = new Pose(18, 60, Math.toRadians(180));
 
     private PathChain rotateToShootPath, shootToGPPSpikePath, eatGPPPath, endGPPToShootPath, shootToPGPSpikePath,
             eatPGPPath, endPGPToShootPath;
@@ -97,79 +94,81 @@ public class AutoBlueFar extends CommandOpMode {
             throw new RuntimeException(e);
         }
 
-
         buildPaths();
 
-
-
         schedule(
-            new ParallelCommandGroup(
-                new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
-                new VisionCommand(robot.vision),
-                    new SequentialCommandGroup(
-                            new WaitCommand(250),
-                            new InstantCommand(() -> {
-                                if (robot.vision.getMotifPattern() != null) {
-                                    robot.rgbLight.setColor(RGBLight.LightColor.PINK);
-                                } else {
-                                    robot.rgbLight.setColor(RGBLight.LightColor.RED);
-                                }
-                            }),
-                            new FollowPathCommand(robot.follower, rotateToShootPath, true),
-                        //shoot pre-loaded artifacts
+                new ParallelCommandGroup(
+                        // Artifact detection & vision
+                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
+                        new VisionCommand(robot.vision),
+
+                        new SequentialCommandGroup(
+                                new WaitCommand(250),
+                                new InstantCommand(robot.vision::latchMotif),
+                                new WaitCommand(250),
+                                new InstantCommand(() -> {
+                                    if (robot.vision.getMotifPattern() != null) {
+                                        robot.rgbLight.setColor(RGBLight.LightColor.PINK);
+                                    } else {
+                                        robot.rgbLight.setColor(RGBLight.LightColor.RED);
+                                    }
+                                }),
+
+
+                        // Move to rotated shoot pose
+                        new FollowPathCommand(robot.follower, rotateToShootPath, true),
+
+                        // Shoot pre-loaded artifacts
                         new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-                        //move to spike 1
+
+                        // Move to spike 1
                         new FollowPathCommand(robot.follower, shootToGPPSpikePath, true),
-                        //gobble up the balls on spike 1
-//                        new ParallelCommandGroup(
-//                            new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000),
-//                            new FollowPathCommand( robot.follower, eatGPPPath, true).setGlobalMaxPower(0.75),
-//                            new InstantCommand(()->robot.juggler.rotateTwoSlots(Juggler.Direction.CW))
-//                        ),  //try the slow rotate????
+
+                        // Collect balls on spike 1 safely
                         new ParallelDeadlineGroup(
-                             //first command controls timing
-                             new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2000),
-                             new FollowPathCommand(robot.follower, eatGPPPath, true).setGlobalMaxPower(0.75),
-                             new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
+                                new FollowPathCommand(robot.follower, eatGPPPath, true).setGlobalMaxPower(0.35), // timing
+                                new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2000),
+                                new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
                         ),
 
-                        //move to shoot position and shut down intake
+                        // Move to shoot position and stop intake
                         new ParallelCommandGroup(
-                            new IntakeCommand(robot.intake, Intake.MotorState.STOP,  250),
-                            new FollowPathCommand(robot.follower, endGPPToShootPath, true).setGlobalMaxPower(1.0)
-                      ),
-                        //shoot the artifacts from spike 1
+                                new FollowPathCommand(robot.follower, endGPPToShootPath, true).setGlobalMaxPower(1.0),
+                                new IntakeCommand(robot.intake, Intake.MotorState.STOP, 250)
+                        ),
+
+                        // Shoot artifacts from spike 1
                         new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
-                        //move to spike 2
-                        new FollowPathCommand(robot.follower, shootToPGPSpikePath, true).setGlobalMaxPower(1.0)),
+                        // Move to spike 2
+                        new FollowPathCommand(robot.follower, shootToPGPSpikePath, true).setGlobalMaxPower(1.0),
 
-                        //gobble up spike 2 balls
-                        new ParallelCommandGroup(
-                            new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000),
-                            new FollowPathCommand( robot.follower, eatPGPPath, true).setGlobalMaxPower(0.75)
-                            ),
-
-                        //move to shoot position and shut down intake
-                        new ParallelCommandGroup(
-                            new IntakeCommand(robot.intake, Intake.MotorState.STOP,100),
-                            new FollowPathCommand(robot.follower, endPGPToShootPath, true).setGlobalMaxPower(1.0)
+                        // Collect balls on spike 2
+                        new ParallelDeadlineGroup(
+                                new FollowPathCommand(robot.follower, eatPGPPath, true).setGlobalMaxPower(0.75),
+                                new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2000)
                         ),
 
-                        //shoot the artifacts from spike 2
-                      new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                        // Move to shoot position and stop intake
+                        new ParallelCommandGroup(
+                                new FollowPathCommand(robot.follower, endPGPToShootPath, true).setGlobalMaxPower(1.0),
+                                new IntakeCommand(robot.intake, Intake.MotorState.STOP, 100)
+                        ),
 
-                      //park outside of launch zone
-                      new FollowPathCommand(robot.follower, shootToGPPSpikePath, true).setGlobalMaxPower(1.0)
-            )
+                        // Shoot artifacts from spike 2
+                        new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
+                        // Park outside launch zone
+                        new FollowPathCommand(robot.follower, shootToGPPSpikePath, true).setGlobalMaxPower(1.0)
+                )
+                )
         );
-    }
+        }
 
 
 
 
-    @Override
+        @Override
     public void run() {
         super.run();
         AprilTagDetection tag = robot.vision.getFirstTargetTag();

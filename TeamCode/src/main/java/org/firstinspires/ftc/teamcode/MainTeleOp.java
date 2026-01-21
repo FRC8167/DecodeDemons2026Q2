@@ -156,9 +156,9 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(()->robot.popper.set(Popper.PopperState.RESET)));
 
 
-
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
+
 
         driver.getGamepadButton(GamepadKeys.Button.BACK)
                 .whenPressed(new CancelPedroCommand());
@@ -236,7 +236,7 @@ public class MainTeleOp extends CommandOpMode {
 //        telemetryM.addData("Obelisk Motif", robot.vision.getLatchedMotifString());
 
 
-
+        telemetry.addData("Popperstate", robot.popper.getPopperState());
         telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
         telemetry.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
 //        telemetry.addData("Juggler counts", robot.juggler.getCurrentPosition());
