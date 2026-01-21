@@ -48,14 +48,14 @@ public class LimeLightVision extends SubsystemBase {
     @Override
     public void periodic() {
         result = ll.getLatestResult();
-
+        
         if (result.isValid() && result != null) {
 //            // Access general information
 
 
             // Get April Tag results
             fiducials = result.getFiducialResults();
-        }
+        } else fiducials = null;
 //            for (LLResultTypes.FiducialResult fiducial : fiducials) {
 //                int id = fiducial.getFiducialId(); // The ID number of the fiducial
 //                double x = fiducial.getTargetXDegrees(); // Where it is (left-right)
