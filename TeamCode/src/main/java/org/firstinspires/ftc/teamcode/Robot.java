@@ -56,47 +56,21 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
     public Telemetry telemetry;
 
-
     public Pose autoEndPose = null;
     public static OpModeType OP_MODE_TYPE;
     static List<LynxModule> ctrlHubs;
 
-    public MotorEx driveMotorRF;
-    public MotorEx driveMotorLF;
-    public MotorEx driveMotorRR;
-    public MotorEx driveMotorLR;
-
-    public MotorEx intakeMotor;
-    public MotorEx shooterMotor;
-    public MotorEx spindexerMotor;
-    public ServoEx popperServoL;
-    public ServoEx popperServoR;
-
-//    public SensorColor sensorColor;
-    public SensorColor slot0Sensor;
-    public SensorColor slot1Sensor;
-    public SensorColor slot2Sensor;
-    public Follower follower;
-
-    public WebcamName webCam1;
-//    public Limelight3A limelight;
-
     public GoBildaPinpointDriver pinpoint;
 
-
+    public Follower follower;
     public MecanumDrive mecanumDrive;
-
-
     public Intake intake;
     public Shooter shooter;
     public Juggler juggler;
     public SensorColor colorSensor;
-
     public Vision vision;
     public LimeLightVision limey;
 
-//    public Feeder feederF, feederR;
-//    public Gate gate;
     public Popper popper;
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
@@ -104,34 +78,29 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
     public void init(HardwareMap hardwareMap) throws InterruptedException {
 
-
         // Hardware
-        driveMotorRF = new MotorEx(hardwareMap, "RightFront").setCachingTolerance(0.01);
-        driveMotorLF = new MotorEx(hardwareMap, "LeftFront").setCachingTolerance(0.01);
-        driveMotorLR = new MotorEx(hardwareMap, "LeftRear").setCachingTolerance(0.01);
-        driveMotorRR = new MotorEx(hardwareMap, "RightRear").setCachingTolerance(0.01);
+        MotorEx driveMotorRF = new MotorEx(hardwareMap, "RightFront").setCachingTolerance(0.01);
+        MotorEx driveMotorLF = new MotorEx(hardwareMap, "LeftFront").setCachingTolerance(0.01);
+        MotorEx driveMotorLR = new MotorEx(hardwareMap, "LeftRear").setCachingTolerance(0.01);
+        MotorEx driveMotorRR = new MotorEx(hardwareMap, "RightRear").setCachingTolerance(0.01);
 
         follower = Constants.createFollower(hardwareMap);
 
-        intakeMotor = new MotorEx(hardwareMap, "Intake").setCachingTolerance(0.01);
-        shooterMotor = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
-        spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
+        MotorEx intakeMotor    = new MotorEx(hardwareMap, "Intake").setCachingTolerance(0.01);
+        MotorEx shooterMotor   = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
+        MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
+        spindexerMotor.resetEncoder();  //added 01-18
 
-//        CRServo feederServoF = new CRServo(hardwareMap, "feederServoF");
-//        CRServo feederServoR = new CRServo(hardwareMap, "feederServoR");
         ServoEx popperServoL = new ServoEx(hardwareMap, "popperServoL");
         ServoEx popperServoR = new ServoEx(hardwareMap, "popperServoR");
 
-//        ServoEx gateServo = new ServoEx(hardwareMap, "gateServo");
-
         ServoEx rgbServo = new ServoEx(hardwareMap, "rgbServo");
 
-        webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
-        //limelight = hwMap.get(Limelight3A.class, "limelight");  //dreaming
+        //WebcamName webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
         //sensorColor = new SensorColor(hardwareMap, "slot1Color");
-        slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
-        slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
-        slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
+        SensorColor slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
+        SensorColor slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
+        SensorColor slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
 
         ctrlHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : ctrlHubs) {
@@ -142,20 +111,13 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         //Instantiate Subsystems
         mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         intake  = new Intake(intakeMotor);
-//        feederF  = new Feeder(feederServoF);
-//        feederR = new Feeder(feederServoR);
-        popper= new Popper(popperServoL, popperServoR);
+        popper  = new Popper(popperServoL, popperServoR);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
-        spindexerMotor.resetEncoder();  //added 01-18
-
-        vision  = new Vision(webCam1);
+        vision  = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
 //        limey = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
-
         rgbLight = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
-//        gate = new Gate(gateServo);
-
 
 
         //Set default command for RGBLight using the registered colorMatch

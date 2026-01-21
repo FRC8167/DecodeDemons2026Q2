@@ -50,26 +50,24 @@ public class LimeLightVision extends SubsystemBase {
         result = ll.getLatestResult();
 
         if (result.isValid() && result != null) {
-            // Access general information
-            Pose3D botpose = result.getBotpose();
-            double captureLatency = result.getCaptureLatency();
-            double targetingLatency = result.getTargetingLatency();
-            double parseLatency = result.getParseLatency();
+//            // Access general information
+
 
             // Get April Tag results
             fiducials = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult fiducial : fiducials) {
-                int id = fiducial.getFiducialId(); // The ID number of the fiducial
-                double x = fiducial.getTargetXDegrees(); // Where it is (left-right)
-                double y = fiducial.getTargetYDegrees(); // Where it is (up-down)
         }
+//            for (LLResultTypes.FiducialResult fiducial : fiducials) {
+//                int id = fiducial.getFiducialId(); // The ID number of the fiducial
+//                double x = fiducial.getTargetXDegrees(); // Where it is (left-right)
+//                double y = fiducial.getTargetYDegrees(); // Where it is (up-down)
+//        }
 
 //            fiducial.getRobotPoseTargetSpace(); // Robot pose relative to the AprilTag Coordinate System (Most Useful)
 //            fiducial.getCameraPoseTargetSpace(); // Camera pose relative to the AprilTag (useful)
 //            fiducial.getRobotPoseFieldSpace(); // Robot pose in the field coordinate system based on this tag alone (useful)
 //            fiducial.getTargetPoseCameraSpace(); // AprilTag pose in the camera's coordinate system (not very useful)
 //            fiducial.getTargetPoseRobotSpace(); // AprilTag pose in the robot's coordinate system (not very useful)
-        }
+//        }
     }
 
 
@@ -87,10 +85,6 @@ public class LimeLightVision extends SubsystemBase {
 
     public void setPipeline(int pipeline) {
         ll.pipelineSwitch(pipeline);
-    }
-
-    public int getCurrentPipeline() {
-        return result.getPipelineIndex();
     }
 
 
@@ -116,6 +110,15 @@ public class LimeLightVision extends SubsystemBase {
      */
     public LLStatus getStatus() {
         return  ll.getStatus();
+    }
+
+    public LLResult getALLResults() {
+        if (result != null && result.isValid()) return result;
+        else return null;
+    }
+
+    public List<LLResultTypes.FiducialResult> getAprilTags() {
+        return fiducials;
     }
 
 
