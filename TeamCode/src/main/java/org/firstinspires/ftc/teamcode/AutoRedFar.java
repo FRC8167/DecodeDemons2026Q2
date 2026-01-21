@@ -111,7 +111,7 @@ private final Pose startPose = MirrorUtility.mirror(new Pose(64+2, 9, Math.toRad
 
         schedule(
                 new ParallelCommandGroup(
-                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch),// robot.shooter),
+                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),// robot.shooter),
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(

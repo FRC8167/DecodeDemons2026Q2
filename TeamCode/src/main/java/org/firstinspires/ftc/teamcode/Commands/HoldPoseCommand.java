@@ -9,25 +9,36 @@ import org.firstinspires.ftc.teamcode.Robot;
 public class HoldPoseCommand extends CommandBase {
 
     private final Robot robot;
-    private final Pose holdPose;
     private final GamepadEx driver;
+    private final Pose targetPose; // the pose passed in (can be null)
+    private Pose holdPose;         // resolved pose at initialize
 
-    public HoldPoseCommand(Pose holdPose, GamepadEx driver) {
+    //Hold CURRENT POSE
+//    public HoldPoseCommand(GamepadEx driver) {
+//        this.robot = Robot.getInstance();
+//        this.driver = driver;
+//        this.targetPose = robot.follower.getPose();    // null = capture current pose
+//        addRequirements(robot.mecanumDrive);
+//    }
+
+    // Hold SPECIFIC POSE
+    public HoldPoseCommand(Pose pose, GamepadEx driver) {
         this.robot = Robot.getInstance();
-        this.holdPose = holdPose;
         this.driver = driver;
+        this.targetPose = pose;    // use this specific pose
         addRequirements(robot.mecanumDrive);
     }
 
     @Override
     public void initialize() {
+        // Decide which pose to hold
+        holdPose = (targetPose != null) ? targetPose : robot.follower.getPose();
+
+        // Command the follower to hold this pose
         robot.follower.followPath(
                 robot.follower.pathBuilder()
-                        .addPath(new BezierLine(robot.follower.getPose(), holdPose))
-                        .setLinearHeadingInterpolation(
-                                robot.follower.getPose().getHeading(),
-                                holdPose.getHeading()
-                        )
+                        .addPath(new BezierLine(holdPose, holdPose)) // zero-length path
+                        .setLinearHeadingInterpolation(holdPose.getHeading(), holdPose.getHeading())
                         .build(),
                 true
         );
@@ -35,16 +46,19 @@ public class HoldPoseCommand extends CommandBase {
 
     @Override
     public void execute() {
-
         robot.follower.update();
     }
 
     @Override
     public boolean isFinished() {
-        // Driver override to end hold
-        return Math.abs(driver.getLeftY()) > 0.1 ||
-                Math.abs(driver.getLeftX()) > 0.1 ||
-                Math.abs(driver.getRightX()) > 0.1;
+        // Only stop if holding current pose and driver moves sticks
+//        if (targetPose == null) {
+            return Math.abs(driver.getLeftY()) > 0.1 ||
+                    Math.abs(driver.getLeftX()) > 0.1 ||
+                    Math.abs(driver.getRightX()) > 0.1;
+//        } else {
+//            return false; // holding a fixed pose ignores stick input
+//        }
     }
 
     @Override

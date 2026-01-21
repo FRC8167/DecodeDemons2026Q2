@@ -98,7 +98,7 @@ public class AutoRedClose extends CommandOpMode {
 
         schedule(
                 new ParallelCommandGroup(
-                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch), // robot.shooter),
+                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null), // robot.shooter),
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
