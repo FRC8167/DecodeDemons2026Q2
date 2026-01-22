@@ -30,11 +30,11 @@ public class Shooter extends SubsystemBase {
     public static final InterpLUT distanceToRPM;
         static{
             distanceToRPM = new InterpLUT();
-            distanceToRPM.add(42.0, 2650.0);
-            distanceToRPM.add(69.0, 2950.0);
-            distanceToRPM.add(94.0, 3250.0);
-            distanceToRPM.add(99.0, 3300.0);
-            distanceToRPM.add(120.0, 3575.0);
+            distanceToRPM.add(42.0, 2650.0+50);
+            distanceToRPM.add(69.0, 2950.0+50);
+            distanceToRPM.add(94.0, 3250.0+50);
+            distanceToRPM.add(99.0, 3300.0+50);
+            distanceToRPM.add(120.0, 3575.0+50);
 
             //in and RPM
             distanceToRPM.createLUT();
