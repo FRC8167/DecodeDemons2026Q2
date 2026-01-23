@@ -145,7 +145,7 @@ public class LimeLightVision extends SubsystemBase {
     public double getDistanceToGoal() {
         for (LLResultTypes.FiducialResult fiducial : fiducials) {
             if(fiducial.getFiducialId() == 20 || fiducial.getFiducialId() == 23){
-                return fiducial.getRobotPoseTargetSpace().getPosition().x;
+                return fiducial.getRobotPoseTargetSpace().getPosition().z;
             }
         }
         return Double.NaN; //what is Dave?

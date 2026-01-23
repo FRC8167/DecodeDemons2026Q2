@@ -115,7 +115,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
         vision  = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
-        limey   = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
+//        limey   = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
         rgbLight   = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
 
