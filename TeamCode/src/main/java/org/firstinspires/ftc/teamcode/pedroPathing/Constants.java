@@ -54,7 +54,7 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(
         0.99,   // max power?
         100,     // max velocity?
-        0.5,    // accel?
+        0.75,    // accel?
         1.0     // decel?
 );
 
