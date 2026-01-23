@@ -4,6 +4,7 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
@@ -41,7 +42,7 @@ public class ShootCaseCommand extends CommandBase {
         super.initialize();
         // Attempt to read the motif
         ColorMatch.ArtifactColor[] motif = vision.getLatchedMotif();
-        assert motif != null;
+//        assert motif != null;  //this was causing the crash!
 
 //        // If motif is missing, schedule a jiggle to help the sensor
 //        if (motif == null || motif.length < 3) {
@@ -62,6 +63,9 @@ public class ShootCaseCommand extends CommandBase {
 //                attempts += 1;
 //            }}
         sequence = buildSequence(caseKey);
+        if (sequence == null) {
+            sequence = new SequentialCommandGroup();
+        }
         sequence.initialize();
 //        throw new RuntimeException("Motif: " + Arrays.toString(motif) +"\n"+"Key: "+caseKey);
 
@@ -175,6 +179,7 @@ public class ShootCaseCommand extends CommandBase {
                             new ShooterSmartSpinUpCommand(shooter, vision),
                             new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1)
                         ),
+//                        new WaitCommand(500),
                         new PopandResetCommand(popper),
                         new ParallelCommandGroup(
                                 new ShooterSmartSpinUpCommand(shooter, vision),

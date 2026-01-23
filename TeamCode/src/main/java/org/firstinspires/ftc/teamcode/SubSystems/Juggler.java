@@ -58,7 +58,7 @@ public class Juggler extends SubsystemBase {
 
     public void startSlowSpin(Direction direction) {
         slowSpinEnabled = true;
-        slowSpinPower = 0.2 * direction.sign;
+        slowSpinPower = 0.38 * direction.sign;
     }
 
     public void Snap() {

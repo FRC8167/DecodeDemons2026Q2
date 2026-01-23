@@ -24,18 +24,19 @@ public class Shooter extends SubsystemBase {
         public static double kp = 0.00045;
         public static double ki = 0.05;
         public static double kd = 0.00008;
-        public static double tolerance= 100.0;  //RPMs
+        public static double tolerance= 20.0;  //RPMs
 
 
     public static final InterpLUT distanceToRPM;
         static{
             distanceToRPM = new InterpLUT();
-            distanceToRPM.add(42.0, 2650.0+100);
-            distanceToRPM.add(69.0, 2950.0+100);
-            distanceToRPM.add(94.0, 3250.0+100);
-            distanceToRPM.add(99.0, 3300.0+100);
-            distanceToRPM.add(120.0, 3575.0+100);
-            distanceToRPM.add(130, 3700);
+            distanceToRPM.add(41.0, 2900);
+            distanceToRPM.add(45.0, 2950);
+            distanceToRPM.add(70.0, 2975);
+            distanceToRPM.add(87.0, 3165);
+            distanceToRPM.add(115.0, 3475);
+            distanceToRPM.add(123.0, 3775);
+            distanceToRPM.add(138.0, 3900);
 
             //in and RPM
             distanceToRPM.createLUT();
@@ -105,13 +106,13 @@ public class Shooter extends SubsystemBase {
 
         public void smartVelocity(double ATdistance) {
             double targetRPM = 0.0;
-            if (ATdistance > 42 && ATdistance < 130){
+            if (ATdistance > 41 && ATdistance < 138){
                 targetRPM = distanceToRPM.get(ATdistance);
 
             }
             else
             {
-                targetRPM = 3575;
+                targetRPM = 3775;
             }
             ticksPerSec = convertRPMToTicksPerSec(targetRPM);
             shooterPID.setSetPoint(ticksPerSec);

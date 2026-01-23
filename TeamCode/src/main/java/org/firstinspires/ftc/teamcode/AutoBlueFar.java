@@ -34,12 +34,12 @@ public class AutoBlueFar extends CommandOpMode {
     Robot robot = Robot.getInstance();
     private ElapsedTime timer;
     private final Pose startPose = new Pose(61, 9, Math.toRadians(90));
-    private final Pose rotatedPose = new Pose(58, 12, Math.toRadians(110));
+    private final Pose rotatedPose = new Pose(58, 12, Math.toRadians(110.5));
     private final Pose artifactsGPPPose = new Pose(42, 37, Math.toRadians(180));
-    private final Pose collectGPPPose = new Pose(18, 37, Math.toRadians(180));
-    private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(110));
+    private final Pose collectGPPPose = new Pose(16, 37, Math.toRadians(180));
+    private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(110.5));
     private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
-    private final Pose collectPGPPose = new Pose(18, 60, Math.toRadians(180));
+    private final Pose collectPGPPose = new Pose(16, 60, Math.toRadians(180));
 
     private PathChain rotateToShootPath, shootToGPPSpikePath, eatGPPPath, endGPPToShootPath, shootToPGPSpikePath,
             eatPGPPath, endPGPToShootPath;
@@ -127,14 +127,13 @@ public class AutoBlueFar extends CommandOpMode {
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
                                 // Move to spike 1
-                                new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),//.setGlobalMaxPower(.4),
+                                new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),
 
 
-                                new ParallelCommandGroup(
-                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.6),
+                                new ParallelDeadlineGroup(
+                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 3000, 0.6),
                                     new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),// ming
-                                    new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
-
+                                    new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
                                 ),
 
                                 // Move to shoot position and stop intake
@@ -150,10 +149,11 @@ public class AutoBlueFar extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, shootToPGPSpikePath),
 
                                 // Collect balls on spike 2
-                                new ParallelCommandGroup(
-                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),//.setGlobalMaxPower(0.35),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.6),
-                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
+                                new ParallelDeadlineGroup(
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 3000, 0.6),
+                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),
+//                                        new RotateXSlotsCommand
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
                                 ),
 
                                 // Move to shoot position and stop intake

@@ -24,7 +24,8 @@ public class ShooterSmartSpinUpCommand extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.smartVelocity(vision.getDistanceToGoal());
+        shooter.
+                smartVelocity(vision.getDistanceToGoal());
     }
 
     @Override
