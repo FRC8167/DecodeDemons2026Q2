@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 
-
+import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
@@ -24,7 +24,7 @@ public class DetectArtifactCommand extends CommandBase {
     private boolean lightOn = true;
     private boolean hasRumbled = false;
 
-    private RGBLight.LightColor currentColor = RGBLight.LightColor.OFF;
+    private Color currentColor = Color.BLACK;
 
     public DetectArtifactCommand(RGBLight rgbLight, ColorMatch colorMatch, Gamepad operator) { //, Shooter shooter) {
         this.rgbLight = rgbLight;
@@ -45,13 +45,13 @@ public class DetectArtifactCommand extends CommandBase {
 
         switch (detected) {
             case GREEN:
-                currentColor = RGBLight.LightColor.GREEN;
+                currentColor = Color.GREEN;
                 break;
             case PURPLE:
-                currentColor = RGBLight.LightColor.VIOLET;
+                currentColor = Color.VIOLET;
                 break;
             default:
-                currentColor = RGBLight.LightColor.BLUE;
+                currentColor = Color.BLUE;
                 break;
         }
 

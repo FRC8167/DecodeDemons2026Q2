@@ -18,7 +18,7 @@ public class Popper extends SubsystemBase {
         this.popperServoR = popperServoR;
 
         popperServoL.set(0.47);
-        popperServoR.set(0.46);
+        popperServoR.set(0.47);
     }
 
     public void set(PopperState state) {

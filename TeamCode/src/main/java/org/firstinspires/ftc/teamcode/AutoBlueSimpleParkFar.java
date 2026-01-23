@@ -6,6 +6,7 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
@@ -89,7 +90,7 @@ public class AutoBlueSimpleParkFar extends CommandOpMode {
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000, 0.5)
                                 ),
                                 //move to park
                                 new ParallelCommandGroup(
@@ -97,7 +98,7 @@ public class AutoBlueSimpleParkFar extends CommandOpMode {
                                         new ShooterSpinUpCommand(robot.shooter,0.0),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 250),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,250)
+                                        new InstantCommand(()->robot.intake.stop())
                                 )
 
                         )

@@ -10,11 +10,13 @@ public class IntakeCommand extends CommandBase {
     private final Intake.MotorState motorState;
     private final ElapsedTime timer = new ElapsedTime();
     private final double duration;
+    private final double power;
 
-    public IntakeCommand(Intake intake, Intake.MotorState motorState, double duration){
+    public IntakeCommand(Intake intake, Intake.MotorState motorState, double duration, double power){
         this.intake = intake;
         this.motorState = motorState;
         this.duration = duration;
+        this.power = power;
         addRequirements(intake);
     }
 
@@ -23,6 +25,8 @@ public class IntakeCommand extends CommandBase {
     public void initialize() {
         timer.reset();
         intake.setMotorState(motorState);
+        intake.setIntakePower(power);
+        intake.setIntakeState();
     }
 
     @Override
@@ -38,7 +42,7 @@ public class IntakeCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        intake.off();
+        intake.stop();
     }
 
 }
