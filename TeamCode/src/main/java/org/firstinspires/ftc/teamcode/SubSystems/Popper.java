@@ -17,20 +17,20 @@ public class Popper extends SubsystemBase {
         this.popperServoL = popperServoL;
         this.popperServoR = popperServoR;
 
-        popperServoL.set(0.53);
-        popperServoR.set(1 - 0.53);
+        popperServoL.set(0.47);
+        popperServoR.set(0.47);
     }
 
     public void set(PopperState state) {
         currentState = state;
         switch (state) {
             case KICK:
-                popperServoL.set(0.25);
-                popperServoR.set(1 - 0.25);
+                popperServoL.set(0.75);//.25
+                popperServoR.set(.75);
                 break;
             case RESET:
-                popperServoL.set(0.53);
-                popperServoR.set(1 - 0.53);
+                popperServoL.set(0.47);//.54
+                popperServoR.set(.47);
                 break;
         }
     }

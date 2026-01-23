@@ -12,15 +12,16 @@ public class Intake extends SubsystemBase{
 
     private boolean isRunning;
 
-    private Double fSpeed = 0.75;
-    private Double rSpeed = -0.5;
+    private final double fSpeed = 0.75;
+    private final double rSpeed = -0.5;
+    private double speed = 0;
     public MotorState motorstate = MotorState.STOP;
 
 
     public Intake (MotorEx intakeMotor){
         this.intakeMotor = intakeMotor;
         intakeMotor.setInverted(true);
-        off();
+        stop();
     }
 
     public enum MotorState{
@@ -34,13 +35,19 @@ public class Intake extends SubsystemBase{
        setIntakeState();
    }
 
+
+   public void setIntakePower(double power){
+       this.speed = power;
+       intakeMotor.set(power);
+   }
+
    public void setIntakeState()  {
        switch(motorstate) {
            case FORWARD:
-               intakeMotor.set(fSpeed);
+               intakeMotor.set(speed);
                break;
            case REVERSE:
-               intakeMotor.set(rSpeed);
+               intakeMotor.set(-speed);
                break;
            case STOP:
                default:
@@ -51,7 +58,7 @@ public class Intake extends SubsystemBase{
    }
 
 
-    public void off(){
+    public void stop(){
         intakeMotor.set(0.0);
         isRunning = false;
     }
@@ -59,7 +66,7 @@ public class Intake extends SubsystemBase{
 
     public void forward() {
         if (isRunning){
-            off();
+            stop();
         } else{
             intakeMotor.set(fSpeed);
             isRunning = true;}
@@ -68,7 +75,7 @@ public class Intake extends SubsystemBase{
 
     public void reverse(){
         if (isRunning){
-            off();
+            stop();
         }else{
         intakeMotor.set(rSpeed);
         isRunning = true;}

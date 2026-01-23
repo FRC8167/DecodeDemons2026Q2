@@ -6,6 +6,7 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
@@ -117,7 +118,7 @@ public class AutoRedClose extends CommandOpMode {
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 2000),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000, 0.5)
                                 ),
                                 //move to nearest spike while shutting off intake, feeders, and shooter
                                 new ParallelCommandGroup(
@@ -131,7 +132,7 @@ public class AutoRedClose extends CommandOpMode {
                                 //gobble up artifacts on nearest spike
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1750),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1750),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1750, 0.5),
                                         new FollowPathCommand( robot.follower, path3, true).setGlobalMaxPower(0.75)
                                 ),
 
@@ -142,7 +143,7 @@ public class AutoRedClose extends CommandOpMode {
 
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,  250),
+                                        new InstantCommand(()->robot.intake.stop()),
                                         new FollowPathCommand(robot.follower, path4, true).setGlobalMaxPower(1.0)
 
                                 ),
@@ -159,7 +160,7 @@ public class AutoRedClose extends CommandOpMode {
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 3000),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 3000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000, 0.5)
                                 ),
                                 //move to middle spike and shut off systems
                                 new ParallelCommandGroup(
@@ -174,11 +175,11 @@ public class AutoRedClose extends CommandOpMode {
                                 new ParallelCommandGroup(
                                         new FollowPathCommand( robot.follower, path7, true),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000, 0.5)
                                 ),
 //                                new ParallelCommandGroup(
 //                                        new GateCommand(robot.gate, Gate.GateState.CLOSED),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000, 0.5)
                                 ),
                                 //prepare and move to shoot position
                                 new ParallelCommandGroup(
@@ -187,7 +188,7 @@ public class AutoRedClose extends CommandOpMode {
                                         new ShooterSpinUpCommand(robot.shooter, 3400),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,  100)
+                                        new InstantCommand(()->robot.intake.stop())
 
                                 ),
 
@@ -201,7 +202,7 @@ public class AutoRedClose extends CommandOpMode {
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 3000),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 3000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000, 0.5)
                                 ),
                                 //park outside  of launch zone and power down systems
                                 new ParallelCommandGroup(
@@ -210,7 +211,7 @@ public class AutoRedClose extends CommandOpMode {
                                         new ShooterSpinUpCommand(robot.shooter,0.0),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP, 100)
+                                        new InstantCommand(()->robot.intake.stop())
                                 )
                         )
 

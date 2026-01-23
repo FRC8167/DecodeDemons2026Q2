@@ -19,6 +19,8 @@ import org.firstinspires.ftc.teamcode.SubSystems.Gate;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import kotlin.time.Instant;
+
 
 //@Disabled
 @Autonomous(name="AutoBlueClose" ,preselectTeleOp = "MainTeleOp", group="Competition")
@@ -117,7 +119,7 @@ public class AutoBlueClose extends CommandOpMode {
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000, 0.5)
                                 ),
                                 //move to nearest spike while shutting off intake, feeders, and shooter
                                 new ParallelCommandGroup(
@@ -126,12 +128,11 @@ public class AutoBlueClose extends CommandOpMode {
                                         new ShooterSpinUpCommand(robot.shooter,0.0),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,100)
-                                ),
+                                        new InstantCommand(()->robot.intake.stop()),
                                 //gobble up artifacts on nearest spike
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1750),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1750),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1750, 0.5),
                                         new FollowPathCommand( robot.follower, path3, true).setGlobalMaxPower(0.75)
                                 ),
 
@@ -139,10 +140,8 @@ public class AutoBlueClose extends CommandOpMode {
 
 //                                new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,  250),
-                                        new FollowPathCommand(robot.follower, path4, true).setGlobalMaxPower(1.0)
-
-                                ),
+                                        new InstantCommand(()->robot.intake.stop()),
+                                        new FollowPathCommand(robot.follower, path4, true, 0.6),
                                 //get ready to shoot
                                 new ShooterSpinUpCommand(robot.shooter, 3400),
                                 //shoot first artifact
@@ -156,7 +155,7 @@ public class AutoBlueClose extends CommandOpMode {
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 3000),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 3000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000, 0.6)
                                 ),
                                 //move to middle spike and shut off systems
                                 new ParallelCommandGroup(
@@ -164,14 +163,14 @@ public class AutoBlueClose extends CommandOpMode {
                                         new ShooterSpinUpCommand(robot.shooter, 0.0),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,  100)
+                                        new InstantCommand(()->robot.intake.stop())
 //                                        new GateCommand(robot.gate, Gate.GateState.OPEN)
                                 ),
                                 //gobble up middle spike artifacts
                                 new ParallelCommandGroup(
                                         new FollowPathCommand( robot.follower, path7, true),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000, 0.6)
                                 ),
 //                                new GateCommand(robot.gate, Gate.GateState.CLOSED),
                                 //prepare and move to shoot position
@@ -181,7 +180,7 @@ public class AutoBlueClose extends CommandOpMode {
                                         new ShooterSpinUpCommand(robot.shooter, 3400),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP,  100)
+                                        new InstantCommand(()->robot.intake.stop())
 
                                 ),
 
@@ -195,7 +194,7 @@ public class AutoBlueClose extends CommandOpMode {
                                 new ParallelCommandGroup(
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 3000),
 //                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 3000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000, 0.6)
                                 ),
                                 //park outside  of launch zone and power down systems
                                 new ParallelCommandGroup(
@@ -206,8 +205,9 @@ public class AutoBlueClose extends CommandOpMode {
 //                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
 //                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP, 100)
                                 )
+                                )
                         )
-
+                )
         );
 
     }

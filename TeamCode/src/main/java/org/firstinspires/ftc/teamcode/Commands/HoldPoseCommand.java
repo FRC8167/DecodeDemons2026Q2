@@ -26,23 +26,35 @@ public class HoldPoseCommand extends CommandBase {
         this.robot = Robot.getInstance();
         this.driver = driver;
         this.targetPose = pose;    // use this specific pose
-        addRequirements(robot.mecanumDrive);
+//        addRequirements(robot.mecanumDrive);
     }
 
     @Override
     public void initialize() {
-        // Decide which pose to hold
-        holdPose = (targetPose != null) ? targetPose : robot.follower.getPose();
+        holdPose = (targetPose != null)
+                ? targetPose
+                : robot.follower.getPose();
 
-        // Command the follower to hold this pose
         robot.follower.followPath(
                 robot.follower.pathBuilder()
-                        .addPath(new BezierLine(holdPose, holdPose)) // zero-length path
-                        .setLinearHeadingInterpolation(holdPose.getHeading(), holdPose.getHeading())
+                        .addPath(new BezierLine(
+                                new Pose(
+                                        holdPose.getX() - 0.01,
+                                        holdPose.getY(),
+                                        holdPose.getHeading()
+                                ),
+                                new Pose(
+                                        holdPose.getX() + 0.01,
+                                        holdPose.getY(),
+                                        holdPose.getHeading()
+                                )
+                        ))
+                        .setConstantHeadingInterpolation(holdPose.getHeading())
                         .build(),
                 true
         );
     }
+
 
     @Override
     public void execute() {
