@@ -11,13 +11,20 @@ import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
+import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
+import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Gate;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.Arrays;
 
 import kotlin.time.Instant;
 
@@ -28,55 +35,65 @@ public class AutoBlueClose extends CommandOpMode {
     Robot robot = Robot.getInstance();
 
     private ElapsedTime timer;
-    private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(-45));
+    private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(135));
+    private final Pose latchPose = new Pose(58, 110, Math.toRadians(70));
     private final Pose artifactsPPGPose = new Pose(56, 84, Math.toRadians(180));
     private final Pose collectPPGPose = new Pose(24, 84, Math.toRadians(180));
-    private final Pose shootClosePose = new Pose(60, 78, Math.toRadians(-45));
-    private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
-    private final Pose collectPGPPose = new Pose(24, 60, Math.toRadians(180));
+    private final Pose shootClosePose = new Pose(60, 78, Math.toRadians(135));
+//    private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
+//    private final Pose collectPGPPose = new Pose(24, 60, Math.toRadians(180));
 
 
 
-    private PathChain path1, path2, path3, path4, path5, path6, path7, path8;
+    private PathChain startToLatchPath, latchToShootClosePath, shootCloseToSpike1Path, collectPPGArtifactsPath, spike1ToShootPath, parkPath;
 
     public void buildPaths() {
         robot.follower.setStartingPose(startPose);
 
 
-        path1 = robot.follower.pathBuilder()
-                .addPath(new BezierLine(startPose, shootClosePose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootClosePose.getHeading())
+        startToLatchPath = robot.follower.pathBuilder()
+                .addPath(new BezierLine(startPose, latchPose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), latchPose.getHeading())
                 .build();
 
-        path2 = robot.follower.pathBuilder()
+        latchToShootClosePath = robot.follower.pathBuilder()
+                .addPath(new BezierLine(latchPose, shootClosePose))
+                .setLinearHeadingInterpolation(latchPose.getHeading(), shootClosePose.getHeading())
+                .build();
+
+        shootCloseToSpike1Path = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, artifactsPPGPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setLinearHeadingInterpolation(shootClosePose.getHeading(), artifactsPPGPose.getHeading())
                 .build();
 
-        path3= robot.follower.pathBuilder()
+        collectPPGArtifactsPath= robot.follower.pathBuilder()
                 .addPath(new BezierLine(artifactsPPGPose, collectPPGPose))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
-        path4 = robot.follower.pathBuilder()
+        spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
                 .setConstantHeadingInterpolation(Math.toRadians(-45))
                 .build();
-        path5 = robot.follower.pathBuilder()
+        parkPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, collectPPGPose))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
-        path6 = robot.follower.pathBuilder()
-                .addPath(new BezierLine(shootClosePose, artifactPGPPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .build();
-        path7 = robot.follower.pathBuilder()
-                .addPath(new BezierLine(artifactPGPPose, collectPGPPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .build();
-        path8 = robot.follower.pathBuilder()
-                .addPath(new BezierLine(collectPGPPose ,shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(-45))
-                .build();
+//        path5 = robot.follower.pathBuilder()
+//                .addPath(new BezierLine(shootClosePose, collectPPGPose))
+//                .setConstantHeadingInterpolation(Math.toRadians(180))
+//                .build();
+//        path6 = robot.follower.pathBuilder()
+//                .addPath(new BezierLine(shootClosePose, artifactPGPPose))
+//                .setConstantHeadingInterpolation(Math.toRadians(180))
+//                .build();
+//        path7 = robot.follower.pathBuilder()
+//                .addPath(new BezierLine(artifactPGPPose, collectPGPPose))
+//                .setConstantHeadingInterpolation(Math.toRadians(180))
+//                .build();
+//        path8 = robot.follower.pathBuilder()
+//                .addPath(new BezierLine(collectPGPPose ,shootClosePose))
+//                .setConstantHeadingInterpolation(Math.toRadians(-45))
+//                .build();
     }
 
     public void initialize() {
@@ -102,113 +119,84 @@ public class AutoBlueClose extends CommandOpMode {
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
+                                //move to latch
+                                new FollowPathCommand(robot.follower, startToLatchPath, true),
+
+                                //latch
+                                new InstantCommand(()-> robot.vision.latchMotif()),
+
                                 //move to launch zone
-                                new ParallelCommandGroup(
-                                        new FollowPathCommand(robot.follower, path1, true),
-                                        new ShooterSpinUpCommand(robot.shooter, 3400)
-                                ),
-//                                new InstantCommand(() -> robot.vision.latchMotifFromTagIfEmpty()),
+                                new FollowPathCommand(robot.follower, latchToShootClosePath),
 
-                                //shoot first artifact
-                                new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
-                                ),
-                                new ShooterSpinUpCommand(robot.shooter, 3400),
-                                //shoot second artifact
-                                new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1000, 0.5)
-                                ),
-                                //move to nearest spike while shutting off intake, feeders, and shooter
-                                new ParallelCommandGroup(
-                                        new FollowPathCommand(robot.follower, path2, true),
-//                                        new GateCommand(robot.gate, Gate.GateState.OPEN),
-                                        new ShooterSpinUpCommand(robot.shooter,0.0),
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new InstantCommand(()->robot.intake.stop()),
-                                //gobble up artifacts on nearest spike
-                                new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1750),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  1750, 0.5),
-                                        new FollowPathCommand( robot.follower, path3, true).setGlobalMaxPower(0.75)
-                                ),
+                                //shoot pre-loaded artifacts
+                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
-//                                        new GateCommand(robot.gate, Gate.GateState.CLOSED),
-
-//                                new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 250),
-                                        new InstantCommand(()->robot.intake.stop()),
-                                        new FollowPathCommand(robot.follower, path4, true, 0.6),
-                                //get ready to shoot
-                                new ShooterSpinUpCommand(robot.shooter, 3400),
-                                //shoot first artifact
+                                //move to spike 1
+                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
+                                new FollowPathCommand(robot.follower, shootCloseToSpike1Path, true, 1.0),
 
                                 new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                        new FollowPathCommand(robot.follower, collectPPGArtifactsPath, true, 0.9),
+                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
                                 ),
-                                new ShooterSpinUpCommand(robot.shooter, 3400),
-                                //shoot second artifact
+                                //Move to shoot position and stop intake
                                 new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 3000),
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 3000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000, 0.6)
-                                ),
-                                //move to middle spike and shut off systems
-                                new ParallelCommandGroup(
-                                        new FollowPathCommand(robot.follower, path6, true),
-                                        new ShooterSpinUpCommand(robot.shooter, 0.0),
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
+                                        new FollowPathCommand(robot.follower, spike1ToShootPath, true, 1.0),
                                         new InstantCommand(()->robot.intake.stop())
-//                                        new GateCommand(robot.gate, Gate.GateState.OPEN)
-                                ),
-                                //gobble up middle spike artifacts
-                                new ParallelCommandGroup(
-                                        new FollowPathCommand( robot.follower, path7, true),
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 2000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  2000, 0.6)
-                                ),
-//                                new GateCommand(robot.gate, Gate.GateState.CLOSED),
-                                //prepare and move to shoot position
-                                new ParallelCommandGroup(
-
-                                        new FollowPathCommand(robot.follower, path8 , true),
-                                        new ShooterSpinUpCommand(robot.shooter, 3400),
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-                                        new InstantCommand(()->robot.intake.stop())
-
                                 ),
 
-                                new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 1000),
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 1000)
-                                ),
-                                new ShooterSpinUpCommand(robot.shooter, 3400),
+                                //shoot artifacts from spike1
+                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
-                                //shoot second artifact
-                                new ParallelCommandGroup(
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederR, 3000),
-//                                        new FeederCommand(Feeder.FeederState.FORWARD, robot.feederF, 3000),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD,  3000, 0.6)
-                                ),
-                                //park outside  of launch zone and power down systems
-                                new ParallelCommandGroup(
-//                                        new GateCommand(robot.gate, Gate.GateState.OPEN),
-                                        new FollowPathCommand(robot.follower, path5, true),
-                                        new ShooterSpinUpCommand(robot.shooter,0.0)
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederR, 100),
-//                                        new FeederCommand(Feeder.FeederState.STOP, robot.feederF, 100),
-//                                        new IntakeCommand(robot.intake, Intake.MotorState.STOP, 100)
-                                )
-                                )
+                                //park outside launch zone
+                                new FollowPathCommand(robot.follower, parkPath),
+                                new InstantCommand(()->robot.shooter.stop())
+
                         )
                 )
         );
+
+
+        // INIT loop prior to coach pressing start
+        while (opModeInInit()) {
+//            robot.vision.scanForAprilTags();
+//            robot.vision.latchMotif();
+//            if (robot.vision.getMotifPattern() != null) {
+//                robot.rgbLight.setColor(Color.AZURE);
+//            } else {
+//                robot.rgbLight.setColor(Color.RED);
+//            }
+            // Detect the slots
+            ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
+            ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
+            ColorMatch.ArtifactColor s2 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+
+            // Check if all slots are known
+            boolean ready = s0 != ColorMatch.ArtifactColor.UNKNOWN &&
+                    s1 != ColorMatch.ArtifactColor.UNKNOWN &&
+                    s2 != ColorMatch.ArtifactColor.UNKNOWN;
+
+            // Telemetry banner
+            telemetry.addLine("==============================");
+            telemetry.addLine(ready
+                    ? "     ✅ READY TO START AUTO"
+                    : "     ❌ REPOSITION ARTIFACTS"
+            );
+            telemetry.addLine("==============================");
+
+            // Show slot colors
+            telemetry.addData("Slot 0", s0);
+            telemetry.addData("Slot 1", s1);
+            telemetry.addData("Slot 2", s2);
+
+            telemetry.addLine("Hand-position artifacts on juggler");
+            telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getMotifPattern()));
+            telemetry.addData("LatchedMotif: ", Arrays.toString(robot.vision.getLatchedMotif()));
+            telemetry.update();
+        }
+
+
 
     }
 
@@ -219,6 +207,11 @@ public class AutoBlueClose extends CommandOpMode {
     public void run() {
         super.run();
         AprilTagDetection tag = robot.vision.getFirstTargetTag();
+        if (robot.vision.getMotifPattern() != null) {
+                robot.rgbLight.setColor(Color.AZURE);
+            } else {
+                robot.rgbLight.setColor(Color.RED);
+            }
         robot.follower.update();
         robot.follower.getPose();
         telemetry.addData("X:  ", robot.follower.getPose().getX());

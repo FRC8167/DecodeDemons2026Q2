@@ -56,13 +56,15 @@ public class ColorMatch extends SubsystemBase {
         float hue = hsv[0];
         float sat = hsv[1];
         float val = hsv[2];
-        if (val < 0.15 || sat < 0.35) {return ArtifactColor.UNKNOWN;}
+        //if (val < 0.15 || sat < 0.35) {return ArtifactColor.UNKNOWN;}
+
         if ((sat == 0 && hue == 0) || (sat == 1 && (hue == 120 || hue == 60))) // air is 120 and value !=0 for some reason
         {return ArtifactColor.UNKNOWN;}
 
 //        if (sat < 0.2 || val < 0.2) return ArtifactColor.UNKNOWN;
         if (hue > 70 && hue < 160 && hue !=120) return ArtifactColor.GREEN;
-        if (hue > 220 && hue < 300) return ArtifactColor.PURPLE;
+        if (hue > 220 && hue < 350) return ArtifactColor.PURPLE;
+
         return ArtifactColor.UNKNOWN;
     }
 

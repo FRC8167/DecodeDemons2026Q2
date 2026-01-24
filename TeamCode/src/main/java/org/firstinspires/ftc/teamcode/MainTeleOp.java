@@ -61,6 +61,7 @@ public class MainTeleOp extends CommandOpMode {
         Robot.OP_MODE_TYPE = Robot.OpModeType.TELEOP;
         // Resets the command scheduler
         super.reset();
+
         //Initialize the robot
         try {
             robot.init(hardwareMap);

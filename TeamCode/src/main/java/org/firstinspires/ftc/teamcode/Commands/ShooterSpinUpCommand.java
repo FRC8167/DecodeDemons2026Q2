@@ -12,6 +12,7 @@ public class ShooterSpinUpCommand extends CommandBase {
     public ShooterSpinUpCommand(Shooter shooterSubsystem, double targetRPM) {
         this.shooter= shooterSubsystem;
         this.targetRPM = targetRPM;
+        addRequirements(shooter);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class ShooterSpinUpCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-            shooter.stop();
+//            shooter.stop();
 
     }
 }
