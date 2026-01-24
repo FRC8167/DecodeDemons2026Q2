@@ -4,15 +4,12 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
-import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
-
-import java.util.Arrays;
 
 public class ShootCaseCommand extends CommandBase {
 
@@ -81,11 +78,23 @@ public class ShootCaseCommand extends CommandBase {
         return sequence.isFinished();
     }
 
+    private void SeqCmdAuto(String key, ColorMatch colorMatch){
+
+       colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
+
+    }
     private SequentialCommandGroup buildSequence(String key) {
+
+        if (colorMatch.detectColor(ColorMatch.Slot.SLOT_0) == ColorMatch.ArtifactColor.UNKNOWN)
+            new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
+
 
         switch (key) {
 
             case "MPGPJGPP":
+                if (colorMatch.detectColor(ColorMatch.Slot.SLOT_0) == ColorMatch.ArtifactColor.UNKNOWN)
+                    new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
+
                 return new SequentialCommandGroup(
                         new ParallelCommandGroup(
                             new ShooterSmartSpinUpCommand(shooter, vision),
@@ -107,6 +116,9 @@ public class ShootCaseCommand extends CommandBase {
 
             case "MPPGJGPP":
             case "MGPPJPPG":
+                if (colorMatch.detectColor(ColorMatch.Slot.SLOT_0) == ColorMatch.ArtifactColor.UNKNOWN)
+                    new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
+
                 return new SequentialCommandGroup(
                         new ParallelCommandGroup(
                             new ShooterSmartSpinUpCommand(shooter, vision),
@@ -128,6 +140,9 @@ public class ShootCaseCommand extends CommandBase {
 
             case "MPPGJPGP":
             case "MPGPJPPG":
+                if (colorMatch.detectColor(ColorMatch.Slot.SLOT_0) == ColorMatch.ArtifactColor.UNKNOWN)
+                    new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
+
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
                         new PopandResetCommand(popper),
@@ -145,6 +160,9 @@ public class ShootCaseCommand extends CommandBase {
                 );
 
             case "MGPPJPGP":
+                if (colorMatch.detectColor(ColorMatch.Slot.SLOT_0) == ColorMatch.ArtifactColor.UNKNOWN)
+                    new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
+
                 return new SequentialCommandGroup(
                         new ParallelCommandGroup(
                             new ShooterSmartSpinUpCommand(shooter, vision),
@@ -172,6 +190,8 @@ public class ShootCaseCommand extends CommandBase {
             case "MGPPJGGG":
             case "UNKNOWN":
             default:
+                if (colorMatch.detectColor(ColorMatch.Slot.SLOT_0) == ColorMatch.ArtifactColor.UNKNOWN)
+                    new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
                 return new SequentialCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
                         new PopandResetCommand(popper),
@@ -185,8 +205,8 @@ public class ShootCaseCommand extends CommandBase {
                                 new ShooterSmartSpinUpCommand(shooter, vision),
                                 new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1)
                         ),
-                        new PopandResetCommand(popper),
-                        new InstantCommand(shooter::stop)
+                        new PopandResetCommand(popper)
+//                        new InstantCommand(shooter::stop)
                 );
         }
     }
