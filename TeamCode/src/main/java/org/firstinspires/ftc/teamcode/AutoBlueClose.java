@@ -72,7 +72,7 @@ public class AutoBlueClose extends CommandOpMode {
                 .build();
         spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(-45))
+                .setConstantHeadingInterpolation(Math.toRadians(135))
                 .build();
         parkPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, collectPPGPose))
