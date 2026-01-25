@@ -103,6 +103,10 @@ public class LimeLightVision extends SubsystemBase {
     }
 
 
+    public double getYawToTarget() {
+        return result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+    }
+
     /**
      * Returns the LimeLight status object that contains the following:
      * Camera Name, temperature, CPU usage, frames per second, current pipeline and pipeline type

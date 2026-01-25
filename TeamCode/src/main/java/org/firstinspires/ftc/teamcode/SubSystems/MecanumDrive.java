@@ -83,25 +83,33 @@ public class  MecanumDrive extends SubsystemBase {
     /**
      * Drive with a constant heading
      *
-     * @param driveCmd
-     * @param strafeCmd
-     * @param turnCmd
-     * @param currentHeading
-     * @param headingDeg
+     * @param driveCmd          Drive command (FWD/REV) from Joystick Input
+     * @param strafeCmd         Strafe command from Joystick Input
+     * @param turnCmd           Turn command from Joystick Input
+     * @param cmdHeadingDeg     Desired Heading to Maintain
+     * @param currentHeading    Robots Current Heading
      */
-    public void driveWithHeading(double driveCmd, double strafeCmd, double turnCmd, double currentHeading, double headingDeg) {
+    public void driveWithHeading(double driveCmd, double strafeCmd, double turnCmd, double cmdHeadingDeg, double currentHeading) {
 
-        double error, gain, newTurnCmd;
+        double error, newTurnCmd;
         double headingCourseGain = 0.1;
-        double headingFineGain = 0.05;
+        double feedForwardGain = 0;
 
-        error = headingDeg - currentHeading;
+        error = cmdHeadingDeg - currentHeading;
+
         /* Need Angle Wrap calculation to ensure turning the shortest distance */
-        if (error > 10) {
-            newTurnCmd = Range.clip(headingCourseGain * error, -1.0, 1.0);
-        } else {
-            newTurnCmd = Range.clip(headingFineGain * error, -1.0, 1.0);
+        while (error > 180) {
+            error -= 2 * 180;
         }
+        while (error < -180) {
+            error += 2 * 180;
+        }
+
+        if (error >= 10 && error < 30) {     // Limit PID control range to +/- 30 degrees of target to eliminate angle wrap
+            newTurnCmd = Range.clip(headingCourseGain * error, -1.0, 1.0);
+        } else newTurnCmd = turnCmd;
+
+        newTurnCmd += (newTurnCmd > 0) ? feedForwardGain : -feedForwardGain;
 
         drive(driveCmd, strafeCmd, newTurnCmd);
     }
