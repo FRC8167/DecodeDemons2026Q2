@@ -34,7 +34,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
 //@Disabled
-@TeleOp(name="Tag Track Tuning", group="Testing")
+@TeleOp(name="Tag Track Tuning", group="TestOps")
 public class TeleOp_TagTrackTuning extends CommandOpMode {
 
     public GamepadEx driver;
