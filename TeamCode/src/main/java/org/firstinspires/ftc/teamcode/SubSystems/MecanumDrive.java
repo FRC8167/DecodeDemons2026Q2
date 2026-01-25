@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Robot;
 
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -14,6 +14,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
  * Handles low-level motor control and odometry updates.
  * Operator input handled in a separate DriveCommand.
  */
+@Configurable
 public class  MecanumDrive extends SubsystemBase {
 
     private final MotorEx frontLeft, backLeft, frontRight, backRight;
@@ -28,7 +29,14 @@ public class  MecanumDrive extends SubsystemBase {
         FIELD_ORIENTATION
     }
 
+    private double robotHeading, targetBearing;
+    private boolean targetValid;
     private DriveMode driveMode;
+
+    // Needed for Panels Tuning - Can be local variable values known
+    double Kp_Heading = 0.1;
+    double FFheading = 0;
+
 
     /**
      *
@@ -57,6 +65,7 @@ public class  MecanumDrive extends SubsystemBase {
 
         controlAuthority = MAX_AUTHORITY;
         driveMode = DriveMode.NORMAL;
+        targetValid = false;
 
         // Initialize motors
         setMotorPower(0, 0, 0, 0);
@@ -70,20 +79,74 @@ public class  MecanumDrive extends SubsystemBase {
      * @param strafeCmd left/right
      * @param turnCmd   rotation
      */
-    public void drive(double driveCmd, double strafeCmd, double turnCmd) {
+    public void calcDriveVals(double driveCmd, double strafeCmd, double turnCmd) {
 
-        double drive = driveCmd * controlAuthority;
-        double strafe = strafeCmd * controlAuthority;
-        double turn = turnCmd * controlAuthority;
+//        double drive  = driveCmd  * controlAuthority;
+//        double strafe = strafeCmd * controlAuthority;
+//        double turn   = turnCmd   * controlAuthority;
+//
+//        double denominator = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(turn), 1);
+//
+//        double frontLeftPower  = (drive + strafe + turn) / denominator;
+//        double backLeftPower   = (drive - strafe + turn) / denominator;
+//        double frontRightPower = (drive - strafe - turn) / denominator;
+//        double backRightPower  = (drive + strafe - turn) / denominator;
+//
+//        setMotorPower(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
 
-        double denominator = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(turn), 1);
+        /* New on 1/25 - Drive Mode Addition */
+        double denominator = Math.max(Math.abs(driveCmd) + Math.abs(strafeCmd) + Math.abs(turnCmd), 1);
 
-        double frontLeftPower  = (drive + strafe + turn) / denominator;
-        double backLeftPower   = (drive - strafe + turn) / denominator;
-        double frontRightPower = (drive - strafe - turn) / denominator;
-        double backRightPower  = (drive + strafe - turn) / denominator;
+        double frontLeftPower  = (driveCmd + strafeCmd + turnCmd) / denominator;
+        double backLeftPower   = (driveCmd - strafeCmd + turnCmd) / denominator;
+        double frontRightPower = (driveCmd - strafeCmd - turnCmd) / denominator;
+        double backRightPower  = (driveCmd + strafeCmd - turnCmd) / denominator;
 
         setMotorPower(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+    }
+
+
+    public void drive(double driveCmd, double strafeCmd, double turnCmd){
+
+        double error, newTurnCmd;
+        double drive, strafe, turn;
+
+        switch (driveMode) {
+
+            case NORMAL:
+                drive  = driveCmd  * controlAuthority;
+                strafe = strafeCmd * controlAuthority;
+                turn   = turnCmd   * controlAuthority;
+                calcDriveVals(drive, strafe, turn);
+                break;
+
+            case CONSTANT_HEADING:
+                if(targetValid) {
+                    error = targetBearing - robotHeading;
+
+                    /* Need Angle Wrap calculation to ensure turning the shortest distance */
+                    while (error > 180) {
+                        error -= 2 * 180;
+                    }
+                    while (error < -180) {
+                        error += 2 * 180;
+                    }
+
+                    newTurnCmd = Kp_Heading * error;
+                    newTurnCmd += (newTurnCmd > 0) ? FFheading : -FFheading;
+                    newTurnCmd = Range.clip(newTurnCmd, -1.0, 1.0);
+
+                } else {
+                    newTurnCmd = turnCmd;
+                }
+
+                calcDriveVals(driveCmd, strafeCmd, newTurnCmd);
+                break;
+
+            case FIELD_ORIENTATION:
+                break;
+
+        }
     }
 
 
@@ -175,11 +238,20 @@ public class  MecanumDrive extends SubsystemBase {
 
     public void setDriveMode(DriveMode driveMode) {
         this.driveMode = driveMode;
+        if(this.driveMode == DriveMode.NORMAL) targetValid = false;
     }
 
+    // Needed for Panels Tuning
+    public void setKpHeading(double kp){ Kp_Heading = kp; }
+    public void setFFheading(double FF){ FFheading  = FF; }
 
-    public void setCurrentHeading() {
 
+    public void setBearings(double robotPoseYaw, double targetPose) {
+        this.robotHeading = robotPoseYaw;
+        if(targetPose != -999)  {
+            this.targetBearing = targetPose;
+            targetValid = true;
+        } else targetValid = false;
     }
 
     public double getControlAuthority() {

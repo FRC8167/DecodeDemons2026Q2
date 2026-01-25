@@ -187,6 +187,16 @@ private ColorMatch.ArtifactColor[] latchedMotif = null;
     }
 
 
+    public double getTargetBearing() {
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.id == 20  || detection.id == 24) {
+                return (detection.ftcPose.bearing);
+            }
+        }
+        return -999;
+    }
+
+
     public void latchMotif() {
         ColorMatch.ArtifactColor[] current = getMotifPattern();
         if (current != null) {

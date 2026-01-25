@@ -5,7 +5,6 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
@@ -23,16 +22,14 @@ import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootMotifCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import kotlin.time.Instant;
 
 @Configurable
 //@Disabled
@@ -194,11 +191,16 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
-
-
-
 //        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(
 //            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
+
+        driver.getGamepadButton(GamepadKeys.Button.Y)
+                .whenPressed( new InstantCommand(()-> robot.mecanumDrive.setDriveMode(MecanumDrive.DriveMode.CONSTANT_HEADING)))
+                .whileHeld(   new InstantCommand(()-> robot.mecanumDrive.setBearings(robot.follower.getPose().getHeading(), robot.vision.getTargetBearing())))
+                .whenReleased(new InstantCommand(()-> robot.mecanumDrive.setDriveMode(MecanumDrive.DriveMode.NORMAL))
+                );
+
+
 
     }
 
