@@ -140,7 +140,11 @@ public class MainTeleOp extends CommandOpMode {
 
 
 
-        //******DRIVER CONTROLS*****
+        /* ****************************** DRIVER CONTROLS ****************************** */
+
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
+
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new InstantCommand(robot.mecanumDrive::enableSnailDrive))
@@ -157,12 +161,18 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(()->robot.popper.set(Popper.PopperState.RESET)));
 
 
-        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
-
-
         driver.getGamepadButton(GamepadKeys.Button.BACK)
                 .whenPressed(new CancelPedroCommand());
+
+        driver.getGamepadButton(GamepadKeys.Button.A)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                new DriveToPoseCommand(robot.getShootPose(), driver),
+                                //Hold the pose as defensive strategy
+                                new HoldPoseCommand(robot.getShootPose(), driver)
+                        )
+
+                );
 
         //driver-assisted shoot commands
         driver.getGamepadButton(GamepadKeys.Button.B)
@@ -184,15 +194,7 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
-        driver.getGamepadButton(GamepadKeys.Button.A)
-                .whenPressed(
-                        new SequentialCommandGroup(
-                                new DriveToPoseCommand(robot.getShootPose(), driver),
-                                //Hold the pose as defensive strategy
-                                 new HoldPoseCommand(robot.getShootPose(), driver)
-                                )
 
-                );
 
 
 //        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(

@@ -177,6 +177,11 @@ public class  MecanumDrive extends SubsystemBase {
         this.driveMode = driveMode;
     }
 
+
+    public void setCurrentHeading() {
+
+    }
+
     public double getControlAuthority() {
         return controlAuthority;
     }
