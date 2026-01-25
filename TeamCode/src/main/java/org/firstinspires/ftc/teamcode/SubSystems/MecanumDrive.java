@@ -22,6 +22,13 @@ public class  MecanumDrive extends SubsystemBase {
     private final double DEGRADE_AUTHORITY = 0.35;
     private final double MAX_AUTHORITY = 0.80;
 
+    public enum DriveMode {
+        NORMAL,
+        CONSTANT_HEADING,
+        FIELD_ORIENTATION
+    }
+
+    private DriveMode driveMode;
 
     /**
      *
@@ -42,7 +49,6 @@ public class  MecanumDrive extends SubsystemBase {
         backLeft.setInverted(true);
         frontRight.setInverted(false);
         backRight.setInverted(false);
-        ;
 
         frontRight.setRunMode(Motor.RunMode.RawPower);
         frontLeft.setRunMode(Motor.RunMode.RawPower);
@@ -50,6 +56,7 @@ public class  MecanumDrive extends SubsystemBase {
         backRight.setRunMode(Motor.RunMode.RawPower);
 
         controlAuthority = MAX_AUTHORITY;
+        driveMode = DriveMode.NORMAL;
 
         // Initialize motors
         setMotorPower(0, 0, 0, 0);
@@ -71,10 +78,10 @@ public class  MecanumDrive extends SubsystemBase {
 
         double denominator = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(turn), 1);
 
-        double frontLeftPower = (drive + strafe + turn) / denominator;
-        double backLeftPower = (drive - strafe + turn) / denominator;
+        double frontLeftPower  = (drive + strafe + turn) / denominator;
+        double backLeftPower   = (drive - strafe + turn) / denominator;
         double frontRightPower = (drive - strafe - turn) / denominator;
-        double backRightPower = (drive + strafe - turn) / denominator;
+        double backRightPower  = (drive + strafe - turn) / denominator;
 
         setMotorPower(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
     }
@@ -92,7 +99,7 @@ public class  MecanumDrive extends SubsystemBase {
     public void driveWithHeading(double driveCmd, double strafeCmd, double turnCmd, double cmdHeadingDeg, double currentHeading) {
 
         double error, newTurnCmd;
-        double headingCourseGain = 0.1;
+        double Kp_Heading = 0.1;
         double feedForwardGain = 0;
 
         error = cmdHeadingDeg - currentHeading;
@@ -106,7 +113,7 @@ public class  MecanumDrive extends SubsystemBase {
         }
 
         if (error >= 10 && error < 30) {     // Limit PID control range to +/- 30 degrees of target to eliminate angle wrap
-            newTurnCmd = Range.clip(headingCourseGain * error, -1.0, 1.0);
+            newTurnCmd = Range.clip(Kp_Heading * error, -1.0, 1.0);
         } else newTurnCmd = turnCmd;
 
         newTurnCmd += (newTurnCmd > 0) ? feedForwardGain : -feedForwardGain;
@@ -144,7 +151,7 @@ public class  MecanumDrive extends SubsystemBase {
     /**
      * Low-level method: set motor power directly
      */
-    public void setMotorPower(double lf, double rf, double lr, double rr) {
+    private void setMotorPower(double lf, double rf, double lr, double rr) {
         frontLeft.set(lf);
         frontRight.set(rf);
         backLeft.set(lr);
@@ -164,6 +171,10 @@ public class  MecanumDrive extends SubsystemBase {
 
     public void disableSnailDrive() {
         controlAuthority = MAX_AUTHORITY;
+    }
+
+    public void setDriveMode(DriveMode driveMode) {
+        this.driveMode = driveMode;
     }
 
     public double getControlAuthority() {
