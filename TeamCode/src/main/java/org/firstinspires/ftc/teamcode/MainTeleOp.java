@@ -88,7 +88,7 @@ public class MainTeleOp extends CommandOpMode {
 
         //******OPERATOR CONTROLS*****
         operator.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileHeld(new ShooterSmartSpinUpCommand(robot.shooter, robot.vision, robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0)))
+                .whileHeld(new ShooterSmartSpinUpCommand(robot.shooter, robot.vision, robot.colorMatch))
                 .whenReleased(new ShooterSpinUpCommand(robot.shooter, 0.0));
 
 

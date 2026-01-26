@@ -13,8 +13,8 @@ public class ShooterSmartSpinUpCommand extends CommandBase {
     private final ColorMatch colorMatch;
 
 
-    public ShooterSmartSpinUpCommand(Shooter shooterSubsystem, Vision vision, ColorMatch.ArtifactColor colorMatch) {
-        this.shooter = shooterSubsystem;
+    public ShooterSmartSpinUpCommand(Shooter shooter, Vision vision, ColorMatch colorMatch) {
+        this.shooter = shooter;
         this.vision = vision;
         this.colorMatch = colorMatch;
 
@@ -28,8 +28,10 @@ public class ShooterSmartSpinUpCommand extends CommandBase {
 
     @Override
     public void execute() {
-        ColorMatch.ArtifactColor currentColor = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
-        shooter.smartVelocity(vision.getDistanceToGoal(), currentColor);
+        //Read slot0 color and spin shooter accordingly
+        ColorMatch.ArtifactColor slot0Color = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
+        shooter.smartVelocity(vision.getDistanceToGoal(), slot0Color);
+
     }
 
     @Override
