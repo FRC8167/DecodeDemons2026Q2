@@ -29,6 +29,10 @@ public class ShootCaseCommand extends CommandBase {
     private int jiggleAttempts = 0;
     private boolean isJiggling = false;
     private long jiggleStartTime = 0;
+    int maxJiggles = 2;
+    private boolean jugglerRotating = false;
+    private boolean kicking = false;
+    private long kickStartTime = 0;
 
     public ShootCaseCommand(
             Juggler juggler,
@@ -62,22 +66,33 @@ public class ShootCaseCommand extends CommandBase {
         ColorMatch.ArtifactColor s0 = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
         ColorMatch.ArtifactColor s1 = colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
         ColorMatch.ArtifactColor s2 = colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+        boolean targetVisible = (s0 == target || s1 == target || s2 == target);
 
 
         //if target motif color in slot0, shoot!!!
-        // limit
-        int maxJiggles = 2;
+
+
         if (s0 == target) {
             shooter.smartVelocity(vision.getDistanceToGoal());
             if (shooter.atTargetVelocity()) {
-                popper.set(Popper.PopperState.KICK);
-                popper.set(Popper.PopperState.RESET);
+                if (!kicking) {
+                    popper.set(Popper.PopperState.KICK);
+                    kickStartTime = System.currentTimeMillis();
+                    kicking = true;
+                }
+                if (kicking && System.currentTimeMillis() - kickStartTime > 250) {
+                    popper.set(Popper.PopperState.RESET);
+                    kicking = false;
+                }
+
                 remainingMotif.remove(0);
+                jugglerRotating = false;
                 jiggleAttempts = 0;
             }
         //if target motif color in slot1, rotate 1 slot CW and then shoot!
-        } else if (s1 == target && !juggler.atTarget()) {
+        } else if (s1 == target && !jugglerRotating) {
             juggler.rotateOneSlot(Juggler.Direction.CW);
+            jugglerRotating = true;
 
         //if target motif color in slot2, rotate 1 slot SSW and then shoot!
         } else if (s2 == target && !juggler.atTarget()) {
@@ -85,16 +100,35 @@ public class ShootCaseCommand extends CommandBase {
 
         //if target not found in any slot, jiggle up to two times.
 
-        } else if (jiggleAttempts < maxJiggles && !isJiggling) {
+
+        } else if (!targetVisible && jiggleAttempts < maxJiggles && !isJiggling) {
 
             // start jiggle one time
             juggler.startSlowSpin(Juggler.Direction.CW);
             jiggleStartTime = System.currentTimeMillis();
             isJiggling = true;
+
+        } else {
+            // FALLBACK: shoot whatever is in slot0
+            shooter.smartVelocity(vision.getDistanceToGoal());
+
+            if (shooter.atTargetVelocity()) {
+                if (!kicking) {
+                    popper.set(Popper.PopperState.KICK);
+                    kickStartTime = System.currentTimeMillis();
+                    kicking = true;
+                }
+                if (kicking && System.currentTimeMillis() - kickStartTime > 250) {
+                    popper.set(Popper.PopperState.RESET);
+                    kicking = false;
+                }
+                remainingMotif.remove(0);   // progress no matter what
+                jugglerRotating = false;
+                jiggleAttempts = 0;
+            }
         }
 
         if (isJiggling && System.currentTimeMillis() - jiggleStartTime >= 200) {
-
             juggler.Snap();
             jiggleAttempts++;
             isJiggling = false;
