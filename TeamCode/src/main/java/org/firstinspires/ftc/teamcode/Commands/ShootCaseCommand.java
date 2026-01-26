@@ -26,7 +26,6 @@ public class ShootCaseCommand extends CommandBase {
     private SequentialCommandGroup sequence;
     //create a list from the color array of available options
     private final List<ColorMatch.ArtifactColor> remainingMotif = new ArrayList<>();
-    private final int maxJiggles = 2; // limit
     private int jiggleAttempts = 0;
     private boolean isJiggling = false;
     private long jiggleStartTime = 0;
@@ -66,6 +65,8 @@ public class ShootCaseCommand extends CommandBase {
 
 
         //if target motif color in slot0, shoot!!!
+        // limit
+        int maxJiggles = 2;
         if (s0 == target) {
             shooter.smartVelocity(vision.getDistanceToGoal());
             if (shooter.atTargetVelocity()) {
@@ -100,9 +101,6 @@ public class ShootCaseCommand extends CommandBase {
         }
 
     }
-
-
-
 
 
     @Override
