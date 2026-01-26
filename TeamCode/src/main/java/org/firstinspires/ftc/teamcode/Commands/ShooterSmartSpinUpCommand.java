@@ -2,18 +2,22 @@ package org.firstinspires.ftc.teamcode.Commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 
+import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 public class ShooterSmartSpinUpCommand extends CommandBase {
 
     private final Shooter shooter;
     private final Vision vision;
+    private final ColorMatch colorMatch;
 
-    public ShooterSmartSpinUpCommand(Shooter shooterSubsystem, Vision vision) {
+
+    public ShooterSmartSpinUpCommand(Shooter shooterSubsystem, Vision vision, ColorMatch.ArtifactColor colorMatch) {
         this.shooter = shooterSubsystem;
         this.vision = vision;
+        this.colorMatch = colorMatch;
+
         addRequirements(shooter);
     }
 
@@ -24,8 +28,8 @@ public class ShooterSmartSpinUpCommand extends CommandBase {
 
     @Override
     public void execute() {
-        shooter.
-                smartVelocity(vision.getDistanceToGoal());
+        ColorMatch.ArtifactColor currentColor = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
+        shooter.smartVelocity(vision.getDistanceToGoal(), currentColor);
     }
 
     @Override

@@ -73,7 +73,7 @@ public class ShootCaseCommand extends CommandBase {
 
 
         if (s0 == target) {
-            shooter.smartVelocity(vision.getDistanceToGoal());
+            shooter.smartVelocity(vision.getDistanceToGoal(), s0);
             if (shooter.atTargetVelocity()) {
                 if (!kicking) {
                     popper.set(Popper.PopperState.KICK);
@@ -110,7 +110,7 @@ public class ShootCaseCommand extends CommandBase {
 
         } else {
             // FALLBACK: shoot whatever is in slot0
-            shooter.smartVelocity(vision.getDistanceToGoal());
+            shooter.smartVelocity(vision.getDistanceToGoal(), s0);
 
             if (shooter.atTargetVelocity()) {
                 if (!kicking) {
