@@ -4,6 +4,7 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
@@ -25,6 +26,10 @@ public class ShootCaseCommand extends CommandBase {
     private SequentialCommandGroup sequence;
     //create a list from the color array of available options
     private final List<ColorMatch.ArtifactColor> remainingMotif = new ArrayList<>();
+    private final int maxJiggles = 2; // limit
+    private int jiggleAttempts = 0;
+    private boolean isJiggling = false;
+    private long jiggleStartTime = 0;
 
     public ShootCaseCommand(
             Juggler juggler,
@@ -51,51 +56,52 @@ public class ShootCaseCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (remainingMotif.isEmpty()) return; //no artifacts to shoot
+        if (remainingMotif.isEmpty()) return;
 
-        //read the next color in the motif pattern
         ColorMatch.ArtifactColor target = remainingMotif.get(0);
 
-        // Read the slots at the start of the ShootCaseCommand
         ColorMatch.ArtifactColor s0 = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
         ColorMatch.ArtifactColor s1 = colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
         ColorMatch.ArtifactColor s2 = colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
 
-        // Dynamically (right word?) create the proper order of events
-        SequentialCommandGroup sequence = new SequentialCommandGroup();
 
+        //if target motif color in slot0, shoot!!!
         if (s0 == target) {
-            // If the target motif color is in slot0, spin up shooter, popand release, remove from motif list
-            sequence.addCommands(
-                    new ShooterSmartSpinUpCommand(shooter, vision),
-                    new PopandResetCommand(popper),
-                    new InstantCommand(() -> remainingMotif.remove(0))
-            );
-
-        } else if (s1 == target) {
-            // If the target motif color is in slot1, rotate 1 slot CW to move to slot0
-            sequence.addCommands(
-                    new RotateOneSlotCommand(juggler, Juggler.Direction.CW)
-            );
-
-        } else if (s2 == target) {
-            // If the target motif color is in slot2, rotate 1 slot CCW to move to slot0
-            sequence.addCommands(
-                    new RotateOneSlotCommand(juggler, Juggler.Direction.CCW)
-            );
-
-        } else {
-            if (s0 == ColorMatch.ArtifactColor.UNKNOWN ||
-                    s1 == ColorMatch.ArtifactColor.UNKNOWN ||
-                    s2 == ColorMatch.ArtifactColor.UNKNOWN) {
-
-                // If target is not visible (UNKNOWN), jiggle the juggler
-                sequence.addCommands(new InstantCommand(() -> new JiggleCommand(juggler))
-                );
+            shooter.smartVelocity(vision.getDistanceToGoal());
+            if (shooter.atTargetVelocity()) {
+                popper.set(Popper.PopperState.KICK);
+                popper.set(Popper.PopperState.RESET);
+                remainingMotif.remove(0);
+                jiggleAttempts = 0;
             }
+        //if target motif color in slot1, rotate 1 slot CW and then shoot!
+        } else if (s1 == target && !juggler.atTarget()) {
+            juggler.rotateOneSlot(Juggler.Direction.CW);
 
+        //if target motif color in slot2, rotate 1 slot SSW and then shoot!
+        } else if (s2 == target && !juggler.atTarget()) {
+            juggler.rotateOneSlot(Juggler.Direction.CCW);
+
+        //if target not found in any slot, jiggle up to two times.
+
+        } else if (jiggleAttempts < maxJiggles && !isJiggling) {
+
+            // start jiggle one time
+            juggler.startSlowSpin(Juggler.Direction.CW);
+            jiggleStartTime = System.currentTimeMillis();
+            isJiggling = true;
         }
+
+        if (isJiggling && System.currentTimeMillis() - jiggleStartTime >= 200) {
+
+            juggler.Snap();
+            jiggleAttempts++;
+            isJiggling = false;
+        }
+
     }
+
+
 
 
 
