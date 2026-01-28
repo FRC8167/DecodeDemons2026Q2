@@ -18,7 +18,7 @@ public class Popper extends SubsystemBase {
         this.popperServoR = popperServoR;
         this.popperServoR.setInverted(true);
         this.popperServoL.set(0.47);
-        this.popperServoR.set(0.47);
+        this.popperServoR.set(0.49);
     }
 
     public void set(PopperState state) {
@@ -29,8 +29,8 @@ public class Popper extends SubsystemBase {
                 popperServoR.set(.75);
                 break;
             case RESET:
-                popperServoL.set(0.47);//.54
-                popperServoR.set(.47);
+                popperServoL.set(0.47);//
+                popperServoR.set(.49);//.47
                 break;
         }
     }

@@ -122,18 +122,18 @@ public class AutoBlueFar extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),
 
 
-//                                new ParallelDeadlineGroup(
-//                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.55),
-//                                    new FollowPathCommand(robot.follower, eatGPPPath, true, 0.95),
-//                                    new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
-//                                ),
-
-                                new ParallelCommandGroup(
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
-                                        new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
-
+                                new ParallelDeadlineGroup(
+                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                    new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
+                                    new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
                                 ),
+
+//                                new ParallelCommandGroup(
+//                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+//                                        new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
+//                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
+//
+//                                ),
 
                                 // Move to shoot position and stop intake
                                 new ParallelCommandGroup(
