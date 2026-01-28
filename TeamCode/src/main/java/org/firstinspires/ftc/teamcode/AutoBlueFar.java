@@ -110,32 +110,21 @@ public class AutoBlueFar extends CommandOpMode {
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
-//                                new WaitCommand(250),
-//                                new WaitCommand(250),
-//                                new InstantCommand(() -> {
-//                                    if (robot.vision.getMotifPattern() != null) {
-//                                        robot.rgbLight.setColor(RGBLight.LightColor.PINK);
-//                                    } else {
-//                                        robot.rgbLight.setColor(RGBLight.LightColor.RED);
-//                                    }
-//                                }),
-
-
+//
                                 // Move to rotated shoot pose
                                 new FollowPathCommand(robot.follower, rotateToShootPath, true),
 
                                 // Shoot pre-loaded artifacts
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
-                                // Move to spike 1
-//                                new ShooterSpinUpCommand(robot.shooter,2500),
+                                // Move to spike 1//
                                 new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),
 
 
 //                                new ParallelDeadlineGroup(
 //                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.55),
-//                                    new FollowPathCommand(robot.follower, eatGPPPath, true, 0.95),// ming
+//                                    new FollowPathCommand(robot.follower, eatGPPPath, true, 0.95),
 //                                    new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
 //                                ),
 

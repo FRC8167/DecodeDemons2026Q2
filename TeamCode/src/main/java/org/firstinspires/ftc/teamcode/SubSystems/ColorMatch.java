@@ -166,6 +166,7 @@ public class ColorMatch extends SubsystemBase {
         RED,
         GREEN,
         PURPLE,
+        NONE,
         UNKNOWN
     }
 
