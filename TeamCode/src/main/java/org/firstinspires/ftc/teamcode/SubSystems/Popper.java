@@ -25,19 +25,19 @@ public class Popper extends SubsystemBase {
         currentState = state;
         switch (state) {
             case KICK:
-//                popperServoL.set(0.75);//.25
-//                popperServoR.set(.75);
+                popperServoL.set(0.75);//.25
+                popperServoR.set(.75);
                 break;
             case RESET:
-//                popperServoL.set(0.47);//.54
-//                popperServoR.set(.47);
+                popperServoL.set(0.47);//.54
+                popperServoR.set(.47);
                 break;
         }
     }
 
     public void midServo() {
-//    popperServoL.set(0.5);
-//    popperServoR.set(0.5);
+    popperServoL.set(0.5);
+    popperServoR.set(0.5);
     }
 
     public PopperState getPopperState() {
