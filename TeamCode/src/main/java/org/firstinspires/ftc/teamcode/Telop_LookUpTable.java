@@ -39,6 +39,7 @@ public class Telop_LookUpTable extends OpMode {
         shooter  = new Shooter(shooterMotor);
         ServoEx popperServoL = new ServoEx(hardwareMap, "popperServoL");
         ServoEx popperServoR = new ServoEx(hardwareMap, "popperServoR");
+        popper = new Popper(popperServoL, popperServoR);
         try {
             vision   = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
         } catch (InterruptedException e) {
