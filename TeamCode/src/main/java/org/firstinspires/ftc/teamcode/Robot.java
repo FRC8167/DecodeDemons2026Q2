@@ -4,6 +4,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -98,9 +99,13 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         //WebcamName webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
         //sensorColor = new SensorColor(hardwareMap, "slot1Color");
-        SensorColor slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
-        SensorColor slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
-        SensorColor slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
+//        SensorColor slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
+//        SensorColor slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
+//        SensorColor slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
+
+        RevColorSensorV3 slot0Sensor = hardwareMap.get(RevColorSensorV3.class, "slot0Sensor");
+        RevColorSensorV3 slot1Sensor = hardwareMap.get(RevColorSensorV3.class, "slot1Sensor");
+        RevColorSensorV3 slot2Sensor = hardwareMap.get(RevColorSensorV3.class, "slot2Sensor");
 
         ctrlHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : ctrlHubs) {
