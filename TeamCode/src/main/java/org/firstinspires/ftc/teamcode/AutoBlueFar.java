@@ -210,11 +210,19 @@ public class AutoBlueFar extends CommandOpMode {
                     : "     ❌ REPOSITION ARTIFACTS"
             );
             telemetry.addLine("==============================");
-
+            //String temp = s0 + robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0);
             // Show slot colors
             telemetry.addData("Slot 0", s0);
+            telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));
+            telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[0]);
+
             telemetry.addData("Slot 1", s1);
+            telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_1));
+            telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[0]);
+
             telemetry.addData("Slot 2", s2);
+            telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_2));
+            telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[0]);
 
             telemetry.addLine("Hand-position artifacts on juggler");
             telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getMotifPattern()));

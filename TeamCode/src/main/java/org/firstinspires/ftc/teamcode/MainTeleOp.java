@@ -248,9 +248,21 @@ public class MainTeleOp extends CommandOpMode {
 
 
 
-        telemetryM.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
-        telemetryM.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
-        telemetryM.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
+        //telemetryM.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
+        //telemetryM.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
+        //telemetryM.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
+        telemetry.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
+        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));
+        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[0]);
+
+        telemetry.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
+        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_1));
+        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[0]);
+
+        telemetry.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
+        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_2));
+        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[0]);
+
         telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
         telemetryM.addData("Current Velocity", current_velocity);
         telemetryM.update(telemetry);
