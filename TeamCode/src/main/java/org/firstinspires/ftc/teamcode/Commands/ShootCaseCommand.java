@@ -118,7 +118,7 @@ public class ShootCaseCommand extends CommandBase {
         // SHOOT LOGIC
         if (!shotInProgress && !rotating) {
             // fire whatever is in slot0 (even UNKNOWN)
-            shooter.smartVelocity(vision.getDistanceToGoal(), virtualSlots[0]);
+            shooter.smartVelocity(vision.getDistanceToGoal());
             if (shooter.atTargetVelocity()) {
                 popper.set(Popper.PopperState.KICK);
                 kickTimer.reset();

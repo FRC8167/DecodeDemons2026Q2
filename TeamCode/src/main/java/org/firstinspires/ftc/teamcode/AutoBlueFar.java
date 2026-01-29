@@ -253,7 +253,7 @@ public class AutoBlueFar extends CommandOpMode {
     }
 
 
-    @Override
+        @Override
     public void end() {
         robot.autoEndPose = robot.follower.getPose();
     }

@@ -104,19 +104,13 @@ public class Shooter extends SubsystemBase {
             return convertTicksPerSecToRPM(shooterMotor.getVelocity());
         }
 
-        public void smartVelocity(double ATdistance, ColorMatch.ArtifactColor color) {
+        public void smartVelocity(double ATdistance) {
             double targetRPM = 0.0;
             if (ATdistance > 41 && ATdistance < 138){
-                if (color == ColorMatch.ArtifactColor.PURPLE || color == ColorMatch.ArtifactColor.UNKNOWN)
-                    {
                     targetRPM=0.11*ATdistance*ATdistance-8.72*ATdistance+3102.92;
-                    }
-                    //targetRPM = distanceToRPM.get(ATdistance);
-                else{
-                    targetRPM=0.11*ATdistance*ATdistance-8.72*ATdistance+3102.92 + 75;  //TODO define DELTA
-                }
+             }
 
-            }
+
             else
             {
                 targetRPM = 3775;
