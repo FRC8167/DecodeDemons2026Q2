@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootLeftoversCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
@@ -116,7 +117,7 @@ public class AutoBlueFar extends CommandOpMode {
 
                                 // Shoot pre-loaded artifacts
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
+                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 // Move to spike 1//
 //                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),
@@ -142,8 +143,11 @@ public class AutoBlueFar extends CommandOpMode {
                                 ),
 
                                 // Shoot artifacts from spike 1
+                                new ParallelCommandGroup(
                                 new InstantCommand(()->robot.intake.stop()),
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
+                                ),
 
                                 // Move to spike 2
 //                                new ShooterSpinUpCommand(robot.shooter,2500),
@@ -205,11 +209,12 @@ public class AutoBlueFar extends CommandOpMode {
             telemetry.addData("Slot 0", s0);
             telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));
             telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[0]);
+            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[1]);
 
             telemetry.addData("Slot 1", s1);
             telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_1));
             telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[0]);
-            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[1]);
+            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[1]);
 
             telemetry.addData("Slot 2", s2);
             telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_2));

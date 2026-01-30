@@ -25,7 +25,7 @@ public class DriveToPoseCommand extends CommandBase {
         robot = Robot.getInstance();
         this.targetPose = targetPose;
         this.driver = driver;
-        addRequirements();  //TODO check if this works
+//        addRequirements();  //TODO check if this works
 
     }
 
@@ -44,18 +44,16 @@ public class DriveToPoseCommand extends CommandBase {
 //        new FollowPathCommand(robot.follower, pathToShoot, true);
         robot.follower.followPath(pathToShoot, true);
 
-
-
-
     }
+
 
     @Override
     public void execute() {
         robot.follower.update();
     }
 
-    @Override
 
+    @Override
     public boolean isFinished() {
 
         boolean driverOverride =

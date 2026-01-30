@@ -10,6 +10,7 @@ public class Popper extends SubsystemBase {
 
     public enum PopperState {
         KICK,
+        SOFTRESET,
         RESET
     }
 
@@ -30,6 +31,10 @@ public class Popper extends SubsystemBase {
             case KICK:
                 popperServoR.set(0.75);//.25
                 popperServoL.set(.75);//.765
+                break;
+            case SOFTRESET:
+                popperServoL.set(0.60);//
+                popperServoR.set(.60);//.47
                 break;
             case RESET:
                 popperServoL.set(0.45);//

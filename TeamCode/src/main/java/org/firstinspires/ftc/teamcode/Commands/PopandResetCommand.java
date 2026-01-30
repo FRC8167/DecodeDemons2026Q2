@@ -16,7 +16,7 @@ public class PopandResetCommand extends SequentialCommandGroup {
         addCommands(
                 new InstantCommand(() -> popper.set(Popper.PopperState.KICK)),
                 new WaitCommand(350), //was 500
-                new InstantCommand(() -> popper.set(Popper.PopperState.RESET)),
+                new InstantCommand(() -> popper.set(Popper.PopperState.SOFTRESET)),
                 new WaitCommand(350),
                 new InstantCommand(() -> popper.set(Popper.PopperState.KICK)),
                 new WaitCommand(350), //was 500

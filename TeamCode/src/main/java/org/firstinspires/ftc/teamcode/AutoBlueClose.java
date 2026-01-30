@@ -145,12 +145,14 @@ public class AutoBlueClose extends CommandOpMode {
                                 //Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, spike1ToShootPath, true, 1.0),
-                                        new InstantCommand(()->robot.intake.stop())
-                                ),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75)
+                                        ),
 
                                 //shoot artifacts from spike1
+                                new ParallelCommandGroup(
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
+                                new InstantCommand(()->robot.intake.stop())
+                                ),
                                 //park outside launch zone
                                 new FollowPathCommand(robot.follower, parkPath),
                                 new InstantCommand(()->robot.shooter.stop())

@@ -65,7 +65,7 @@ public class HoldPoseCommand extends CommandBase {
     public boolean isFinished() {
         // Only stop if holding current pose and driver moves sticks
 //        if (targetPose == null) {
-            return Math.abs(driver.getLeftY()) > 0.1 ||
+            return  Math.abs(driver.getLeftY()) > 0.1 ||
                     Math.abs(driver.getLeftX()) > 0.1 ||
                     Math.abs(driver.getRightX()) > 0.1;
 //        } else {
