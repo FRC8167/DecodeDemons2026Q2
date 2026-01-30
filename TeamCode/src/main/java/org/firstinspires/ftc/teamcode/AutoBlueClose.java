@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.ParallelDeadlineGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
+import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Gate;
@@ -36,10 +38,10 @@ public class AutoBlueClose extends CommandOpMode {
 
     private ElapsedTime timer;
     private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(135));
-    private final Pose latchPose = new Pose(58, 110, Math.toRadians(70));
+    private final Pose latchPose = new Pose(56, 110, Math.toRadians(80));
     private final Pose artifactsPPGPose = new Pose(56, 84, Math.toRadians(180));
-    private final Pose collectPPGPose = new Pose(24, 84, Math.toRadians(180));
-    private final Pose shootClosePose = new Pose(60, 78, Math.toRadians(135));
+    private final Pose collectPPGPose = new Pose(18, 84, Math.toRadians(180));
+    private final Pose shootClosePose = new Pose(56, 78, Math.toRadians(135));
 //    private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
 //    private final Pose collectPGPPose = new Pose(24, 60, Math.toRadians(180));
 
@@ -135,10 +137,10 @@ public class AutoBlueClose extends CommandOpMode {
                                 new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootCloseToSpike1Path, true, 1.0),
 
-                                new ParallelCommandGroup(
+                                new ParallelDeadlineGroup(
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
                                         new FollowPathCommand(robot.follower, collectPPGArtifactsPath, true, 0.9),
-                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
                                 ),
                                 //Move to shoot position and stop intake
                                 new ParallelCommandGroup(

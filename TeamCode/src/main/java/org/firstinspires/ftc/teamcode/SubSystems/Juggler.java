@@ -27,7 +27,7 @@ public class Juggler extends SubsystemBase {
         spindexer.resetEncoder();
         spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
         jugglerPID = new PIDFController(.02,0,0,0); // ki, kd, kv);  //was.01
-        jugglerPID.setTolerance(10);
+        jugglerPID.setTolerance(5);
         target = 0;
     }
 

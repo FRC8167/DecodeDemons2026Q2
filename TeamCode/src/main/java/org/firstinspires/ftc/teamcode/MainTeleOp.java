@@ -88,7 +88,7 @@ public class MainTeleOp extends CommandOpMode {
 
         //******OPERATOR CONTROLS*****
         operator.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileHeld(new ShooterSmartSpinUpCommand(robot.shooter, robot.vision, robot.colorMatch))
+                .whileHeld(new ShooterSmartSpinUpCommand(robot.shooter, robot.vision))
                 .whenReleased(new ShooterSpinUpCommand(robot.shooter, 0.0));
 
 
@@ -184,7 +184,7 @@ public class MainTeleOp extends CommandOpMode {
                                 ),
                                 new ParallelCommandGroup(
                                         //Spin down shooter
-                                        new ShooterSpinUpCommand(robot.shooter, 0),
+                                        new InstantCommand(()->robot.shooter.stop()),
                                         //End the path hold
                                         new InstantCommand(() -> robot.follower.breakFollowing())
                                 )

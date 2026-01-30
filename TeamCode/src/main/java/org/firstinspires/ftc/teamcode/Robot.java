@@ -4,6 +4,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -49,8 +50,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     }
 
     //field poses
-    public static final Pose BLUE_SHOOT_FAR_POSE = new Pose(56, 10, Math.toRadians(110.5));
-    private static final Pose RED_SHOOT_FAR_POSE = MirrorUtility.mirror(new Pose(56, 10, Math.toRadians(110.5)));
+    public static final Pose BLUE_SHOOT_FAR_POSE = new Pose(56, 14, Math.toRadians(110.5));
+    private static final Pose RED_SHOOT_FAR_POSE = MirrorUtility.mirror(new Pose(56, 14, Math.toRadians(110.5)));
 
     private static Alliance alliance = Alliance.UNSPECIFIED;
 
@@ -75,7 +76,6 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
 
-
     public void init(HardwareMap hardwareMap) throws InterruptedException {
 
         // Hardware
@@ -98,9 +98,9 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         //WebcamName webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
         //sensorColor = new SensorColor(hardwareMap, "slot1Color");
-        SensorColor slot0Sensor = new SensorColor(hardwareMap, "slot0Sensor");
-        SensorColor slot1Sensor = new SensorColor(hardwareMap, "slot1Sensor");
-        SensorColor slot2Sensor = new SensorColor(hardwareMap, "slot2Sensor");
+        RevColorSensorV3 slot0Sensor = hardwareMap.get(RevColorSensorV3.class,"slot0Sensor");
+        RevColorSensorV3 slot1Sensor = hardwareMap.get(RevColorSensorV3.class,"slot1Sensor");
+        RevColorSensorV3 slot2Sensor = hardwareMap.get(RevColorSensorV3.class,"slot2Sensor");
 
         ctrlHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : ctrlHubs) {

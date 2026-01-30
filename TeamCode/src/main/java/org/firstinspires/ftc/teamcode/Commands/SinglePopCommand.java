@@ -8,20 +8,17 @@ import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 
 
-public class PopandResetCommand extends SequentialCommandGroup {
+public class SinglePopCommand extends SequentialCommandGroup {
 
-    public PopandResetCommand(Popper popper) {
+    public SinglePopCommand(Popper popper) {
         addRequirements(popper);
 
         addCommands(
                 new InstantCommand(() -> popper.set(Popper.PopperState.KICK)),
                 new WaitCommand(350), //was 500
                 new InstantCommand(() -> popper.set(Popper.PopperState.RESET)),
-                new WaitCommand(350),
-                new InstantCommand(() -> popper.set(Popper.PopperState.KICK)),
-                new WaitCommand(350), //was 500
-                new InstantCommand(() -> popper.set(Popper.PopperState.RESET)),
                 new WaitCommand(350)
+
         );
     }
 

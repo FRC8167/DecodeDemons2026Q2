@@ -63,7 +63,7 @@ public class TeleOp_TagTrackTuning extends CommandOpMode {
 
         //end pose held in robot
         //if auto ran, last pose is used or else default of 24,24,0
-        Pose startPose = robot.autoEndPose != null ? robot.autoEndPose : new Pose(24, 24, 0);
+        Pose startPose = robot.autoEndPose != null ? robot.autoEndPose : new Pose(24, 24, 90);
         robot.follower.setStartingPose(startPose);
         robot.follower.update();
         schedule(new VisionCommand(robot.vision));
@@ -110,7 +110,7 @@ public class TeleOp_TagTrackTuning extends CommandOpMode {
         }
 
         telemetryM.addData("Follower Heading[deg]", Math.round(Math.toDegrees(robot.follower.getPose().getHeading()) * 100) / 100.0);
-        telemetryM.addData("Pinpoint Heading[deg]", Math.round(Math.toDegrees(robot.pinpoint.getHeading(AngleUnit.DEGREES)) * 100) / 100.0);
+//        telemetryM.addData("Pinpoint Heading[deg]", Math.round(Math.toDegrees(robot.pinpoint.getHeading(AngleUnit.DEGREES)) * 100) / 100.0);
         telemetryM.addData("Distance to Goal[in]", robot.vision.getDistanceToGoal());
 
         telemetryM.update(telemetry);

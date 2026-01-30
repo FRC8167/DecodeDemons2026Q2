@@ -35,12 +35,12 @@ public class AutoBlueFar extends CommandOpMode {
     Robot robot = Robot.getInstance();
     private ElapsedTime timer;
     private final Pose startPose = new Pose(61, 9, Math.toRadians(90));
-    private final Pose rotatedPose = new Pose(58, 10, Math.toRadians(110.5));
+    private final Pose rotatedPose = new Pose(58, 10, Math.toRadians(113.5));
     private final Pose artifactsGPPPose = new Pose(42, 35, Math.toRadians(180));
-    private final Pose collectGPPPose = new Pose(12, 35, Math.toRadians(180));
-    private final Pose shootFarPose = new Pose(56, 10, Math.toRadians(110.5));
+    private final Pose collectGPPPose = new Pose(16, 35, Math.toRadians(180));
+    private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(113.5));
     private final Pose artifactPGPPose = new Pose(56, 57, Math.toRadians(180));
-    private final Pose collectPGPPose = new Pose(12, 57, Math.toRadians(180));
+    private final Pose collectPGPPose = new Pose(16, 57, Math.toRadians(180));
 
     private PathChain rotateToShootPath, shootToGPPSpikePath, eatGPPPath, endGPPToShootPath, shootToPGPSpikePath,
             eatPGPPath, endPGPToShootPath;
@@ -118,7 +118,7 @@ public class AutoBlueFar extends CommandOpMode {
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
                                 // Move to spike 1//
-                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
+//                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),
 
 
@@ -144,17 +144,17 @@ public class AutoBlueFar extends CommandOpMode {
                                 // Shoot artifacts from spike 1
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
 
-//                                // Move to spike 2
-////                                new ShooterSpinUpCommand(robot.shooter,2500),
+                                // Move to spike 2
+//                                new ShooterSpinUpCommand(robot.shooter,2500),
 //                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
-//
+
 //                                new FollowPathCommand(robot.follower, shootToPGPSpikePath),
 //
 //                                // Collect balls on spike 2
-//                                new ParallelCommandGroup(
+//                                new ParallelDeadlineGroup(
 //                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
 //                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.75),
-//                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
+//                                        new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
 //                                ),
 //
 //                                // Move to shoot position and stop intake
@@ -165,7 +165,7 @@ public class AutoBlueFar extends CommandOpMode {
 //
 //                                // Shoot artifacts from spike 2
 //                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
+//
 //                        // Park outside launch zone
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath),
                                 new InstantCommand(()->robot.shooter.stop())
@@ -208,10 +208,12 @@ public class AutoBlueFar extends CommandOpMode {
             telemetry.addData("Slot 1", s1);
             telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_1));
             telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[0]);
+            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[1]);
 
             telemetry.addData("Slot 2", s2);
             telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_2));
             telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[0]);
+            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[1]);
 
             telemetry.addLine("Hand-position artifacts on juggler");
             telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getMotifPattern()));

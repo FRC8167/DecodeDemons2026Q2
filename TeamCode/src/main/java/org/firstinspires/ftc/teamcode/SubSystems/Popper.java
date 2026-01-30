@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
+import static java.lang.Thread.sleep;
+
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 public class Popper extends SubsystemBase {
@@ -17,20 +20,20 @@ public class Popper extends SubsystemBase {
         this.popperServoL = popperServoL;
         this.popperServoR = popperServoR;
         this.popperServoR.setInverted(true);
-        this.popperServoL.set(0.47);
-        this.popperServoR.set(0.49);
+        this.popperServoL.set(0.45);
+        this.popperServoR.set(0.43);//.49
     }
 
     public void set(PopperState state) {
         currentState = state;
         switch (state) {
             case KICK:
-                popperServoL.set(0.75);//.25
-                popperServoR.set(.75);
+                popperServoR.set(0.75);//.25
+                popperServoL.set(.75);//.765
                 break;
             case RESET:
-                popperServoL.set(0.47);//
-                popperServoR.set(.49);//.47
+                popperServoL.set(0.45);//
+                popperServoR.set(.43);//.47
                 break;
         }
     }
