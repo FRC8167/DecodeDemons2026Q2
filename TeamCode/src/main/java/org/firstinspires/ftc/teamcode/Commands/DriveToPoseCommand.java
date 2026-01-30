@@ -19,7 +19,6 @@ public class DriveToPoseCommand extends CommandBase {
     private final GamepadEx driver;
 
 
-
     public DriveToPoseCommand(Pose targetPose, GamepadEx driver)
     {
         robot = Robot.getInstance();
@@ -42,7 +41,7 @@ public class DriveToPoseCommand extends CommandBase {
                 )
                 .build();
 //        new FollowPathCommand(robot.follower, pathToShoot, true);
-        robot.follower.followPath(pathToShoot, true);
+        robot.follower.followPath(pathToShoot, false);
 
     }
 

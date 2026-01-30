@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootLeftoversCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
@@ -124,15 +125,15 @@ public class AutoBlueClose extends CommandOpMode {
                                 //move to latch
                                 new FollowPathCommand(robot.follower, startToLatchPath, true),
 
-                                //latch
-                                new InstantCommand(()-> robot.vision.latchMotif()),
+//                                //latch
+//                                new InstantCommand(()-> robot.vision.latchMotif()),
 
                                 //move to launch zone
                                 new FollowPathCommand(robot.follower, latchToShootClosePath),
 
                                 //shoot pre-loaded artifacts
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
+                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 //move to spike 1
                                 new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootCloseToSpike1Path, true, 1.0),
@@ -151,6 +152,7 @@ public class AutoBlueClose extends CommandOpMode {
                                 //shoot artifacts from spike1
                                 new ParallelCommandGroup(
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 new InstantCommand(()->robot.intake.stop())
                                 ),
                                 //park outside launch zone

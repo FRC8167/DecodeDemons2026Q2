@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootLeftoversCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
@@ -35,13 +36,13 @@ import java.util.Arrays;
 public class AutoRedFar extends CommandOpMode {
     Robot robot = Robot.getInstance();
     private ElapsedTime timer;
-    private final Pose startPose = MirrorUtility.mirror(new Pose(61, 9,Math.toRadians(90)));
-    private final Pose rotatedPose = MirrorUtility.mirror(new Pose(58, 10, Math.toRadians(110.5)));
+    private final Pose startPose = MirrorUtility.mirror(new Pose(61, 9, Math.toRadians(90)));
+    private final Pose rotatedPose = MirrorUtility.mirror(new Pose(58, 10, Math.toRadians(113.5)));
     private final Pose artifactsGPPPose = MirrorUtility.mirror(new Pose(42, 35, Math.toRadians(180)));
-    private final Pose collectGPPPose = MirrorUtility.mirror(new Pose(12, 35, Math.toRadians(180)));
-    private final Pose shootFarPose = MirrorUtility.mirror(new Pose(56, 10, Math.toRadians(110.5)));
+    private final Pose collectGPPPose = MirrorUtility.mirror(new Pose(16, 35, Math.toRadians(180)));
+    private final Pose shootFarPose = MirrorUtility.mirror(new Pose(56, 12, Math.toRadians(113.5)));
     private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(56, 57, Math.toRadians(180)));
-    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(12, 57, Math.toRadians(180)));
+    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 57, Math.toRadians(180)));
 
     private PathChain rotateToShootPath, shootToGPPSpikePath, eatGPPPath, endGPPToShootPath, shootToPGPSpikePath,
             eatPGPPath, endPGPToShootPath;
@@ -111,62 +112,55 @@ public class AutoRedFar extends CommandOpMode {
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
-//                                new WaitCommand(250),
-//                                new WaitCommand(250),
-//                                new InstantCommand(() -> {
-//                                    if (robot.vision.getMotifPattern() != null) {
-//                                        robot.rgbLight.setColor(RGBLight.LightColor.PINK);
-//                                    } else {
-//                                        robot.rgbLight.setColor(RGBLight.LightColor.RED);
-//                                    }
-//                                }),
-
-
+//
                                 // Move to rotated shoot pose
                                 new FollowPathCommand(robot.follower, rotateToShootPath, true),
 
                                 // Shoot pre-loaded artifacts
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
-                                // Move to spike 1
-//                                new ShooterSpinUpCommand(robot.shooter,2500),
-                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
+                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                // Move to spike 1//
+//                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),
 
 
-//                                new ParallelDeadlineGroup(
-//                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.55),
-//                                    new FollowPathCommand(robot.follower, eatGPPPath, true, 0.95),// ming
-//                                    new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
-//                                ),
-
-                                new ParallelCommandGroup(
+                                new ParallelDeadlineGroup(
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
                                         new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
-
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
                                 ),
+
+//                                new ParallelCommandGroup(
+//                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+//                                        new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
+//                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
+//
+//                                ),
 
                                 // Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
-                                        new InstantCommand(()->robot.intake.stop())
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75)
                                 ),
 
                                 // Shoot artifacts from spike 1
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()->robot.intake.stop()),
+                                        new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                        new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
+                                ),
 
-//                                // Move to spike 2
-////                                new ShooterSpinUpCommand(robot.shooter,2500),
+                                // Move to spike 2
+//                                new ShooterSpinUpCommand(robot.shooter,2500),
 //                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
-//
+
 //                                new FollowPathCommand(robot.follower, shootToPGPSpikePath),
 //
 //                                // Collect balls on spike 2
-//                                new ParallelCommandGroup(
+//                                new ParallelDeadlineGroup(
 //                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
 //                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.75),
-//                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
+//                                        new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
 //                                ),
 //
 //                                // Move to shoot position and stop intake
@@ -177,7 +171,7 @@ public class AutoRedFar extends CommandOpMode {
 //
 //                                // Shoot artifacts from spike 2
 //                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
+//
 //                        // Park outside launch zone
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath),
                                 new InstantCommand(()->robot.shooter.stop())
@@ -211,11 +205,22 @@ public class AutoRedFar extends CommandOpMode {
                     : "     ❌ REPOSITION ARTIFACTS"
             );
             telemetry.addLine("==============================");
-
+            //String temp = s0 + robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0);
             // Show slot colors
             telemetry.addData("Slot 0", s0);
+            telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));
+            telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[0]);
+            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[1]);
+
             telemetry.addData("Slot 1", s1);
+            telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_1));
+            telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[0]);
+            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[1]);
+
             telemetry.addData("Slot 2", s2);
+            telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_2));
+            telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[0]);
+            telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[1]);
 
             telemetry.addLine("Hand-position artifacts on juggler");
             telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getMotifPattern()));

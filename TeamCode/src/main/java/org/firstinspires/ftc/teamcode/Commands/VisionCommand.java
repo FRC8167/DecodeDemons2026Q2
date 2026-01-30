@@ -20,6 +20,7 @@ public class VisionCommand extends CommandBase {
     @Override
     public void execute() {
         vision.scanForAprilTags();
+        vision.latchMotif();
     }
 
     @Override

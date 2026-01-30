@@ -139,8 +139,8 @@ public class MainTeleOp extends CommandOpMode {
 
         /* ****************************** DRIVER CONTROLS ****************************** */
 
-        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
+//        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+//                .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
 
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
@@ -163,31 +163,19 @@ public class MainTeleOp extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(
-                        new SequentialCommandGroup(
-                                new DriveToPoseCommand(robot.getShootPose(), driver),
-                                //Hold the pose as defensive strategy
-                                new HoldPoseCommand(robot.getShootPose(), driver)
-                        )
-
-                );
+                                new DriveToPoseCommand(robot.getShootPose(), driver)
+                          );
 
         //driver-assisted shoot commands
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(
                         new SequentialCommandGroup(
                                 new DriveToPoseCommand(robot.getShootPose(), driver),
-                                new ParallelCommandGroup(
-                                        //Hold the pose as defensive strategy
-                                        new HoldPoseCommand(robot.getShootPose(), driver),
-                                        //Motif shoot command
-                                        new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
-                                ),
-                                new ParallelCommandGroup(
-                                        //Spin down shooter
-                                        new InstantCommand(()->robot.shooter.stop()),
+                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new InstantCommand(()->robot.shooter.stop())
                                         //End the path hold
-                                        new InstantCommand(() -> robot.follower.breakFollowing())
-                                )
+//                                        new InstantCommand(() -> robot.follower.breakFollowing())
+
                         )
                 );
 

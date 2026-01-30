@@ -33,8 +33,8 @@ public class Popper extends SubsystemBase {
                 popperServoL.set(.75);//.765
                 break;
             case SOFTRESET:
-                popperServoL.set(0.60);//
-                popperServoR.set(.60);//.47
+                popperServoL.set(0.55);//
+                popperServoR.set(0.55);//.47
                 break;
             case RESET:
                 popperServoL.set(0.45);//

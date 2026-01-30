@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.ParallelDeadlineGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
@@ -17,7 +18,9 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootLeftoversCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
+import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Gate;
@@ -36,11 +39,12 @@ public class AutoRedClose extends CommandOpMode {
     Robot robot = Robot.getInstance();
 
     private ElapsedTime timer;
-    private final Pose startPose = MirrorUtility.mirror(new Pose(26.5, 126.5,Math.toRadians(135)));
-    private final Pose latchPose = MirrorUtility.mirror(new Pose(58, 110, Math.toRadians(70)));
+    private final Pose startPose = MirrorUtility.mirror(new Pose(26.5, 126.5, Math.toRadians(135)));
+    private final Pose latchPose = new Pose(88, 110, Math.toRadians(105));
+//    private final Pose latchPose = MirrorUtility.mirror(new Pose(56, 110, Math.toRadians(80)));
     private final Pose artifactsPPGPose = MirrorUtility.mirror(new Pose(56, 84, Math.toRadians(180)));
-    private final Pose collectPPGPose = MirrorUtility.mirror(new Pose(24, 84, Math.toRadians(180)));
-    private final Pose shootClosePose = MirrorUtility.mirror(new Pose(60, 78, Math.toRadians(135)));
+    private final Pose collectPPGPose = MirrorUtility.mirror(new Pose(18, 84, Math.toRadians(180)));
+    private final Pose shootClosePose = MirrorUtility.mirror(new Pose(56, 78, Math.toRadians(135)));
 //    private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
 //    private final Pose collectPGPPose = new Pose(24, 60, Math.toRadians(180));
 
@@ -73,7 +77,7 @@ public class AutoRedClose extends CommandOpMode {
                 .build();
         spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180-135))
+                .setConstantHeadingInterpolation(Math.toRadians(45))
                 .build();
         parkPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, collectPPGPose))
@@ -124,32 +128,35 @@ public class AutoRedClose extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, startToLatchPath, true),
 
                                 //latch
-                                new InstantCommand(()-> robot.vision.latchMotif()),
+//                                new InstantCommand(()-> robot.vision.latchMotif()),
 
                                 //move to launch zone
                                 new FollowPathCommand(robot.follower, latchToShootClosePath),
 
                                 //shoot pre-loaded artifacts
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
+                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 //move to spike 1
                                 new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootCloseToSpike1Path, true, 1.0),
 
-                                new ParallelCommandGroup(
+                                new ParallelDeadlineGroup(
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
                                         new FollowPathCommand(robot.follower, collectPPGArtifactsPath, true, 0.9),
-                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
                                 ),
                                 //Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, spike1ToShootPath, true, 1.0),
-                                        new InstantCommand(()->robot.intake.stop())
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75)
                                 ),
 
                                 //shoot artifacts from spike1
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-
+                                new ParallelCommandGroup(
+                                        new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                        new InstantCommand(()->robot.intake.stop()),
+                                        new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
+                                ),
                                 //park outside launch zone
                                 new FollowPathCommand(robot.follower, parkPath),
                                 new InstantCommand(()->robot.shooter.stop())

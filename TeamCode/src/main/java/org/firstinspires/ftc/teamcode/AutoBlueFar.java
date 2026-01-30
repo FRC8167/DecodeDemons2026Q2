@@ -144,9 +144,9 @@ public class AutoBlueFar extends CommandOpMode {
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
-                                new InstantCommand(()->robot.intake.stop()),
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
+                                    new InstantCommand(()->robot.intake.stop()),
+                                    new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                    new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
                                 ),
 
                                 // Move to spike 2

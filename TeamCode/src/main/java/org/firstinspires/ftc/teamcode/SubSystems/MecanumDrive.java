@@ -12,7 +12,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 /**
  * MecanumDrive Subsystem
  * Handles low-level motor control and odometry updates.
- * Operator input handled in a separate DriveCommand.
+ * Operator   input handled in a separate DriveCommand.
  */
 @Configurable
 public class  MecanumDrive extends SubsystemBase {
@@ -21,7 +21,7 @@ public class  MecanumDrive extends SubsystemBase {
 
     private double controlAuthority;
     private final double DEGRADE_AUTHORITY = 0.35;
-    private final double MAX_AUTHORITY = 0.80;
+    private final double MAX_AUTHORITY = 0.75;
 
     public enum DriveMode {
         NORMAL,
