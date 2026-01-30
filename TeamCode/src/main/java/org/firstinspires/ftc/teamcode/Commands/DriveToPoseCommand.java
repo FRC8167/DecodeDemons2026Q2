@@ -25,7 +25,7 @@ public class DriveToPoseCommand extends CommandBase {
         robot = Robot.getInstance();
         this.targetPose = targetPose;
         this.driver = driver;
-        addRequirements(robot.mecanumDrive);  //TODO check if this works
+        addRequirements();  //TODO check if this works
 
     }
 
