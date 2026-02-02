@@ -13,20 +13,14 @@ public class HoldPoseCommand extends CommandBase {
     private final Pose targetPose; // the pose passed in (can be null)
     private Pose holdPose;         // resolved pose at initialize
 
-    //Hold CURRENT POSE
-//    public HoldPoseCommand(GamepadEx driver) {
-//        this.robot = Robot.getInstance();
-//        this.driver = driver;
-//        this.targetPose = robot.follower.getPose();    // null = capture current pose
-//        addRequirements(robot.mecanumDrive);
-//    }
 
-    // Hold SPECIFIC POSE
+
+
     public HoldPoseCommand(Pose pose, GamepadEx driver) {
         this.robot = Robot.getInstance();
         this.driver = driver;
         this.targetPose = pose;    // use this specific pose
-//        addRequirements(robot.mecanumDrive);
+        addRequirements(robot.mecanumDrive);
     }
 
     @Override
@@ -37,18 +31,7 @@ public class HoldPoseCommand extends CommandBase {
 
         robot.follower.followPath(
                 robot.follower.pathBuilder()
-                        .addPath(new BezierLine(
-                                new Pose(
-                                        holdPose.getX() - 0.01,
-                                        holdPose.getY(),
-                                        holdPose.getHeading()
-                                ),
-                                new Pose(
-                                        holdPose.getX() + 0.01,
-                                        holdPose.getY(),
-                                        holdPose.getHeading()
-                                )
-                        ))
+                        .addPath(new BezierLine(holdPose, holdPose))
                         .setConstantHeadingInterpolation(holdPose.getHeading())
                         .build(),
                 true
@@ -58,7 +41,8 @@ public class HoldPoseCommand extends CommandBase {
 
     @Override
     public void execute() {
-        robot.follower.update();
+
+//        robot.follower.update();
     }
 
     @Override

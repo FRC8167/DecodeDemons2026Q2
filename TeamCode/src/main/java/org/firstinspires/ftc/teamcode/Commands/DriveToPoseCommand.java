@@ -24,7 +24,7 @@ public class DriveToPoseCommand extends CommandBase {
         robot = Robot.getInstance();
         this.targetPose = targetPose;
         this.driver = driver;
-//        addRequirements();  //TODO check if this works
+        addRequirements(robot.mecanumDrive);
 
     }
 
@@ -48,7 +48,8 @@ public class DriveToPoseCommand extends CommandBase {
 
     @Override
     public void execute() {
-        robot.follower.update();
+
+//        robot.follower.update();
     }
 
 
@@ -60,7 +61,9 @@ public class DriveToPoseCommand extends CommandBase {
                         Math.abs(driver.getLeftX()) > 0.1 ||
                         Math.abs(driver.getRightX()) > 0.1;
 
-        return !robot.follower.isBusy() || driverOverride;
+//        return !robot.follower.isBusy() || driverOverride;
+        return robot.follower.atPose(targetPose, 1.0, Math.toRadians((2)))
+                || driverOverride;
     }
 
 
