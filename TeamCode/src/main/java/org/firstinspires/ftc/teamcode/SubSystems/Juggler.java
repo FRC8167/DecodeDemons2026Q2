@@ -3,10 +3,7 @@ package org.firstinspires.ftc.teamcode.SubSystems;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.controller.PIDFController;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
-
-import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
 
 public class Juggler extends SubsystemBase {
 
@@ -21,7 +18,7 @@ public class Juggler extends SubsystemBase {
 
     private final PIDFController jugglerPID;
 
-    private int rel_count;
+    private int normalizedCount;
     /*
         slot 0 -   0 counts to 95  counts, center = 47.5
         slot 1 -  96 counts to 191 counts, center = 143.5
@@ -125,23 +122,23 @@ public class Juggler extends SubsystemBase {
             spindexer.set(output);
 
             /* Added for Debugging Slot Center Error */
-            rel_count = (int)currentPosition;
-            if(rel_count > 287) rel_count = 288 - (int)currentPosition;
+            normalizedCount = (int)currentPosition;
+            if(normalizedCount > 287) normalizedCount = (int)currentPosition - 288;
     }
 
 
-    public int getRelativeCount() { return rel_count; }
+    public int getRelativeCount() { return normalizedCount; }
 
 
     public double getSlotCenterError() {
         double error = -999;
 
-        if(rel_count >= 0 && rel_count < 96) {
-            error = rel_count - 0.5;
-        } else if(rel_count >= 96 && rel_count < 192) {
-            error = rel_count - 95.5;
-        } else if (rel_count > 192 && rel_count < 288) {
-            error = rel_count - 190.5;
+        if(normalizedCount >= 240 || normalizedCount < 47) {
+            error = normalizedCount - 0.5;
+        } else if(normalizedCount >= 48 && normalizedCount < 143) {
+            error = normalizedCount - 95.5;
+        } else if (normalizedCount > 144 && normalizedCount < 239) {
+            error = normalizedCount - 190.5;
         }
 
         return error;
