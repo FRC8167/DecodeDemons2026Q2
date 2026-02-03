@@ -130,6 +130,10 @@ public class Juggler extends SubsystemBase {
     public int getRelativeCount() { return normalizedCount; }
 
 
+    /**
+     * Calculates the difference between the actual Slot center position and the theoretical
+     * @return Difference in counts. Positive errors indicate the juggler rotated more CW than theoretical
+     */
     public double getSlotCenterError() {
         double error = -999;
 
