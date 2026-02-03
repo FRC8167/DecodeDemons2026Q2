@@ -16,13 +16,13 @@ public class Slide extends SubsystemBase {
     public static int KICK_POS = 500;  //units are ticks
 
     //Limits
-    public static int DOWN_LIMIT = -10;
+    public static int DOWN_LIMIT = 10;
     public static int UP_LIMIT   = 580;  //units are ticks
 
     // PID using ticks
     public static double kP = 0.0003;
     public static double kI = 0.0;
-    public static double kD = 0.0002;
+    public static double kD = 0.0000;
     public static double kF = 0.0;
 
 
