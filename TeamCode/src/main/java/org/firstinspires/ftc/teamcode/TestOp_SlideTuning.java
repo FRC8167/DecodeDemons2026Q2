@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Slide;
 
 
 @Configurable
-@TeleOp(name = "Shooter PID Tuning")
+@TeleOp(name = "Slider PID Tuning")
 public class TestOp_SlideTuning extends OpMode {
 
     Slide slide;
