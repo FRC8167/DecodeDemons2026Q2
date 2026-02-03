@@ -116,7 +116,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         intake  = new Intake(intakeMotor);
         popper  = new Popper(popperServoL, popperServoR);
-        mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
+//        mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         slide = new Slide(slideMotor);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
@@ -132,7 +132,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         rgbLight.setDefaultCommand(detectArtifactCommand);
 
         //Register Subsystems
-        register(mecanumDrive, intake, shooter, slide, popper, vision, rgbLight, colorMatch, juggler);
+        register(mecanumDrive, intake, shooter, popper, slide, vision, rgbLight, colorMatch, juggler);
 
         if (OP_MODE_TYPE.equals(OpModeType.AUTO)) {
             initHasMovement();

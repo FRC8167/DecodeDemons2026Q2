@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 
 
 public class DriveToPoseCommand extends CommandBase {
@@ -24,7 +25,6 @@ public class DriveToPoseCommand extends CommandBase {
         robot = Robot.getInstance();
         this.targetPose = targetPose;
         this.driver = driver;
-        addRequirements(robot.mecanumDrive);
 
     }
 
@@ -62,7 +62,7 @@ public class DriveToPoseCommand extends CommandBase {
                         Math.abs(driver.getRightX()) > 0.1;
 
 //        return !robot.follower.isBusy() || driverOverride;
-        return robot.follower.atPose(targetPose, 1.0, Math.toRadians((2)))
+        return robot.follower.atPose(targetPose, 2.0, 2.0, Math.toRadians(6))
                 || driverOverride;
     }
 

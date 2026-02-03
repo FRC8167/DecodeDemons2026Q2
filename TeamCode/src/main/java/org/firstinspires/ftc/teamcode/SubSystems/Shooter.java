@@ -106,7 +106,7 @@ public class Shooter extends SubsystemBase {
 
         public void smartVelocity(double ATdistance) {
             double targetRPM = 0.0;
-            if (ATdistance > 41 && ATdistance < 138){
+            if (ATdistance > 46 && ATdistance < 140){
                     targetRPM=0.0566*ATdistance*ATdistance+0.1224466*ATdistance+2879.84478;
              }
 

@@ -46,6 +46,7 @@ public class MainTeleOp extends CommandOpMode {
     public static double current_velocity = 3200;
     public double increment = 25;
 
+    private boolean automatedDrive = false;
 
     private Pose startPose;
 //    private Pose autoEndPose;
@@ -71,7 +72,8 @@ public class MainTeleOp extends CommandOpMode {
             startPose = robot.autoEndPose;
         }
 
-        robot.mecanumDrive.setDefaultCommand(new DriveCommand(robot.mecanumDrive, gamepad1));
+//        robot.mecanumDrive.setDefaultCommand(new DriveCommand(robot.mecanumDrive, gamepad1));
+
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         //end pose held in robot
@@ -158,21 +160,29 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(()->robot.popper.set(Popper.PopperState.RESET)));
 
 
-        driver.getGamepadButton(GamepadKeys.Button.BACK)
-                .whenPressed(new CancelPedroCommand());
+//        driver.getGamepadButton(GamepadKeys.Button.BACK)
+//                .whenPressed(new CancelPedroCommand());
 
         driver.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(
-                                new DriveToPoseCommand(robot.getShootPose(), driver)
-                          );
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> automatedDrive = true),
+                                new DriveToPoseCommand(robot.getShootPose(), driver),
+                                new CancelPedroCommand(),
+                                new InstantCommand(() -> automatedDrive = false)
+                        )
+                );
 
         //driver-assisted shoot commands
         driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(
                         new SequentialCommandGroup(
+                                new InstantCommand(() -> automatedDrive = true),
                                 new DriveToPoseCommand(robot.getShootPose(), driver),
                                 new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-                                new InstantCommand(()->robot.shooter.stop())
+                                new InstantCommand(()->robot.shooter.stop()),
+                                new CancelPedroCommand(),
+                                new InstantCommand(() -> automatedDrive = false)
                                         //End the path hold
 //                                        new InstantCommand(() -> robot.follower.breakFollowing())
 
@@ -196,9 +206,25 @@ public class MainTeleOp extends CommandOpMode {
     @Override
     public void run() {
         super.run();
+
+        if (!automatedDrive) {
+//            robot.follower.setTeleOpDrive(
+//                    -gamepad1.left_stick_y,
+//                    gamepad1.left_stick_x,
+//                    gamepad1.right_stick_x
+//            );
+            robot.follower.breakFollowing();
+            robot.mecanumDrive.drive(
+                    -gamepad1.left_stick_y,
+                    gamepad1.left_stick_x,
+                    gamepad1.right_stick_x
+            );
+        }
+
         robot.follower.update();
         robot.autoEndPose = robot.follower.getPose();
         AprilTagDetection tag = robot.vision.getFirstTargetTag();
+
 
 
         if (tag != null) {

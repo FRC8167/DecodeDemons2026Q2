@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -12,15 +13,15 @@ public class Slide extends SubsystemBase {
     public static final double TICKS_PER_REV = 537.7;
     public static final double MM_PER_REV = 120.0;
     public static final double TICKS_PER_MM = TICKS_PER_REV / MM_PER_REV;//4.5
-    public static int NEST_POS = 0;
-    public static int KICK_POS = 500;  //units are ticks
+    public static int NEST_POS = 10;
+    public static int KICK_POS = 480;  //units are ticks
 
     //Limits
     public static int DOWN_LIMIT = 10;
-    public static int UP_LIMIT   = 580;  //units are ticks
+    public static int UP_LIMIT   = 480;  //units are ticks
 
     // PID using ticks
-    public static double kP = 0.0001;
+    public static double kP = 0.001;
     public static double kI = 0.0;
     public static double kD = 0.0;
     public static double kF = 0.0;
@@ -53,7 +54,7 @@ public class Slide extends SubsystemBase {
         slidePID.setTolerance(TOLERANCE);
         double currentPosition = slideMotor.getCurrentPosition();
         double output = slidePID.calculate(currentPosition);
-        output = Math.max(-MAX_POWER, Math.min(MAX_POWER, output));
+        output = Range.clip(output, -0.5, 0.5);
         slideMotor.set(output);
 
     }

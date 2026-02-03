@@ -11,7 +11,7 @@ public class Juggler extends SubsystemBase {
 
     public static final int PPR = 288;
     public static final int SLOTS = 3;
-    public static final int COUNTS_PER_SLOT = PPR / SLOTS;
+    public static final int COUNTS_PER_SLOT = PPR / SLOTS - 1;
     int target;
     private boolean slowSpinEnabled = false;
     private double slowSpinPower = 0.0;
@@ -114,7 +114,7 @@ public class Juggler extends SubsystemBase {
             }
 
             // Indexing = w/PID
-            double currentPosition = spindexer.getCurrentPosition();
+            int currentPosition = spindexer.getCurrentPosition();
             double output = Range.clip(
                     jugglerPID.calculate(currentPosition),
                     -0.3, 0.3
