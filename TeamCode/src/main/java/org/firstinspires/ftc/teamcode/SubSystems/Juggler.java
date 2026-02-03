@@ -26,6 +26,11 @@ public class Juggler extends SubsystemBase {
         slot 0 -   0 counts to 95  counts, center = 47.5
         slot 1 -  96 counts to 191 counts, center = 143.5
         slot 2 - 192 counts to 287 counts, center = 239.5
+
+        if Slot 0 centered is set to 0 counts
+        slot 0 - 240 counts to 47  counts, center = -0.5
+        slot 1 -  48 counts to 143 counts, center = 95.5
+        slot 2 - 144 counts to 239 counts, center = 190.5
      */
 
 
@@ -132,11 +137,11 @@ public class Juggler extends SubsystemBase {
         double error = -999;
 
         if(rel_count >= 0 && rel_count < 96) {
-            error = rel_count - 47.5;
+            error = rel_count - 0.5;
         } else if(rel_count >= 96 && rel_count < 192) {
-            error = rel_count - 143.5;
+            error = rel_count - 95.5;
         } else if (rel_count > 192 && rel_count < 288) {
-            error = rel_count - 239.5;
+            error = rel_count - 190.5;
         }
 
         return error;
