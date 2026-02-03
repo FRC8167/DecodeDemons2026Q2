@@ -8,7 +8,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 public class Slide extends SubsystemBase {
 
     private final MotorEx slideMotor;
-    public static double MAX_POWER = 0.6;
+    public static double MAX_POWER = 0.5;
     public static final double TICKS_PER_REV = 537.7;
     public static final double MM_PER_REV = 120.0;
     public static final double TICKS_PER_MM = TICKS_PER_REV / MM_PER_REV;//4.5
@@ -20,11 +20,10 @@ public class Slide extends SubsystemBase {
     public static int UP_LIMIT   = 580;  //units are ticks
 
     // PID using ticks
-    public static double kP = 0.0003;
+    public static double kP = 0.0001;
     public static double kI = 0.0;
-    public static double kD = 0.0000;
+    public static double kD = 0.0;
     public static double kF = 0.0;
-
 
     public static double TOLERANCE = 15;
     private final PIDFController slidePID;
@@ -47,6 +46,7 @@ public class Slide extends SubsystemBase {
         slidePID.setSetPoint(targetTicks);
     }
 
+
     @Override
     public void periodic() {
         slidePID.setPIDF(kP, kI, kD, kF);
@@ -57,6 +57,7 @@ public class Slide extends SubsystemBase {
         slideMotor.set(output);
 
     }
+
 
     public void stop() {
         slideMotor.set(0);
@@ -69,9 +70,11 @@ public class Slide extends SubsystemBase {
         return ticks;
     }
 
+
     public int getPositionTicks() {
         return slideMotor.getCurrentPosition();
     }
+
 
     public boolean atTarget() {
         return slidePID.atSetPoint();
