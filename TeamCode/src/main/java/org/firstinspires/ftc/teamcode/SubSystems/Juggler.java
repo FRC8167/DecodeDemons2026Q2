@@ -21,6 +21,7 @@ public class Juggler extends SubsystemBase {
 
     private final PIDFController jugglerPID;
 
+
     public Juggler(MotorEx motor) {
         this.spindexer = motor;
         spindexer.setRunMode(MotorEx.RunMode.RawPower);
@@ -30,6 +31,7 @@ public class Juggler extends SubsystemBase {
         jugglerPID.setTolerance(5);
         target = 0;
     }
+
 
     public enum Direction {
         CW(1),
@@ -46,20 +48,24 @@ public class Juggler extends SubsystemBase {
         jugglerPID.setSetPoint(target);
     }
 
+
     public void rotateTwoSlots(Direction direction) {
         target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT*2;
         jugglerPID.setSetPoint(target);
     }
+
 
     public void rotateToSlot(int slotIndex) {
         if (slotIndex == 1) { rotateOneSlot(Direction.CW);}
         else if (slotIndex ==2) {rotateOneSlot(Direction.CCW);}
     }
 
+
     public void startSlowSpin(Direction direction) {
         slowSpinEnabled = true;
         slowSpinPower = 0.2 * direction.sign;
     }
+
 
     public void Snap() {
         slowSpinEnabled = false;
@@ -106,9 +112,6 @@ public class Juggler extends SubsystemBase {
             );
             spindexer.set(output);
         }
-
-
-
 
 
 }

@@ -6,6 +6,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 @Configurable
 public class Slide extends SubsystemBase {
+
     private final MotorEx slideMotor;
     public static double MAX_POWER = 0.6;
     public static final double TICKS_PER_REV = 537.7;
