@@ -21,6 +21,13 @@ public class Juggler extends SubsystemBase {
 
     private final PIDFController jugglerPID;
 
+    private int rel_count;
+    /*
+        slot 0 -   0 counts to 95  counts, center = 47.5
+        slot 1 -  96 counts to 191 counts, center = 143.5
+        slot 2 - 192 counts to 287 counts, center = 239.5
+     */
+
 
     public Juggler(MotorEx motor) {
         this.spindexer = motor;
@@ -111,7 +118,28 @@ public class Juggler extends SubsystemBase {
                     -0.3, 0.3
             );
             spindexer.set(output);
+
+            /* Added for Debugging Slot Center Error */
+            rel_count = (int)currentPosition;
+            if(rel_count > 287) rel_count = 288 - (int)currentPosition;
+    }
+
+
+    public int getRelativeCount() { return rel_count; }
+
+
+    public double getSlotCenterError() {
+        double error = -999;
+
+        if(rel_count >= 0 && rel_count < 96) {
+            error = rel_count - 47.5;
+        } else if(rel_count >= 96 && rel_count < 192) {
+            error = rel_count - 143.5;
+        } else if (rel_count > 192 && rel_count < 288) {
+            error = rel_count - 239.5;
         }
 
+        return error;
+    }
 
 }
