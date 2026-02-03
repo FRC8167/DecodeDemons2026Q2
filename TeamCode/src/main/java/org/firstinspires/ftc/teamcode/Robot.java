@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
+import org.firstinspires.ftc.teamcode.SubSystems.Slide;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
@@ -73,6 +74,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public LimeLightVision limey;
 
     public Popper popper;
+    public Slide slide;
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
 
@@ -89,6 +91,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         MotorEx intakeMotor    = new MotorEx(hardwareMap, "Intake").setCachingTolerance(0.01);
         MotorEx shooterMotor   = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
         MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
+        MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
+
         spindexerMotor.resetEncoder();  //added 01-18
 
         ServoEx popperServoL = new ServoEx(hardwareMap, "popperServoL");
@@ -112,6 +116,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         intake  = new Intake(intakeMotor);
         popper  = new Popper(popperServoL, popperServoR);
+        mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
+        slide = new Slide(slideMotor);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
         vision  = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
@@ -126,7 +132,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         rgbLight.setDefaultCommand(detectArtifactCommand);
 
         //Register Subsystems
-        register(mecanumDrive, intake, shooter, popper, vision, rgbLight, colorMatch, juggler);
+        register(mecanumDrive, intake, shooter, slide, popper, vision, rgbLight, colorMatch, juggler);
 
         if (OP_MODE_TYPE.equals(OpModeType.AUTO)) {
             initHasMovement();
