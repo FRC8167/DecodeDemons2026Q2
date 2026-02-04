@@ -13,7 +13,7 @@ public class Slide extends SubsystemBase {
     public static final double TICKS_PER_REV = 537.7;
     public static final double MM_PER_REV = 120.0;
     public static final double TICKS_PER_MM = TICKS_PER_REV / MM_PER_REV;//4.5
-    public static int NEST_POS = 10;
+    public static int NEST_POS = 12;
     public static int KICK_POS = 480;  //units are ticks
 
     //Limits
@@ -26,7 +26,7 @@ public class Slide extends SubsystemBase {
     public static double kD = 0.0;
     public static double kF = 0.0;
 
-    public static double TOLERANCE = 15;
+    public static double TOLERANCE = 5;
     private final PIDFController slidePID;
     private int targetTicks = 0;
 
