@@ -7,17 +7,19 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 
 
+@Disabled
 @Configurable
 @TeleOp(name="LimeLight Turn to Tag", group="TestOps")
 public class TestOpTest_Limelight extends OpMode {
 
-     static TelemetryManager tmPanels;
+    static TelemetryManager tmPanels;
 
     LimeLightVision limey;
 
