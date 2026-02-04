@@ -5,23 +5,17 @@ import android.annotation.SuppressLint;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.qualcomm.hardware.limelightvision.LLFieldMap;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
-import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
-import org.firstinspires.ftc.teamcode.SubSystems.Vision;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 @Configurable
 @TeleOp(name="TestOp LimeLight", group="TestOps")
-public class TeleOpTest_Limelight extends OpMode {
+public class TestOpTest_Limelight extends OpMode {
 
      static TelemetryManager tmPanels;
 

@@ -5,37 +5,21 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
-import com.seattlesolvers.solverslib.command.RunCommand;
-import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
-import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
-import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
-import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
-import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
-import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
-import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
-import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
 //@Disabled
 @TeleOp(name="Tag Track Tuning", group="TestOps")
-public class TeleOp_TagTrackTuning extends CommandOpMode {
+public class TestOp_TagTrackTuning extends CommandOpMode {
 
     public GamepadEx driver;
     private final Robot robot = Robot.getInstance();

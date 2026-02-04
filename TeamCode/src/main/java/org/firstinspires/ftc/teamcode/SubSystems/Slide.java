@@ -54,9 +54,8 @@ public class Slide extends SubsystemBase {
         slidePID.setTolerance(TOLERANCE);
         double currentPosition = slideMotor.getCurrentPosition();
         double output = slidePID.calculate(currentPosition);
-        output = Range.clip(output, -0.5, 0.5);
+        output = Range.clip(output, -0.3, 0.3);
         slideMotor.set(output);
-
     }
 
 

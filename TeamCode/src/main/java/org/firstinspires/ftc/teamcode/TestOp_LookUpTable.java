@@ -9,7 +9,6 @@ import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
@@ -18,8 +17,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 @Configurable
-@TeleOp(name="TestOp LookUp Table Calibration", group="TestOps")
-public class Telop_LookUpTable extends OpMode {
+@TeleOp(name="Shooter LookUp Table Calibration", group="TestOps")
+public class TestOp_LookUpTable extends OpMode {
 
     private final Robot robot = Robot.getInstance();
     static TelemetryManager tmPanels;
