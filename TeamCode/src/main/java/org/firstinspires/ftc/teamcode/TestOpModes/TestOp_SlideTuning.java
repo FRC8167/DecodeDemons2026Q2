@@ -18,7 +18,7 @@ public class TestOp_SlideTuning extends OpMode {
 
     Slide slide;
 
-    static int cmd;
+    static int cmdCounts;
     static int MAX_COUNTS = (int)(537.7 * 0.7);
     static int MIN_COUNTS = (int)(537.7 * 0.4);
     static long STEP_DURATION_SEC = 2;
@@ -62,22 +62,22 @@ public class TestOp_SlideTuning extends OpMode {
         if ((currentTime - prevTime) >= (STEP_DURATION_SEC * 1000)) {
             switch (nextState) {
                 case HIGH:
-                    cmd = MAX_COUNTS;
+                    cmdCounts = MAX_COUNTS;
                     nextState = State.LOW;
                     break;
 
                 case LOW:
-                    cmd = MIN_COUNTS;
+                    cmdCounts = MIN_COUNTS;
                     nextState = State.HIGH;
                     break;
             }
-            slide.setTargetTicks(cmd);
+            slide.setTargetTicks(cmdCounts);
             prevTime = currentTime;
         }
 
 
         // Display on Panels
-        tmPanels.addData("Commanded Position (cnts)", cmd);
+        tmPanels.addData("Commanded Position (cnts)", cmdCounts);
         tmPanels.addData("Actual Position (cnts)", slide.getPositionTicks());
         tmPanels.addData("Shooter at Target ", slide.atTarget());
 
