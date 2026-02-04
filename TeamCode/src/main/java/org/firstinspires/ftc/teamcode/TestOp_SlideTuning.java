@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Slide;
 
 
 @Configurable
-@TeleOp(name = "Slider PID Tuning")
+@TeleOp(name = "Slider PID Tuning", group="TestOps")
 public class TestOp_SlideTuning extends OpMode {
 
     Slide slide;
@@ -55,6 +55,7 @@ public class TestOp_SlideTuning extends OpMode {
     @Override
     public void loop() {
 
+        slide.periodic();
         currentTime = System.currentTimeMillis();
 
         // Create square wave command between 20%-80% of motor full speed rpm. 10s High and 10s low
