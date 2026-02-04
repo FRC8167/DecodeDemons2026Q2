@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 
 
 @Configurable
-@TeleOp(name="TestOp LimeLight", group="TestOps")
+@TeleOp(name="LimeLight Turn to Tag", group="TestOps")
 public class TestOpTest_Limelight extends OpMode {
 
      static TelemetryManager tmPanels;
