@@ -79,16 +79,17 @@ public class TestOp_Slide_Manual_Move extends OpMode {
         telemetry.addLine("Increment by  5:  A-, B+");
         telemetry.addLine("Increment by  1: LB-, RB+");
         telemetry.addLine("*************************");
+        telemetry.addLine("");
         telemetry.addData("Commanded Position [cnts]", cmdCounts);
+        telemetry.addData("PID Setpoint [cnts]", slide.getPidSetpoint());
         telemetry.addData("Actual Position [cnts]", slide.getPositionTicks());
         telemetry.addData("Slide at Target", slide.atTarget());
-        telemetry.addData("Error [cnts]", cmdCounts - slide.getPositionTicks());
         telemetry.update();
 
         tmPanels.addData("Commanded Position [cnts]", cmdCounts);
+        tmPanels.addData("PID Setpoint [cnts]", slide.getPidSetpoint());
         tmPanels.addData("Actual Position [cnts]", slide.getPositionTicks());
         tmPanels.addData("Slide at Target", slide.atTarget());
-        tmPanels.addData("Error [cnts]", cmdCounts - slide.getPositionTicks());
         tmPanels.update();
 
         xPressed = gamepad1.x;

@@ -75,8 +75,10 @@ public class Slide extends SubsystemBase {
         return slideMotor.getCurrentPosition();
     }
 
+    public int getPidSetpoint() { return (int)slidePID.getSetPoint(); }
 
     public boolean atTarget() {
         return slidePID.atSetPoint();
     }
+
 }
