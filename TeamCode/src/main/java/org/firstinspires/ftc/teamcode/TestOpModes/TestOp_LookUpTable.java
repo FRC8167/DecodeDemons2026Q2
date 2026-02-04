@@ -62,6 +62,9 @@ public class TestOp_LookUpTable extends OpMode {
     @Override
     public void loop() {
 
+        shooter.periodic();
+        vision.periodic();
+
         vision.scanForAprilTags();
         AprilTagDetection tag = vision.getFirstTargetTag();
 
@@ -92,8 +95,6 @@ public class TestOp_LookUpTable extends OpMode {
         }
 
         shooter.setVelocity(cmd);
-        shooter.periodic();
-        vision.periodic();
 
         tmPanels.addData("Commanded RPM", cmd);
         tmPanels.addData("Shooter Velocity (RPM)", shooter.getRPM());
