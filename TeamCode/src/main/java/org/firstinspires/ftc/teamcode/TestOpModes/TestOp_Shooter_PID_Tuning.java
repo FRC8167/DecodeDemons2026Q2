@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TestOpModes;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -9,33 +9,31 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.SubSystems.Slide;
-
+import org.firstinspires.ftc.teamcode.SubSystems.Shooter_Alternate;
 
 @Configurable
-@TeleOp(name = "Slider PID Tuning", group="TestOps")
-public class TestOp_SlideTuning extends OpMode {
+@TeleOp(name = "Shooter PID Tuning", group="TestOps")
+public class TestOp_Shooter_PID_Tuning extends OpMode {
 
-    Slide slide;
+    Shooter_Alternate shooter;
 
-    static int cmd;
-    static int MAX_COUNTS = (int)(537.7 * 0.7);
-    static int MIN_COUNTS = (int)(537.7 * 0.4);
-    static long STEP_DURATION_SEC = 2;
+    static double cmd;
+    static double MAX_MOTOR_RPM     = 6000;
+    static long   STEP_DURATION_SEC = 10;
 
     static TelemetryManager tmPanels;
 
     long currentTime = 0;
     long prevTime = 0;
 
-    private enum State {HIGH, LOW}
+    private enum State {HIGH, LOW};
     State nextState = State.HIGH;
 
 
     @Override
     public void init() {
-        MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
-        slide = new Slide(slideMotor);
+        MotorEx shooterMotor = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
+        shooter  = new Shooter_Alternate(shooterMotor);
         tmPanels = PanelsTelemetry.INSTANCE.getTelemetry();
     }
 
@@ -55,33 +53,41 @@ public class TestOp_SlideTuning extends OpMode {
     @Override
     public void loop() {
 
-        slide.periodic();
+        shooter.periodic();
         currentTime = System.currentTimeMillis();
 
         // Create square wave command between 20%-80% of motor full speed rpm. 10s High and 10s low
-        if ((currentTime - prevTime) >= (STEP_DURATION_SEC * 1000)) {
+        if( (currentTime - prevTime) >= (STEP_DURATION_SEC * 1000) ) {
             switch (nextState) {
                 case HIGH:
-                    cmd = MAX_COUNTS;
+                    cmd = MAX_MOTOR_RPM * 0.80;
                     nextState = State.LOW;
                     break;
 
                 case LOW:
-                    cmd = MIN_COUNTS;
+                    cmd = MAX_MOTOR_RPM * 0.20;
                     nextState = State.HIGH;
                     break;
             }
-            slide.setTargetTicks(cmd);
+            shooter.setVelocity(cmd);
             prevTime = currentTime;
         }
 
 
         // Display on Panels
-        tmPanels.addData("Commanded Position (cnts)", cmd);
-        tmPanels.addData("Actual Position (cnts)", slide.getPositionTicks());
-        tmPanels.addData("Shooter at Target ", slide.atTarget());
+        tmPanels.debug("Commanded Speed (RPM)",       cmd);
+        tmPanels.debug("Shooter Speed (RPM)", "%.1f", shooter.getRPM());
+        tmPanels.debug("Shooter Speed (TPS)", "%.1f", shooter.getTicsPerSec());
+        tmPanels.debug("Shooter at Target ",          shooter.atTargetVelocity());
+
+        tmPanels.addData("------- Using addData ", "instead of debug -------");
+        tmPanels.addData("Commanded RPM", cmd);
+        tmPanels.addData("Motor RPM",     shooter.getRPM());
 
         tmPanels.update(telemetry);     // Should update both the driver station and panels
+
     }
 }
+
+
 
