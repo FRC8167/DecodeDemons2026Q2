@@ -62,7 +62,7 @@ public class TestOpTest_Limelight extends OpMode {
 //                tmPanels.addData("Distance Unit", aTag.getRobotPoseTargetSpace().getPosition().unit);
 
                 tmPanels.addData("Distance [in]", limey.getDistanceToGoal()*39.27);
-                tmPanels.addData("Yaw Angle to Target", limey.getYawToTarget());
+//                tmPanels.addData("Yaw Angle to Target", limey.getYawToTarget());
             }
         } else {
             tmPanels.addLine("No target tags (20–24) detected.");

@@ -76,10 +76,14 @@ public class TestOp_SlideTuning extends OpMode {
         }
 
 
+        //Allow for Plots
+        tmPanels.debug(cmdCounts);
+        tmPanels.debug(slide.getPositionTicks());
+
         // Display on Panels
         tmPanels.addData("Commanded Position (cnts)", cmdCounts);
         tmPanels.addData("Actual Position (cnts)", slide.getPositionTicks());
-        tmPanels.addData("Shooter at Target ", slide.atTarget());
+        tmPanels.addData("Slide at Target ", slide.atTarget());
 
         tmPanels.update(telemetry);     // Should update both the driver station and panels
     }
