@@ -109,11 +109,11 @@ public class LimeLightVision extends SubsystemBase {
     }
 
 
-    public double getYawToTarget() {
+    public double getYawToTag() {
         if (tagsFound) {
-            return fiducials.get(0).getTargetXDegrees(); // Where first target is (left-right)
+            return fiducials.get(0).getTargetXDegrees(); // Where first target Crosshair is (left-right)
 //           return result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
-        } else return 0;
+        } else return -999;
     }
 
     /**

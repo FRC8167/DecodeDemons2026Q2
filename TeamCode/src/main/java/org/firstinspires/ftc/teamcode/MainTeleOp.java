@@ -193,11 +193,11 @@ public class MainTeleOp extends CommandOpMode {
 //            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
 
         // Not Competition Ready
-//        driver.getGamepadButton(GamepadKeys.Button.Y)
-//                .whenPressed( new InstantCommand(()-> robot.mecanumDrive.setDriveMode(MecanumDrive.DriveMode.CONSTANT_HEADING)))
-//                .whileHeld(   new InstantCommand(()-> robot.mecanumDrive.setBearings(0, -robot.limey.getYawToTarget())))
-//                .whenReleased(new InstantCommand(()-> robot.mecanumDrive.setDriveMode(MecanumDrive.DriveMode.NORMAL))
-//                );
+        driver.getGamepadButton(GamepadKeys.Button.Y)
+                .whenPressed( new InstantCommand(()-> robot.mecanumDrive.setDriveMode(MecanumDrive.DriveMode.CONSTANT_HEADING)))
+                .whileHeld(   new InstantCommand(()-> robot.mecanumDrive.setBearings(robot.limey.getYawToTag(), 0)))
+                .whenReleased(new InstantCommand(()-> robot.mecanumDrive.setDriveMode(MecanumDrive.DriveMode.NORMAL))
+                );
 
     }
 

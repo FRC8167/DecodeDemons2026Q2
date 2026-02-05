@@ -29,7 +29,7 @@ public class  MecanumDrive extends SubsystemBase {
         FIELD_ORIENTATION
     }
 
-    private double robotHeading, targetBearing;
+    private double tagTx, targetBearing;
     private boolean targetValid;
     private DriveMode driveMode;
 
@@ -122,7 +122,7 @@ public class  MecanumDrive extends SubsystemBase {
 
             case CONSTANT_HEADING:
                 if(targetValid) {
-                    error = targetBearing - robotHeading;
+                    error = targetBearing - tagTx;
 
                     /* Need Angle Wrap calculation to ensure turning the shortest distance */
                     while (error > 180) {
@@ -246,10 +246,10 @@ public class  MecanumDrive extends SubsystemBase {
     public void setFFheading(double FF){ FFheading  = FF; }
 
 
-    public void setBearings(double robotPoseYaw, double targetPose) {
-        this.robotHeading = robotPoseYaw;
-        if(targetPose != -999)  {
-            this.targetBearing = targetPose;
+    public void setBearings(double limelightTx, double cmdAngleDiffDegree) {
+        this.tagTx = limelightTx;
+        if(cmdAngleDiffDegree != -999)  {
+            this.targetBearing = cmdAngleDiffDegree;
             targetValid = true;
         } else targetValid = false;
     }
