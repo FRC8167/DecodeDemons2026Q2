@@ -71,7 +71,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public Juggler juggler;
     public SensorColor colorSensor;
     public Vision vision;
-    public LimeLightVision limey;
+//    public LimeLightVision vision;
 
     public Popper popper;
     public Slide slide;
@@ -120,8 +120,9 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         slide = new Slide(slideMotor);
         shooter = new Shooter(shooterMotor);
         juggler = new Juggler(spindexerMotor);
-        vision  = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
-//        limey   = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
+
+        vision = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
+//        vision = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
         rgbLight   = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
 

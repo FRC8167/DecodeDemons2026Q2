@@ -34,8 +34,8 @@ public class  MecanumDrive extends SubsystemBase {
     private DriveMode driveMode;
 
     // Needed for Panels Tuning - Can be local variable values known
-    double Kp_Heading = 0.1;
-    double FFheading = 0;
+    double Kp_Heading = 0.01;
+    double FFheading = 0.025;
 
 
     /**
