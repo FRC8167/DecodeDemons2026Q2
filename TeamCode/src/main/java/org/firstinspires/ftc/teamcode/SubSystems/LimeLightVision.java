@@ -19,6 +19,7 @@ public class LimeLightVision extends SubsystemBase {
 
     private final Limelight3A ll;
     private LLResult result;
+    private boolean tagsFound;
 
 //    Position defaultPosition = new Position(DistanceUnit.INCH, 0,0,0,0);
 //    YawPitchRollAngles defaultAngles = new YawPitchRollAngles(AngleUnit.DEGREES,0,0,0,0);
@@ -42,6 +43,7 @@ public class LimeLightVision extends SubsystemBase {
         ll.setPollRateHz(100);
         ll.pipelineSwitch(pipeLine);
         if(Enable_Immediately) { start(); }
+        tagsFound = false;
     }
 
 
@@ -55,7 +57,11 @@ public class LimeLightVision extends SubsystemBase {
 
             // Get April Tag results
             fiducials = result.getFiducialResults();
-        } else fiducials = null;
+            tagsFound = true;
+        } else {
+            fiducials = null;
+            tagsFound = false;
+        }
 //            for (LLResultTypes.FiducialResult fiducial : fiducials) {
 //                int id = fiducial.getFiducialId(); // The ID number of the fiducial
 //                double x = fiducial.getTargetXDegrees(); // Where it is (left-right)
@@ -104,7 +110,10 @@ public class LimeLightVision extends SubsystemBase {
 
 
     public double getYawToTarget() {
-        return result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+        if (tagsFound) {
+            return fiducials.get(0).getTargetXDegrees(); // Where first target is (left-right)
+//           return result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+        } else return 0;
     }
 
     /**

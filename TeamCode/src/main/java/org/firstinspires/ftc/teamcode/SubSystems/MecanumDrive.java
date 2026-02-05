@@ -176,7 +176,7 @@ public class  MecanumDrive extends SubsystemBase {
         }
 
         if (error >= 10 && error < 30) {     // Limit PID control range to +/- 30 degrees of target to eliminate angle wrap
-            newTurnCmd = Range.clip(Kp_Heading * error, -1.0, 1.0);
+            newTurnCmd = Kp_Heading * error;
         } else newTurnCmd = turnCmd;
 
         newTurnCmd += (newTurnCmd > 0) ? feedForwardGain : -feedForwardGain;
