@@ -46,6 +46,7 @@ public class Juggler extends SubsystemBase {
         jugglerPID.setTolerance(5);
         target = 0;
 
+
     }
 
 
@@ -120,6 +121,23 @@ public class Juggler extends SubsystemBase {
         int snappedTarget = nearestSlot * COUNTS_PER_SLOT;
         jugglerPID.setSetPoint(snappedTarget);
         target = snappedTarget;
+
+        /*
+        slowSpinEnabled = false;
+
+                switch (currentSlot) {
+            case 0:
+                target = SLOT0_CENTER;
+                break;
+            case 1:
+                target = SLOT1_CENTER;
+                break;
+            case 2:
+                target = SLOT2_CENTER;
+                break;
+        }
+        jugglerPID.setSetPoint(target);
+         */
     }
 
 
@@ -166,7 +184,7 @@ public class Juggler extends SubsystemBase {
     }
 
 
-    public int getRelativeCount() { return normalizedCount; }
+    public int getNormalizedCount() { return normalizedCount; }
 
 
     /**
