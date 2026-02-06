@@ -18,6 +18,7 @@ public class Juggler extends SubsystemBase {
 
     private final PIDFController jugglerPID;
 
+    /* wheat 06 FEB 2026 */
     private int normalizedCount;
     /*
         slot 0 -   0 counts to 95  counts, center = 47.5
@@ -29,6 +30,11 @@ public class Juggler extends SubsystemBase {
         slot 1 -  48 counts to 143 counts, center = 95.5
         slot 2 - 144 counts to 239 counts, center = 190.5
      */
+    private int SLOT0_CENTER = 1;
+    private int SLOT1_CENTER = 96;
+    private int SLOT2_CENTER = 191;
+
+    private int currentSlot;
 
 
     public Juggler(MotorEx motor) {
@@ -39,6 +45,7 @@ public class Juggler extends SubsystemBase {
         jugglerPID = new PIDFController(.02,0,0,0); // ki, kd, kv);  //was.01
         jugglerPID.setTolerance(5);
         target = 0;
+
     }
 
 
@@ -55,12 +62,42 @@ public class Juggler extends SubsystemBase {
     public void rotateOneSlot(Direction direction) {
         target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT;
         jugglerPID.setSetPoint(target);
+
+        /* *********************************************
+        switch (currentSlot) {
+            case 0:
+                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT2_CENTER;
+                break;
+            case 1:
+                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT0_CENTER;
+                break;
+            case 2:
+                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT1_CENTER;
+                break;
+        }
+        jugglerPID.setSetPoint(target);
+        /* ********************************************* */
     }
 
 
     public void rotateTwoSlots(Direction direction) {
         target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT*2;
         jugglerPID.setSetPoint(target);
+
+        /* *********************************************
+        switch (currentSlot) {
+            case 0:
+                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT1_CENTER;
+                break;
+            case 1:
+                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT2_CENTER;
+                break;
+            case 2:
+                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT0_CENTER;
+                break;
+        }
+        jugglerPID.setSetPoint(target);
+        /* ********************************************* */
     }
 
 
@@ -84,6 +121,7 @@ public class Juggler extends SubsystemBase {
         jugglerPID.setSetPoint(snappedTarget);
         target = snappedTarget;
     }
+
 
     public void stop(){
         spindexer.set(0.0);
@@ -122,8 +160,9 @@ public class Juggler extends SubsystemBase {
             spindexer.set(output);
 
             /* Added for Debugging Slot Center Error */
-            normalizedCount = (int)currentPosition;
-            if(normalizedCount > 287) normalizedCount = (int)currentPosition - 288;
+            normalizedCount = currentPosition;
+            if(normalizedCount > 287) normalizedCount = currentPosition - 288;
+            updateCurrentSlot();
     }
 
 
@@ -131,21 +170,18 @@ public class Juggler extends SubsystemBase {
 
 
     /**
-     * Calculates the difference between the actual Slot center position and the theoretical
-     * @return Difference in counts. Positive errors indicate the juggler rotated more CW than theoretical
+     * Determines the current slot
      */
-    public double getSlotCenterError() {
-        double error = -999;
+    public void updateCurrentSlot() {
 
         if(normalizedCount >= 240 || normalizedCount < 47) {
-            error = normalizedCount - 0.5;
+            currentSlot = 0;
         } else if(normalizedCount >= 48 && normalizedCount < 143) {
-            error = normalizedCount - 95.5;
+            currentSlot = 1;
         } else if (normalizedCount > 144 && normalizedCount < 239) {
-            error = normalizedCount - 190.5;
+            currentSlot = 2;
         }
-
-        return error;
     }
+
 
 }
