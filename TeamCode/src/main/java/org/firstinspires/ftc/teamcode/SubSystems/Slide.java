@@ -9,24 +9,24 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 public class Slide extends SubsystemBase {
 
     private final MotorEx slideMotor;
-    public static double MAX_POWER = 0.95;
+    public static double MAX_POWER = 0.75 ;
     public static final double TICKS_PER_REV = 537.7;
     public static final double MM_PER_REV = 120.0;
     public static final double TICKS_PER_MM = TICKS_PER_REV / MM_PER_REV;//4.5
-    public static int NEST_POS = 12;
-    public static int KICK_POS = 480;  //units are ticks
+    public static int NEST_POS = 6;
+    public static int KICK_POS = 460;  //units are ticks
 
     //Limits
-    public static int DOWN_LIMIT = 10;
-    public static int UP_LIMIT   = 480;  //units are ticks
+    public static int DOWN_LIMIT = 5;
+    public static int UP_LIMIT   = 470;  //units are ticks
 
     // PID using ticks
-    public static double kP = 0.0155;
+    public static double kP = 0.004; //0.0155;
     public static double kI = 0.0;
-    public static double kD = 2.5E-4;
+    public static double kD = 0; //2.5E-4;
     public static double kF = 0.0;
 
-    public static double TOLERANCE = 3;
+    public static double TOLERANCE = 10;
     private final PIDFController slidePID;
     private int targetTicks = 0;
 
@@ -38,7 +38,7 @@ public class Slide extends SubsystemBase {
         slideMotor.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
         slidePID = new PIDFController(kP, kI, kD, kF);
         slidePID.setTolerance(TOLERANCE);
-        setTargetTicks(NEST_POS);
+        //setTargetTicks(NEST_POS);
     }
 
 
@@ -50,8 +50,8 @@ public class Slide extends SubsystemBase {
 
     @Override
     public void periodic() {
-        slidePID.setPIDF(kP, kI, kD, kF);
-        slidePID.setTolerance(TOLERANCE);
+//        slidePID.setPIDF(kP, kI, kD, kF);
+//        slidePID.setTolerance(TOLERANCE);
         double currentPosition = slideMotor.getCurrentPosition();
         double output = slidePID.calculate(currentPosition);
         output = Range.clip(output, -MAX_POWER, MAX_POWER);
@@ -60,7 +60,7 @@ public class Slide extends SubsystemBase {
 
 
     public void stop() {
-        slideMotor.set(0);
+        slidePID.setSetPoint(NEST_POS);
     }
 
 

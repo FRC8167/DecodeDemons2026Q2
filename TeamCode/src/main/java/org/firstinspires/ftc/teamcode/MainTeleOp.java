@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
+import org.firstinspires.ftc.teamcode.Commands.KickCommand;
+import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
@@ -114,9 +116,9 @@ public class MainTeleOp extends CommandOpMode {
         operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(
                         new SequentialCommandGroup(
-                                new InstantCommand(()->robot.popper.set(Popper.PopperState.KICK)),
-                                new WaitCommand(500),
-                                new InstantCommand(()->robot.popper.set(Popper.PopperState.RESET))
+                                new KickCommand(robot.slide),
+                                new WaitCommand(50),
+                                new NestCommand(robot.slide)
                         )
                 );
 
@@ -204,6 +206,7 @@ public class MainTeleOp extends CommandOpMode {
     @Override
     public void run() {
         super.run();
+        robot.slide.periodic();
 
         if (!automatedDrive) {
 //            robot.follower.setTeleOpDrive(

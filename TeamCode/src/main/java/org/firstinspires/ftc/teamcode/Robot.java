@@ -100,7 +100,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         ServoEx rgbServo = new ServoEx(hardwareMap, "rgbServo");
 
-        //WebcamName webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
+        WebcamName webCam1 = hardwareMap.get(WebcamName.class, "Webcam1");
         //sensorColor = new SensorColor(hardwareMap, "slot1Color");
         RevColorSensorV3 slot0Sensor = hardwareMap.get(RevColorSensorV3.class,"slot0Sensor");
         RevColorSensorV3 slot1Sensor = hardwareMap.get(RevColorSensorV3.class,"slot1Sensor");
@@ -134,6 +134,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         //Register Subsystems
         register(mecanumDrive, intake, shooter, popper, slide, vision, rgbLight, colorMatch, juggler);
+        slide.setTargetTicks(40);
 
         if (OP_MODE_TYPE.equals(OpModeType.AUTO)) {
             initHasMovement();

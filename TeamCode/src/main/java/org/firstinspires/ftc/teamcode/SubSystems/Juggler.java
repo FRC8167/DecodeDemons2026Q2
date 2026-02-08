@@ -61,10 +61,10 @@ public class Juggler extends SubsystemBase {
 
 
     public void rotateOneSlot(Direction direction) {
-        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT;
-        jugglerPID.setSetPoint(target);
+//        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT;
+//        jugglerPID.setSetPoint(target);
 
-        /* *********************************************
+
         switch (currentSlot) {
             case 0:
                 target = (direction.sign > 0) ? SLOT1_CENTER : SLOT2_CENTER;
@@ -77,15 +77,15 @@ public class Juggler extends SubsystemBase {
                 break;
         }
         jugglerPID.setSetPoint(target);
-        /* ********************************************* */
+
     }
 
 
     public void rotateTwoSlots(Direction direction) {
-        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT*2;
-        jugglerPID.setSetPoint(target);
+//        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT*2;
+//        jugglerPID.setSetPoint(target);
 
-        /* *********************************************
+
         switch (currentSlot) {
             case 0:
                 target = (direction.sign > 0) ? SLOT2_CENTER : SLOT1_CENTER;
@@ -98,7 +98,7 @@ public class Juggler extends SubsystemBase {
                 break;
         }
         jugglerPID.setSetPoint(target);
-        /* ********************************************* */
+
     }
 
 
@@ -115,14 +115,14 @@ public class Juggler extends SubsystemBase {
 
 
     public void Snap() {
-        slowSpinEnabled = false;
-        int currentPos = spindexer.getCurrentPosition();
-        int nearestSlot = Math.round((float) currentPos / COUNTS_PER_SLOT);
-        int snappedTarget = nearestSlot * COUNTS_PER_SLOT;
-        jugglerPID.setSetPoint(snappedTarget);
-        target = snappedTarget;
+//        slowSpinEnabled = false;
+//        int currentPos = spindexer.getCurrentPosition();
+//        int nearestSlot = Math.round((float) currentPos / COUNTS_PER_SLOT);
+//        int snappedTarget = nearestSlot * COUNTS_PER_SLOT;
+//        jugglerPID.setSetPoint(snappedTarget);
+//        target = snappedTarget;
 
-        /*
+
         slowSpinEnabled = false;
 
                 switch (currentSlot) {
@@ -137,7 +137,7 @@ public class Juggler extends SubsystemBase {
                 break;
         }
         jugglerPID.setSetPoint(target);
-         */
+
     }
 
 
