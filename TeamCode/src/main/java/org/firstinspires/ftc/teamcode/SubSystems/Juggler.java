@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.SubSystems;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.controller.PIDFController;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 public class Juggler extends SubsystemBase {
@@ -11,7 +12,7 @@ public class Juggler extends SubsystemBase {
 
     public static final int PPR = 288;
     public static final int SLOTS = 3;
-    public static final int COUNTS_PER_SLOT = PPR / SLOTS - 1;
+    public static final int COUNTS_PER_SLOT = PPR / SLOTS;
     int target;
     private boolean slowSpinEnabled = false;
     private double slowSpinPower = 0.0;
@@ -20,6 +21,7 @@ public class Juggler extends SubsystemBase {
 
     /* wheat 06 FEB 2026 */
     private int normalizedCount;
+    private int revolutions;
     /*
         slot 0 -   0 counts to 95  counts, center = 47.5
         slot 1 -  96 counts to 191 counts, center = 143.5
@@ -45,8 +47,6 @@ public class Juggler extends SubsystemBase {
         jugglerPID = new PIDFController(.02,0,0,0); // ki, kd, kv);  //was.01
         jugglerPID.setTolerance(5);
         target = 0;
-
-
     }
 
 
@@ -64,7 +64,6 @@ public class Juggler extends SubsystemBase {
 //        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT;
 //        jugglerPID.setSetPoint(target);
 
-
         switch (currentSlot) {
             case 0:
                 target = (direction.sign > 0) ? SLOT1_CENTER : SLOT2_CENTER;
@@ -76,7 +75,7 @@ public class Juggler extends SubsystemBase {
                 target = (direction.sign > 0) ? SLOT0_CENTER : SLOT1_CENTER;
                 break;
         }
-        jugglerPID.setSetPoint(target);
+        jugglerPID.setSetPoint(target * revolutions * PPR);
 
     }
 
@@ -97,7 +96,7 @@ public class Juggler extends SubsystemBase {
                 target = (direction.sign > 0) ? SLOT1_CENTER : SLOT0_CENTER;
                 break;
         }
-        jugglerPID.setSetPoint(target);
+        jugglerPID.setSetPoint(target * revolutions * PPR);
 
     }
 
@@ -122,10 +121,9 @@ public class Juggler extends SubsystemBase {
 //        jugglerPID.setSetPoint(snappedTarget);
 //        target = snappedTarget;
 
-
         slowSpinEnabled = false;
 
-                switch (currentSlot) {
+        switch (currentSlot) {
             case 0:
                 target = SLOT0_CENTER;
                 break;
@@ -136,7 +134,7 @@ public class Juggler extends SubsystemBase {
                 target = SLOT2_CENTER;
                 break;
         }
-        jugglerPID.setSetPoint(target);
+        jugglerPID.setSetPoint(target * revolutions * PPR);
 
     }
 
@@ -179,7 +177,15 @@ public class Juggler extends SubsystemBase {
 
             /* Added for Debugging Slot Center Error */
             normalizedCount = currentPosition;
-            if(normalizedCount > 287) normalizedCount = currentPosition - 288;
+            if(normalizedCount > 287) {
+                normalizedCount -= 288;
+                revolutions += 1;
+            }
+            else if(normalizedCount < 0) {
+                normalizedCount += 288;
+                revolutions -= 1;
+            }
+
             updateCurrentSlot();
     }
 
