@@ -44,8 +44,8 @@ public class Juggler extends SubsystemBase {
         spindexer.setRunMode(MotorEx.RunMode.RawPower);
         spindexer.resetEncoder();
         spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
-        jugglerPID = new PIDFController(.02,0,0,0); // ki, kd, kv);  //was.01
-        jugglerPID.setTolerance(5);
+        jugglerPID = new PIDFController(.01,0,0,0); // ki, kd, kv);  //was.02
+        jugglerPID.setTolerance(2);
         target = 0;
     }
 
@@ -75,7 +75,8 @@ public class Juggler extends SubsystemBase {
                 target = (direction.sign > 0) ? SLOT0_CENTER : SLOT1_CENTER;
                 break;
         }
-        jugglerPID.setSetPoint(target * revolutions * PPR);
+//        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
+        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
 
     }
 
@@ -96,7 +97,8 @@ public class Juggler extends SubsystemBase {
                 target = (direction.sign > 0) ? SLOT1_CENTER : SLOT0_CENTER;
                 break;
         }
-        jugglerPID.setSetPoint(target * revolutions * PPR);
+//        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
+        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
 
     }
 
@@ -134,7 +136,8 @@ public class Juggler extends SubsystemBase {
                 target = SLOT2_CENTER;
                 break;
         }
-        jugglerPID.setSetPoint(target * revolutions * PPR);
+//        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
+        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
 
     }
 
@@ -158,9 +161,35 @@ public class Juggler extends SubsystemBase {
     }
 
 
+
+
+
+
     @Override
     public void periodic() {
-            //Slow spin = no PID
+
+        //DMW 2/9 trying to fix normalization
+        int currentPosition = spindexer.getCurrentPosition();
+
+
+        revolutions = Math.floorDiv(currentPosition, PPR);
+        normalizedCount = Math.floorMod(currentPosition, PPR);
+
+
+        /* Added for Debugging Slot Center Error */
+
+//        normalizedCount = currentPosition;
+//        if(normalizedCount > 287) {
+//            normalizedCount -= 288;
+//            revolutions += 1;
+//        }
+//        else if(normalizedCount < 0)
+//            { normalizedCount += 288; revolutions -= 1;
+//            }
+        updateCurrentSlot();
+
+
+        //Slow spin = no PID
             if (slowSpinEnabled) {
                 //No PID
                 spindexer.set(slowSpinPower);
@@ -168,23 +197,16 @@ public class Juggler extends SubsystemBase {
             }
 
             // Indexing = w/PID
-            int currentPosition = spindexer.getCurrentPosition();
+//            int currentPosition = spindexer.getCurrentPosition();  //DMW 2/9
             double output = Range.clip(
                     jugglerPID.calculate(currentPosition),
                     -0.3, 0.3
             );
             spindexer.set(output);
 
-            /* Added for Debugging Slot Center Error */
-            normalizedCount = currentPosition;
-            if(normalizedCount > 287) {
-                normalizedCount -= 288;
-                revolutions += 1;
-            }
-            else if(normalizedCount < 0) {
-                normalizedCount += 288;
-                revolutions -= 1;
-            }
+
+
+
 
             updateCurrentSlot();
     }
@@ -196,6 +218,18 @@ public class Juggler extends SubsystemBase {
     /**
      * Determines the current slot
      */
+
+//    public void updateCurrentSlot() {
+//        if (normalizedCount >= 240 || normalizedCount < 48) {
+//            currentSlot = 0;
+//        } else if (normalizedCount < 144) {
+//            currentSlot = 1;
+//        } else {
+//            currentSlot = 2;
+//        }
+//    }
+
+//DMW 2/9  Return to Dave's normalization
     public void updateCurrentSlot() {
 
         if(normalizedCount >= 240 || normalizedCount < 47) {
