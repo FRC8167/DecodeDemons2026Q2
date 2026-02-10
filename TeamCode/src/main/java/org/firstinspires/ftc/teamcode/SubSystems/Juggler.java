@@ -9,6 +9,9 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 public class Juggler extends SubsystemBase {
 
     private final MotorEx spindexer;
+    private LimitSwitch limitSwitch;
+    private boolean jugglerHome = false;
+    private boolean hasTarget = false;
 
     public static final int PPR = 288;
     public static final int SLOTS = 3;
@@ -20,8 +23,8 @@ public class Juggler extends SubsystemBase {
     private final PIDFController jugglerPID;
 
     /* wheat 06 FEB 2026 */
-    private int normalizedCount;
-    private int revolutions;
+//    private int normalizedCount;
+//    private int revolutions;
     /*
         slot 0 -   0 counts to 95  counts, center = 47.5
         slot 1 -  96 counts to 191 counts, center = 143.5
@@ -32,15 +35,16 @@ public class Juggler extends SubsystemBase {
         slot 1 -  48 counts to 143 counts, center = 95.5
         slot 2 - 144 counts to 239 counts, center = 190.5
      */
-    private int SLOT0_CENTER = 1;
-    private int SLOT1_CENTER = 96;
-    private int SLOT2_CENTER = 191;
+//    private int SLOT0_CENTER = 1;
+//    private int SLOT1_CENTER = 96;
+//    private int SLOT2_CENTER = 191;
+//
+//    private int currentSlot;
 
-    private int currentSlot;
 
-
-    public Juggler(MotorEx motor) {
+    public Juggler(MotorEx motor, LimitSwitch limitSwitch) {
         this.spindexer = motor;
+        this.limitSwitch = limitSwitch;
         spindexer.setRunMode(MotorEx.RunMode.RawPower);
         spindexer.resetEncoder();
         spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
@@ -60,45 +64,63 @@ public class Juggler extends SubsystemBase {
     }
 
 
-    public void rotateOneSlot(Direction direction) {
-//        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT;
-//        jugglerPID.setSetPoint(target);
-
-        switch (currentSlot) {
-            case 0:
-                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT2_CENTER;
-                break;
-            case 1:
-                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT0_CENTER;
-                break;
-            case 2:
-                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT1_CENTER;
-                break;
+    public void homeSlow() {
+        if (jugglerHome) {
+            spindexer.stopMotor();
+            return;
         }
-//        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
-        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
+
+        // Slow, safe power
+        spindexer.set(0.15);
+
+        if (limitSwitch.isHome()) {
+            spindexer.stopMotor();
+            spindexer.resetEncoder();
+            jugglerHome = true;
+        }
+    }
+
+    public void rotateOneSlot(Direction direction) {
+        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT;
+        jugglerPID.setSetPoint(target);
+        hasTarget = true;
+
+//        switch (currentSlot) {
+//            case 0:
+//                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT2_CENTER;
+//                break;
+//            case 1:
+//                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT0_CENTER;
+//                break;
+//            case 2:
+//                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT1_CENTER;
+//                break;
+//        }
+////        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
+//        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
 
     }
 
 
     public void rotateTwoSlots(Direction direction) {
-//        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT*2;
-//        jugglerPID.setSetPoint(target);
+        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT*2;
+        jugglerPID.setSetPoint(target);
+        hasTarget = true;
 
 
-        switch (currentSlot) {
-            case 0:
-                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT1_CENTER;
-                break;
-            case 1:
-                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT2_CENTER;
-                break;
-            case 2:
-                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT0_CENTER;
-                break;
-        }
-//        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
-        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
+//        switch (currentSlot) {
+//            case 0:
+//                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT1_CENTER;
+//                break;
+//            case 1:
+//                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT2_CENTER;
+//                break;
+//            case 2:
+//                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT0_CENTER;
+//                break;
+//        }
+////        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
+//        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
 
     }
 
@@ -116,28 +138,29 @@ public class Juggler extends SubsystemBase {
 
 
     public void Snap() {
-//        slowSpinEnabled = false;
-//        int currentPos = spindexer.getCurrentPosition();
-//        int nearestSlot = Math.round((float) currentPos / COUNTS_PER_SLOT);
-//        int snappedTarget = nearestSlot * COUNTS_PER_SLOT;
-//        jugglerPID.setSetPoint(snappedTarget);
-//        target = snappedTarget;
-
         slowSpinEnabled = false;
+        int currentPos = spindexer.getCurrentPosition();
+        int nearestSlot = Math.round((float) currentPos / COUNTS_PER_SLOT);
+        int snappedTarget = nearestSlot * COUNTS_PER_SLOT;
+        jugglerPID.setSetPoint(snappedTarget);
+        target = snappedTarget;
+        hasTarget = true;
 
-        switch (currentSlot) {
-            case 0:
-                target = SLOT0_CENTER;
-                break;
-            case 1:
-                target = SLOT1_CENTER;
-                break;
-            case 2:
-                target = SLOT2_CENTER;
-                break;
-        }
+//        slowSpinEnabled = false;
+//
+//        switch (currentSlot) {
+//            case 0:
+//                target = SLOT0_CENTER;
+//                break;
+//            case 1:
+//                target = SLOT1_CENTER;
+//                break;
+//            case 2:
+//                target = SLOT2_CENTER;
+//                break;
+//        }
 //        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
-        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
+//        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
 
     }
 
@@ -169,11 +192,11 @@ public class Juggler extends SubsystemBase {
     public void periodic() {
 
         //DMW 2/9 trying to fix normalization
-        int currentPosition = spindexer.getCurrentPosition();
-
-
-        revolutions = Math.floorDiv(currentPosition, PPR);
-        normalizedCount = Math.floorMod(currentPosition, PPR);
+//        int currentPosition = spindexer.getCurrentPosition();
+//
+//
+//        revolutions = Math.floorDiv(currentPosition, PPR);
+//        normalizedCount = Math.floorMod(currentPosition, PPR);
 
 
         /* Added for Debugging Slot Center Error */
@@ -186,33 +209,48 @@ public class Juggler extends SubsystemBase {
 //        else if(normalizedCount < 0)
 //            { normalizedCount += 288; revolutions -= 1;
 //            }
-        updateCurrentSlot();
+//        updateCurrentSlot();
 
 
-        //Slow spin = no PID
-            if (slowSpinEnabled) {
-                //No PID
-                spindexer.set(slowSpinPower);
-                return;
-            }
+
 
             // Indexing = w/PID
-//            int currentPosition = spindexer.getCurrentPosition();  //DMW 2/9
-            double output = Range.clip(
-                    jugglerPID.calculate(currentPosition),
-                    -0.3, 0.3
-            );
-            spindexer.set(output);
+        if (!jugglerHome && limitSwitch.isHome()) {
+            spindexer.stopMotor();
+            spindexer.resetEncoder();
+            jugglerPID.reset();
+            jugglerHome = true;
+            return;
+        }
+
+        if (!jugglerHome) {
+            // Let homeSlow() control the motor
+            return;
+        }
+
+        if (slowSpinEnabled) {
+            spindexer.set(slowSpinPower);
+            return;
+        }
+//add if there are unexplained twitches
+//        if (!hasTarget) {
+//            spindexer.stopMotor();
+//            return;
+//        }
+
+        int currentPosition = spindexer.getCurrentPosition();
+        double output = Range.clip(
+                jugglerPID.calculate(currentPosition),
+                -0.3, 0.3
+        );
+        spindexer.set(output);
 
 
-
-
-
-            updateCurrentSlot();
+//            updateCurrentSlot();
     }
 
 
-    public int getNormalizedCount() { return normalizedCount; }
+//    public int getNormalizedCount() { return normalizedCount; }
 
 
     /**
@@ -230,16 +268,16 @@ public class Juggler extends SubsystemBase {
 //    }
 
 //DMW 2/9  Return to Dave's normalization
-    public void updateCurrentSlot() {
-
-        if(normalizedCount >= 240 || normalizedCount < 47) {
-            currentSlot = 0;
-        } else if(normalizedCount >= 48 && normalizedCount < 143) {
-            currentSlot = 1;
-        } else if (normalizedCount > 144 && normalizedCount < 239) {
-            currentSlot = 2;
-        }
-    }
+//    public void updateCurrentSlot() {
+//
+//        if(normalizedCount >= 240 || normalizedCount < 47) {
+//            currentSlot = 0;
+//        } else if(normalizedCount >= 48 && normalizedCount < 143) {
+//            currentSlot = 1;
+//        } else if (normalizedCount > 144 && normalizedCount < 239) {
+//            currentSlot = 2;
+//        }
+//    }
 
 
 }

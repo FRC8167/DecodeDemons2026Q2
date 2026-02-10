@@ -5,6 +5,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
+import org.firstinspires.ftc.teamcode.SubSystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
@@ -77,6 +79,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public Slide slide;
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
+    public LimitSwitch limitSwitch;
 
     public void init(HardwareMap hardwareMap) throws InterruptedException {
 
@@ -105,6 +108,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         RevColorSensorV3 slot0Sensor = hardwareMap.get(RevColorSensorV3.class,"slot0Sensor");
         RevColorSensorV3 slot1Sensor = hardwareMap.get(RevColorSensorV3.class,"slot1Sensor");
         RevColorSensorV3 slot2Sensor = hardwareMap.get(RevColorSensorV3.class,"slot2Sensor");
+        DigitalChannel jugglerLimitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
 
         ctrlHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : ctrlHubs) {
@@ -119,12 +123,13 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 //        mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         slide = new Slide(slideMotor);
         shooter = new Shooter(shooterMotor);
-        juggler = new Juggler(spindexerMotor);
+        juggler = new Juggler(spindexerMotor, jugglerLimitSwitch);
 
         vision = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
 //        vision = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
         rgbLight   = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
+        limitSwitch = new LimitSwitch(jugglerLimitSwitch);
 
 
         //Set default command for RGBLight using the registered colorMatch
@@ -133,7 +138,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         rgbLight.setDefaultCommand(detectArtifactCommand);
 
         //Register Subsystems
-        register(mecanumDrive, intake, shooter, popper, slide, vision, rgbLight, colorMatch, juggler);
+        register(mecanumDrive, intake, shooter, popper, slide, vision, rgbLight, colorMatch, juggler, limitSwitch);
         slide.setTargetTicks(6);
 
         if (OP_MODE_TYPE.equals(OpModeType.AUTO)) {

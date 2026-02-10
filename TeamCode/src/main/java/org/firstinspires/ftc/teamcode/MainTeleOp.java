@@ -190,6 +190,9 @@ public class MainTeleOp extends CommandOpMode {
 
                         )
                 );
+        if (gamepad1.a) {
+            new InstantCommand(()->robot.juggler.homeSlow());
+        }
 
 //        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(
 //            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
