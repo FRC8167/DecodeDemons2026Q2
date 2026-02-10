@@ -72,14 +72,15 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public Shooter shooter;
     public Juggler juggler;
     public SensorColor colorSensor;
-    public Vision vision;
-//    public LimeLightVision vision;
+//    public Vision vision;
+    public LimeLightVision vision;
 
     public Popper popper;
     public Slide slide;
     public RGBLight rgbLight;
     public ColorMatch colorMatch;
     public LimitSwitch limitSwitch;
+
 
     public void init(HardwareMap hardwareMap) throws InterruptedException {
 
@@ -108,7 +109,13 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         RevColorSensorV3 slot0Sensor = hardwareMap.get(RevColorSensorV3.class,"slot0Sensor");
         RevColorSensorV3 slot1Sensor = hardwareMap.get(RevColorSensorV3.class,"slot1Sensor");
         RevColorSensorV3 slot2Sensor = hardwareMap.get(RevColorSensorV3.class,"slot2Sensor");
-        DigitalChannel jugglerLimitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
+
+
+        DigitalChannel jugglerDigitalSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
+        jugglerDigitalSwitch.setMode(DigitalChannel.Mode.INPUT);
+        limitSwitch = new LimitSwitch(jugglerDigitalSwitch);
+        juggler = new Juggler(spindexerMotor, limitSwitch);
+
 
         ctrlHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : ctrlHubs) {
@@ -123,13 +130,14 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 //        mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
         slide = new Slide(slideMotor);
         shooter = new Shooter(shooterMotor);
-        juggler = new Juggler(spindexerMotor, jugglerLimitSwitch);
 
-        vision = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
-//        vision = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
+
+//        vision = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
+        vision = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"), 1, true);
         rgbLight   = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
-        limitSwitch = new LimitSwitch(jugglerLimitSwitch);
+
+
 
 
         //Set default command for RGBLight using the registered colorMatch

@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
@@ -17,7 +18,8 @@ public class ShootCaseCommand extends CommandBase {
     private final Popper popper;
     private final Shooter shooter;
     private final ColorMatch colorMatch;
-    private final Vision vision;
+    private final
+    LimeLightVision vision;
     // private SequentialCommandGroup sequence;
     // private SeqCmdAuto sequence;
     private SequentialCommandGroup sequence;
@@ -27,7 +29,7 @@ public class ShootCaseCommand extends CommandBase {
             Popper popper,
             Shooter shooter,
             ColorMatch colorMatch,
-            Vision vision) {
+            LimeLightVision vision) {
         this.juggler = juggler;
         this.popper = popper;
         this.shooter = shooter;

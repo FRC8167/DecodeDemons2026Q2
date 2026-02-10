@@ -3,17 +3,18 @@ package org.firstinspires.ftc.teamcode.Commands;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
+import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 
 public class ShooterSmartSpinUpCommand extends CommandBase {
 
     private final Shooter shooter;
-    private final Vision vision;
+    private final LimeLightVision vision;
     //private final ColorMatch colorMatch;
 
 
-    public ShooterSmartSpinUpCommand(Shooter shooter, Vision vision) {
+    public ShooterSmartSpinUpCommand(Shooter shooter, LimeLightVision vision) {
         this.shooter = shooter;
         this.vision = vision;
         //this.colorMatch = colorMatch;
