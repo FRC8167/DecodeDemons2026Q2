@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.icu.text.Transliterator;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.LLFieldMap;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -15,6 +19,7 @@ import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
@@ -209,7 +214,7 @@ public class MainTeleOp extends CommandOpMode {
     @Override
     public void run() {
         super.run();
-        robot.slide.periodic();
+//        robot.slide.periodic();
 
         if (!automatedDrive) {
 //            robot.follower.setTeleOpDrive(
@@ -227,15 +232,17 @@ public class MainTeleOp extends CommandOpMode {
 
         robot.follower.update();
         robot.autoEndPose = robot.follower.getPose();
-        AprilTagDetection tag = robot.vision.getFirstTargetTag();
+//        AprilTagDetection tag = robot.vision.getFirstTargetTag();
+        LLResultTypes.FiducialResult tag = robot.vision.getAprilTags().get(0);
 
 
 
         if (tag != null) {
             telemetry.addLine("Target Tag Detected!");
-            telemetry.addData("ID", tag.id);
-            telemetry.addData("Center", "(%.0f, %.0f)", tag.center.x, tag.center.y);
-            telemetry.addData("Range (in)", "%.1f", tag.ftcPose.range);
+            telemetry.addData("ID", tag.getFiducialId());
+            Position targetInCamera = tag.getTargetPoseCameraSpace().getPosition();
+            telemetry.addData("Center", "(%.0f, %.0f)", targetInCamera.x, targetInCamera.z); //Note: These values may be swapped
+            telemetry.addData("Range (in)", "%.1f", Math.sqrt(Math.pow(targetInCamera.x, 2) + Math.pow(targetInCamera.y, 2) + Math.pow(targetInCamera.z, 2)));
         } else {
             telemetry.addLine("No target tags (20–24) detected.");
         }
