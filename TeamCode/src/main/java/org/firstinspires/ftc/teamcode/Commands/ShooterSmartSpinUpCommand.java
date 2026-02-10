@@ -31,7 +31,7 @@ public class ShooterSmartSpinUpCommand extends CommandBase {
     public void execute() {
         //Read slot0 color and spin shooter accordingly
         //ColorMatch.ArtifactColor slot0Color = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
-        shooter.smartVelocity(vision.getDistanceToGoal());
+        shooter.smartVelocity(vision.getGoalDistance());
 
     }
 

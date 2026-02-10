@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
@@ -11,172 +10,299 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.teamcode.Cogintilities.PoseMath;
+import org.firstinspires.ftc.teamcode.Cogintilities.TeamConstants;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class LimeLightVision extends SubsystemBase {
+public class LimeLightVision extends SubsystemBase implements TeamConstants {
+    double LIME_VISION_STALENESS_TOL = 200; //Staleness in milliseconds
+    double LIME_VISION_POSE_MEDIATING_STALENESS_TOL = 0.5; //Staleness in seconds for which older poses will be removed
+    double LIME_VISION_POSE_MEDIATING_MIN_POSES = 3;
 
-    private final Limelight3A ll;
-    private LLResult result;
-    private boolean tagsFound;
+    Position BLUE_GOAL_TARGET = new Position(DistanceUnit.INCH, -60.699807, -57.531366, 38.75, 0);
+    Position RED_GOAL_TARGET = new Position(DistanceUnit.INCH, -60.699807, 57.531366, 38.75, 0);
 
-//    Position defaultPosition = new Position(DistanceUnit.INCH, 0,0,0,0);
-//    YawPitchRollAngles defaultAngles = new YawPitchRollAngles(AngleUnit.DEGREES,0,0,0,0);
-//    private Pose3D robotPose = new Pose3D(defaultPosition, defaultAngles);
-
-    List<LLResultTypes.FiducialResult> fiducials;
-
-
-    // From the web cam vision subsystem
     private ColorMatch.ArtifactColor[] latchedMotif = null;
 
+    private final Limelight3A limelight;
+//    IMU imu;
+    private int pipeline;
 
-    /**
-     * Create a Limelight vision object
-     * @param limeLightCamera Camera as defined in the hardware map
-     * @param pipeLine Pipeline to initialize the limelight to analyze
-     * @param Enable_Immediately Set true to start the image acquisition immediately. Alternately you can call the start() method.
-     */
-    public LimeLightVision(Limelight3A limeLightCamera, int pipeLine, boolean Enable_Immediately) {
-        ll = limeLightCamera;
-        ll.setPollRateHz(100);
-        ll.pipelineSwitch(pipeLine);
-        if(Enable_Immediately) { start(); }
-        tagsFound = false;
+    private List<Pose3D> previousPoses = new ArrayList<>();
+    private double previousTagID;
+
+    public LimeLightVision(Limelight3A limelight) {
+        this.limelight = limelight;
+        this.limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
+        this.limelight.start(); // This tells Limelight to start looking!
+        this.limelight.pipelineSwitch(0);
+        pipeline = 0;
     }
-
-
-    @Override
-    public void periodic() {
-        result = ll.getLatestResult();
-        
-        if (result.isValid() && result != null) {
-//            // Access general information
-
-
-            // Get April Tag results
-            fiducials = result.getFiducialResults();
-            tagsFound = true;
-        } else {
-            fiducials = null;
-            tagsFound = false;
-        }
-//            for (LLResultTypes.FiducialResult fiducial : fiducials) {
-//                int id = fiducial.getFiducialId(); // The ID number of the fiducial
-//                double x = fiducial.getTargetXDegrees(); // Where it is (left-right)
-//                double y = fiducial.getTargetYDegrees(); // Where it is (up-down)
-//        }
-
-//            fiducial.getRobotPoseTargetSpace(); // Robot pose relative to the AprilTag Coordinate System (Most Useful)
-//            fiducial.getCameraPoseTargetSpace(); // Camera pose relative to the AprilTag (useful)
-//            fiducial.getRobotPoseFieldSpace(); // Robot pose in the field coordinate system based on this tag alone (useful)
-//            fiducial.getTargetPoseCameraSpace(); // AprilTag pose in the camera's coordinate system (not very useful)
-//            fiducial.getTargetPoseRobotSpace(); // AprilTag pose in the robot's coordinate system (not very useful)
-//        }
-    }
-
-
-//    private double calcDistanceToTag() {
-//        double scale = 1;
-//        double pixelArea = tag.getTa();
-//        return pixelArea * scale;
-//    }
-
-
-//    public Pose3D getPose() {
-//        return robotPose;
-//    }
 
 
     public void setPipeline(int pipeline) {
-        ll.pipelineSwitch(pipeline);
+        this.limelight.pipelineSwitch(pipeline);
+        this.pipeline = pipeline;
     }
-
-
-//    public double getDistanceToTag(int TagId) {
-//        return distanceToTag;
-//    }
-
 
     public void start() {
-        ll.start();
+        limelight.start();
     }
-
 
     public void stop() {
-        ll.stop();
+        limelight.stop();
     }
 
-
-    public double getYawToTag() {
-        if (tagsFound) {
-            return fiducials.get(0).getTargetXDegrees(); // Where first target Crosshair is (left-right)
-//           return result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
-        } else return -999;
-    }
-
-    /**
-     * Returns the LimeLight status object that contains the following:
-     * Camera Name, temperature, CPU usage, frames per second, current pipeline and pipeline type
-     * @return Limelight status object
-     */
-    public LLStatus getStatus() {
-        return  ll.getStatus();
-    }
-
-    public LLResult getALLResults() {
-        if (result != null && result.isValid()) return result;
-        else return null;
-    }
-
-    public List<LLResultTypes.FiducialResult> getAprilTags() {
-        return fiducials;
-    }
-
-
-    /* **************************** From the web cam vision subsystem *************************** */
-
-    public ColorMatch.ArtifactColor[] getMotifPattern() {
-
-        if(fiducials != null && !fiducials.isEmpty()) {
-            // Use first tag in View
-            switch (fiducials.get(0).getFiducialId()) {
-                case 21:  // GPP
-                    return new ColorMatch.ArtifactColor[]{ColorMatch.ArtifactColor.GREEN, ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.PURPLE};
-                case 22:  // PGP
-                    return new ColorMatch.ArtifactColor[]{ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.GREEN, ColorMatch.ArtifactColor.PURPLE};
-                case 23:  // PPG
-                    return new ColorMatch.ArtifactColor[]{ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.GREEN};
-                default:
-                    return null;
-            }
+    public LLResult getResult() {
+        LLResult result = limelight.getLatestResult();
+        if (result != null && result.isValid() && result.getPipelineIndex() == pipeline && result.getStaleness() <= LIME_VISION_STALENESS_TOL) {
+            return result;
         } else return null;
     }
 
-
-    public double getDistanceToGoal() {
-        for (LLResultTypes.FiducialResult fiducial : fiducials) {
-            if(fiducial.getFiducialId() == 20 || fiducial.getFiducialId() == 23){
-                return fiducial.getRobotPoseTargetSpace().getPosition().z;
+    public Pose3D getRobotPose3D() {
+        previousPoses = PoseMath.removeOldPoses(previousPoses, LIME_VISION_POSE_MEDIATING_STALENESS_TOL);
+        LLResult result = getResult();
+        if (result == null) return null;
+        List<LLResultTypes.FiducialResult> fiducials = getGoalFiducials(result);
+        double fiducialID;
+        if (fiducials != null && !fiducials.isEmpty()) {
+            fiducialID = fiducials.get(0).getFiducialId();
+            if (fiducialID != previousTagID) {
+                previousPoses.clear();
+                previousTagID = fiducialID;
             }
-        }
-        return Double.NaN; //what is Dave?
+        } else return null;
+
+        Pose3D pose = result.getBotpose();
+        if (pose == null || !PoseMath.poseIsValid(pose)) return null;
+        previousPoses.add(PoseMath.poseWithAcquisitionTime(pose));
+        return pose;
     }
 
+    public Pose3D getMediatiatedRobotPose3D() {
+        getRobotPose3D();
+        if (previousPoses.size() < LIME_VISION_POSE_MEDIATING_MIN_POSES) return null;
+        return PoseMath.poseMedian(previousPoses, DistanceUnit.INCH, AngleUnit.DEGREES);
+    }
+
+    public double getPreviousPosesSize() {
+        return previousPoses.size();
+    }
+
+//    public Pose2d getRobotPose2d() {
+//        return PoseMath.Pose3DtoPose2d(getRobotPose3D());
+//    }
+//
+//    public Pose2d getMediatedRobotPose2d() {
+//        return PoseMath.Pose3DtoPose2d(getMediatiatedRobotPose3D());
+//    }
+
+    public double getGoalBearing(LLResult result, Pose3D pose3D) {
+        if (result == null) return Double.NaN;
+        if (pose3D == null) return Double.NaN;
+        Position position = pose3D.getPosition().toUnit(DistanceUnit.INCH);
+        YawPitchRollAngles orientation = pose3D.getOrientation();
+
+        List<LLResultTypes.FiducialResult> goalFiducials = getGoalFiducials(result);
+        if (goalFiducials == null || goalFiducials.isEmpty()) return Double.NaN;
+        LLResultTypes.FiducialResult goalFiducial = null;
+        if (goalFiducials.size() == 1) {
+            goalFiducial = goalFiducials.get(0);
+        } else {
+            for (LLResultTypes.FiducialResult fiducialResult : goalFiducials) {
+                int id = fiducialResult.getFiducialId();
+                double angle = orientation.getYaw(AngleUnit.DEGREES);
+                if (angle >= -180 && angle < 0 && id == 20) {
+                    goalFiducial = fiducialResult;
+                    break;
+                } else if (angle >= 0 && angle < 180 && id == 24) {
+                    goalFiducial = fiducialResult;
+                    break;
+                }
+
+            }
+        }
+
+        if (goalFiducial == null) return Double.NaN;
+
+        double rawAngle;
+
+        int id = goalFiducial.getFiducialId();
+        if (id == 20) {
+            rawAngle = PoseMath.poseArcTan(position, BLUE_GOAL_TARGET, AngleUnit.DEGREES);
+        } else if (id == 24) {
+            rawAngle = PoseMath.poseArcTan(position, RED_GOAL_TARGET, AngleUnit.DEGREES);
+        } else {
+            return Double.NaN;
+        }
+
+        double robotBearing = rawAngle-orientation.getYaw(AngleUnit.DEGREES);
+        return AngleUnit.normalizeDegrees(robotBearing);
+    }
+
+    public double getGoalBearing(Pose3D pose3D) {
+        return getGoalBearing(getResult(), pose3D);
+    }
+
+    public double getGoalBearing() {
+        return getGoalBearing(getResult(), getRobotPose3D());
+    }
+
+    public double getMediatedGoalBearing() {
+        return getGoalBearing(getResult(), getMediatiatedRobotPose3D());
+    }
+
+    public double getGoalDistance(LLResult result, Pose3D pose3D) {
+        if (result == null) return Double.NaN;
+        if (pose3D == null) return Double.NaN;
+        Position position = pose3D.getPosition().toUnit(DistanceUnit.INCH);
+        YawPitchRollAngles orientation = pose3D.getOrientation();
+
+        List<LLResultTypes.FiducialResult> goalFiducials = getGoalFiducials(result);
+        if (goalFiducials == null || goalFiducials.isEmpty()) return Double.NaN;
+        LLResultTypes.FiducialResult goalFiducial = null;
+        if (goalFiducials.size() == 1) {
+            goalFiducial = goalFiducials.get(0);
+        } else {
+            for (LLResultTypes.FiducialResult fiducialResult : goalFiducials) {
+                int id = fiducialResult.getFiducialId();
+                double angle = orientation.getYaw(AngleUnit.DEGREES);
+                if (angle >= -180 && angle < 0 && id == 20) {
+                    goalFiducial = fiducialResult;
+                    break;
+                } else if (angle >= 0 && angle < 180 && id == 24) {
+                    goalFiducial = fiducialResult;
+                    break;
+                }
+
+            }
+        }
+
+        if (goalFiducial == null) return Double.NaN;
+
+        double distance;
+
+        int id = goalFiducial.getFiducialId();
+        if (id == 20) {
+            distance = PoseMath.poseFlattenedDistance(position, BLUE_GOAL_TARGET, DistanceUnit.INCH);
+        } else if (id == 24) {
+            distance = PoseMath.poseFlattenedDistance(position, RED_GOAL_TARGET, DistanceUnit.INCH);
+        } else {
+            return Double.NaN;
+        }
+
+        return distance;
+    }
+
+    public double getGoalDistance() {
+        return getGoalDistance(getResult(), getRobotPose3D());
+    }
+
+    public double getMediatedGoalDistance() {
+        return getGoalDistance(getResult(), getMediatiatedRobotPose3D());
+    }
+
+    static public List<LLResultTypes.FiducialResult> getGoalFiducials(LLResult result) { //Note: O
+        if (result == null || !result.isValid()) return null;
+        List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+        if (fiducialResults == null || fiducialResults.isEmpty()) return null;
+        List<LLResultTypes.FiducialResult> goalResults = new ArrayList<>();
+        for (LLResultTypes.FiducialResult fiducialResult : fiducialResults) {
+            int id = fiducialResult.getFiducialId();
+            if (id == 20 || id == 24) {
+                goalResults.add(fiducialResult);
+            }
+        }
+        return goalResults;
+    }
+
+    static public List<LLResultTypes.FiducialResult> getObeliskFiducials(LLResult result) { //Note: O
+        if (result == null || !result.isValid()) return null;
+        List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+        if (fiducialResults == null || fiducialResults.isEmpty()) return null;
+        List<LLResultTypes.FiducialResult> obeliskResults = new ArrayList<>();
+        for (LLResultTypes.FiducialResult fiducialResult : fiducialResults) {
+            int id = fiducialResult.getFiducialId();
+            if (id == 21 || id == 22 || id == 23) {
+                obeliskResults.add(fiducialResult);
+            }
+        }
+        return obeliskResults;
+    }
+
+    static public List<Integer> getObeliskIDs(LLResult result) { //Note: O
+        List<LLResultTypes.FiducialResult> obeliskResults = getObeliskFiducials(result);
+        if (obeliskResults == null || obeliskResults.isEmpty()) return null;
+        List<Integer> idList = new ArrayList<>();
+        for (LLResultTypes.FiducialResult fiducialResult : obeliskResults) {
+            idList.add(fiducialResult.getFiducialId());
+        }
+        return idList;
+    }
+
+    public ColorMatch.ArtifactColor[] getIdStates(int id) {
+        switch (id) {
+            case 21: return new ColorMatch.ArtifactColor[]{ColorMatch.ArtifactColor.GREEN, ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.PURPLE};
+            case 22: return new ColorMatch.ArtifactColor[]{ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.GREEN, ColorMatch.ArtifactColor.PURPLE};
+            case 23: return new ColorMatch.ArtifactColor[]{ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.PURPLE, ColorMatch.ArtifactColor.GREEN};
+            default: return null;
+        }
+    }
+
+    public List<ColorMatch.ArtifactColor[]> getSequences() {
+        List<Integer> obeliskIDs = getObeliskIDs(getResult());
+        if (obeliskIDs == null || obeliskIDs.isEmpty()) return null;
+        List<ColorMatch.ArtifactColor[]> sequences = new ArrayList<>();
+        for (Integer ID : obeliskIDs) {
+            ColorMatch.ArtifactColor[] states = getIdStates(ID);
+            if (states != null) sequences.add(states);
+        }
+        return sequences.isEmpty() ? null : sequences;
+    }
+
+    public ColorMatch.ArtifactColor[] getFirstSequence() {
+        List<ColorMatch.ArtifactColor[]> sequences = getSequences();
+        return (sequences == null || sequences.isEmpty()) ? null : sequences.get(0);
+    }
+
+    static public String tagIdLookup(int id) {
+        switch (id) {
+            case 20: return "BLUE GOAL";
+            case 21: return "GPP";
+            case 22: return "PGP";
+            case 23: return "PPG";
+            case 24: return "RED GOAL";
+            default: return "Unknown";
+        }
+    }
 
     public void latchMotif() {
-        ColorMatch.ArtifactColor[] current = getMotifPattern();
+        ColorMatch.ArtifactColor[] current = getFirstSequence();
         if (current != null) {
             latchedMotif = current.clone();
         }
     }
 
-
     public ColorMatch.ArtifactColor[] getLatchedMotif() {
         return latchedMotif;
     }
 
+//    public Pose3D getMT2Pos() {
+//        double robotYaw = imu.getRobotYawPitchRollAngles().getYaw();
+//        limelight.updateRobotOrientation(robotYaw);
+//        LLResult result = getResult();
+//        if (result == null) return null;
+//        return result.getBotpose_MT2();
+//    }
+
+    public void takePhoto(String string) {
+        limelight.captureSnapshot(string);
+    }
+
+
+
 
 }
-

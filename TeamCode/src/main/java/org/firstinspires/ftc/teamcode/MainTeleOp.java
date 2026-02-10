@@ -195,9 +195,11 @@ public class MainTeleOp extends CommandOpMode {
 
                         )
                 );
-        if (gamepad1.a) {
-            new InstantCommand(()->robot.juggler.homeSlow());
-        }
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+                .whenPressed(
+                        new InstantCommand(()->robot.juggler.homeSlow())
+                );
+
 
 //        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(
 //            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
@@ -233,26 +235,26 @@ public class MainTeleOp extends CommandOpMode {
         robot.follower.update();
         robot.autoEndPose = robot.follower.getPose();
 //        AprilTagDetection tag = robot.vision.getFirstTargetTag();
-        LLResultTypes.FiducialResult tag = robot.vision.getAprilTags().get(0);
+//        LLResultTypes.FiducialResult tag = robot.vision.getAprilTags().get(0);
 
 
 
-        if (tag != null) {
-            telemetry.addLine("Target Tag Detected!");
-            telemetry.addData("ID", tag.getFiducialId());
-            Position targetInCamera = tag.getTargetPoseCameraSpace().getPosition();
-            telemetry.addData("Center", "(%.0f, %.0f)", targetInCamera.x, targetInCamera.z); //Note: These values may be swapped
-            telemetry.addData("Range (in)", "%.1f", Math.sqrt(Math.pow(targetInCamera.x, 2) + Math.pow(targetInCamera.y, 2) + Math.pow(targetInCamera.z, 2)));
-        } else {
-            telemetry.addLine("No target tags (20–24) detected.");
-        }
+//        if (tag != null) {
+//            telemetry.addLine("Target Tag Detected!");
+//            telemetry.addData("ID", tag.getFiducialId());
+//            Position targetInCamera = tag.getTargetPoseCameraSpace().getPosition();
+//            telemetry.addData("Center", "(%.0f, %.0f)", targetInCamera.x, targetInCamera.z); //Note: These values may be swapped
+//            telemetry.addData("Range (in)", "%.1f", Math.sqrt(Math.pow(targetInCamera.x, 2) + Math.pow(targetInCamera.y, 2) + Math.pow(targetInCamera.z, 2)));
+//        } else {
+//            telemetry.addLine("No target tags (20–24) detected.");
+//        }
 
 
         telemetry.addData("autoEndPose", robot.autoEndPose.toString());
         telemetry.addData("FollowerX", Math.round(robot.follower.getPose().getX() * 100) / 100.0);
         telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);
         telemetry.addData("FollowerH", Math.round(Math.toDegrees(robot.follower.getPose().getHeading()) * 100) / 100.0);
-        telemetry.addData("Distance to Goal", robot.vision.getDistanceToGoal());
+        telemetry.addData("Distance to Goal", robot.vision.getGoalDistance());
 
         ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
 

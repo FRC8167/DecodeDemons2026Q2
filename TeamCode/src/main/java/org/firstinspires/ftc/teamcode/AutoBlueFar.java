@@ -180,9 +180,9 @@ public class AutoBlueFar extends CommandOpMode {
 
         // INIT loop prior to coach pressing start
         while (opModeInInit()) {
-            robot.vision.scanForAprilTags();
+            //robot.vision.scanForAprilTags();
             robot.vision.latchMotif();
-            if (robot.vision.getMotifPattern() != null) {
+            if (robot.vision.getFirstSequence() != null) {
                 robot.rgbLight.setColor(Color.AZURE);
             } else {
                 robot.rgbLight.setColor(Color.RED);
@@ -222,7 +222,7 @@ public class AutoBlueFar extends CommandOpMode {
             telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[1]);
 
             telemetry.addLine("Hand-position artifacts on juggler");
-            telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getMotifPattern()));
+            telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getFirstSequence()));
             telemetry.addData("LatchedMotif: ", Arrays.toString(robot.vision.getLatchedMotif()));
             telemetry.update();
         }
@@ -255,7 +255,7 @@ public class AutoBlueFar extends CommandOpMode {
 
 
         // AFTER coach presses START
-        AprilTagDetection tag = robot.vision.getFirstTargetTag();
+        //AprilTagDetection tag = robot.vision.getFirstTargetTag();
         robot.follower.update();
 
 

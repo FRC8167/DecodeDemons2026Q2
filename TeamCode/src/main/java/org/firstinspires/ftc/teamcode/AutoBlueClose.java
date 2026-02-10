@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -12,6 +13,7 @@ import com.seattlesolvers.solverslib.command.ParallelDeadlineGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
@@ -197,7 +199,7 @@ public class AutoBlueClose extends CommandOpMode {
             telemetry.addData("Slot 2", s2);
 
             telemetry.addLine("Hand-position artifacts on juggler");
-            telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getMotifPattern()));
+            telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getFirstSequence()));
             telemetry.addData("LatchedMotif: ", Arrays.toString(robot.vision.getLatchedMotif()));
             telemetry.update();
         }
@@ -212,8 +214,9 @@ public class AutoBlueClose extends CommandOpMode {
     @Override
     public void run() {
         super.run();
-        AprilTagDetection tag = robot.vision.getFirstTargetTag();
-        if (robot.vision.getMotifPattern() != null) {
+        //AprilTagDetection tag = robot.vision.getFirstTargetTag();
+//        LLResultTypes.FiducialResult tag = robot.vision.getAprilTags().get(0);
+        if (robot.vision.getFirstSequence() != null) {
                 robot.rgbLight.setColor(Color.AZURE);
             } else {
                 robot.rgbLight.setColor(Color.RED);
@@ -223,15 +226,16 @@ public class AutoBlueClose extends CommandOpMode {
         telemetry.addData("X:  ", robot.follower.getPose().getX());
         telemetry.addData("Y:  ", robot.follower.getPose().getY());
         telemetry.addData("Theta:  ", robot.follower.getPose().getHeading());
-        if (tag != null) {
-            telemetry.addLine("Target Tag Detected!");
-            telemetry.addData("ID", tag.id);
-            telemetry.addData("Center", "(%.0f, %.0f)", tag.center.x, tag.center.y);
-            telemetry.addData("Range (in)", "%.1f", tag.ftcPose.range);
-        } else {
-            telemetry.addLine("No target tags (20–24) detected.");
-        }
-        telemetry.update();
+//        if (tag != null) {
+//            telemetry.addLine("Target Tag Detected!");
+//            telemetry.addData("ID", tag.getFiducialId());
+//            Position targetInCamera = tag.getTargetPoseCameraSpace().getPosition();
+//            telemetry.addData("Center", "(%.0f, %.0f)", targetInCamera.x, targetInCamera.z); //Note: These values may be swapped
+//
+//        } else {
+//            telemetry.addLine("No target tags (20–24) detected.");
+//        }
+//        telemetry.update();
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -187,9 +188,9 @@ public class AutoRedSimpleParkFar extends CommandOpMode {
 
         // INIT loop prior to coach pressing start
         while (opModeInInit()) {
-            robot.vision.scanForAprilTags();
+            //robot.vision.scanForAprilTags();
             robot.vision.latchMotif();
-            if (robot.vision.getMotifPattern() != null) {
+            if (robot.vision.getFirstSequence() != null) {
                 robot.rgbLight.setColor(Color.AZURE);
             } else {
                 robot.rgbLight.setColor(Color.RED);
@@ -229,7 +230,7 @@ public class AutoRedSimpleParkFar extends CommandOpMode {
             telemetry.addData("s",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[1]);
 
             telemetry.addLine("Hand-position artifacts on juggler");
-            telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getMotifPattern()));
+            telemetry.addData("CurrentMotif: ", Arrays.toString(robot.vision.getFirstSequence()));
             telemetry.addData("LatchedMotif: ", Arrays.toString(robot.vision.getLatchedMotif()));
             telemetry.update();
         }
@@ -262,7 +263,8 @@ public class AutoRedSimpleParkFar extends CommandOpMode {
 
 
         // AFTER coach presses START
-        AprilTagDetection tag = robot.vision.getFirstTargetTag();
+        //AprilTagDetection tag = robot.vision.getFirstTargetTag();
+//        LLResultTypes.FiducialResult tag = robot.vision.getAprilTags().get(0);
         robot.follower.update();
 
 
