@@ -128,7 +128,7 @@ public class AutoBlueClose extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, startToLatchPath, true),
 
 //                                //latch
-//                                new InstantCommand(()-> robot.vision.latchMotif()),
+                                new InstantCommand(()-> robot.vision.latchMotif()),
 
                                 //move to launch zone
                                 new FollowPathCommand(robot.follower, latchToShootClosePath),
@@ -226,6 +226,10 @@ public class AutoBlueClose extends CommandOpMode {
         telemetry.addData("X:  ", robot.follower.getPose().getX());
         telemetry.addData("Y:  ", robot.follower.getPose().getY());
         telemetry.addData("Theta:  ", robot.follower.getPose().getHeading());
+        telemetry.addData("Goal Distance", robot.vision.getGoalDistance());
+        telemetry.addData("Goal Bearing", robot.vision.getGoalBearing());
+        telemetry.addData("Vision Pose Valid", robot.vision.getMediatiatedRobotPose3D() != null);
+        telemetry.addData("Latched Motif", Arrays.toString(robot.vision.getLatchedMotif()));
 //        if (tag != null) {
 //            telemetry.addLine("Target Tag Detected!");
 //            telemetry.addData("ID", tag.getFiducialId());

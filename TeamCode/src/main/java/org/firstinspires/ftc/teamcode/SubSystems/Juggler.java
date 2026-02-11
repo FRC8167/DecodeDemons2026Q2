@@ -10,7 +10,7 @@ public class Juggler extends SubsystemBase {
     private final MotorEx spindexer;
     private final LimitSwitch limitSwitch;
 
-    private boolean homed = false;
+    private boolean homed = true;
     private boolean hasTarget = false;
     private boolean lastHomeState = false;
 
@@ -44,7 +44,7 @@ public class Juggler extends SubsystemBase {
         spindexer.resetEncoder();
         spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
 
-        jugglerPID = new PIDFController(0.01, 0, 0, 0);
+        jugglerPID = new PIDFController(0.015, 0, 0.0005, 0);
         jugglerPID.setTolerance(3);
 
 
@@ -70,6 +70,8 @@ public class Juggler extends SubsystemBase {
             currentSlot = 0;
         }
     }
+
+    final int magnetOffsetTicks
 
     // You spin me round (like a record) . . .
 
@@ -100,6 +102,7 @@ public class Juggler extends SubsystemBase {
 
     private void moveToSlot(int slot) {
         targetPosition = slot * COUNTS_PER_SLOT;
+        jugglerPID.reset();
         jugglerPID.setSetPoint(targetPosition);
         hasTarget = true;
     }
@@ -108,7 +111,7 @@ public class Juggler extends SubsystemBase {
 
     public void snapToNearestSlot() {
         if (!homed) return;
-
+        slowSpinEnabled = false;
         int position = spindexer.getCurrentPosition();
 
         int nearestSlot = Math.round(position / (float) COUNTS_PER_SLOT);
@@ -149,9 +152,11 @@ public void stop(){
 //            currentSlot = 0;
 //        }
 
-        lastHomeState = homeNow;
+//        lastHomeState = homeNow;
 
-        if (!homed) return;
+        if (!homed && hasTarget) {
+            return; // don't PID until homed
+        }
 
         if (hasTarget) {
             int currentPosition = spindexer.getCurrentPosition();
