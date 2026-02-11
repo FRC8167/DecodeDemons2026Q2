@@ -71,7 +71,7 @@ public class Juggler extends SubsystemBase {
         }
     }
 
-    final int magnetOffsetTicks
+
 
     // You spin me round (like a record) . . .
 

@@ -138,7 +138,10 @@ public class MainTeleOp extends CommandOpMode {
         operator.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(robot.vision::latchMotif));
 
-
+        operator.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(
+                        new InstantCommand(()->robot.juggler.homeSlow())
+                );
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
@@ -199,10 +202,7 @@ public class MainTeleOp extends CommandOpMode {
 
                         )
                 );
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
-                .whenPressed(
-                        new InstantCommand(()->robot.juggler.homeSlow())
-                );
+
 
 
 //        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(

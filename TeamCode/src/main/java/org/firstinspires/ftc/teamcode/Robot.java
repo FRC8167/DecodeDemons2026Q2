@@ -147,7 +147,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         //Register Subsystems
         register(mecanumDrive, intake, shooter, popper, slide, vision, rgbLight, colorMatch, juggler, limitSwitch);
-        slide.setTargetTicks(6);
+        slide.setTargetTicks(8);
 
         if (OP_MODE_TYPE.equals(OpModeType.AUTO)) {
             initHasMovement();
