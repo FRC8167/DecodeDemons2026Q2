@@ -7,6 +7,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLFieldMap;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -34,9 +35,12 @@ import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.List;
 
 @Configurable
 //@Disabled
@@ -234,8 +238,7 @@ public class MainTeleOp extends CommandOpMode {
 
         robot.follower.update();
         robot.autoEndPose = robot.follower.getPose();
-//        AprilTagDetection tag = robot.vision.getFirstTargetTag();
-//        LLResultTypes.FiducialResult tag = robot.vision.getAprilTags().get(0);
+
 
 
 
@@ -249,6 +252,26 @@ public class MainTeleOp extends CommandOpMode {
 //            telemetry.addLine("No target tags (20–24) detected.");
 //        }
 
+        //Trying to add limelight replacement for above
+        LLResult result = robot.vision.getResult();
+
+        if (result == null) {
+            telemetry.addLine("AprilTags: No valid Limelight result");
+        } else {
+            List<LLResultTypes.FiducialResult> tags = result.getFiducialResults();
+
+            if (tags == null || tags.isEmpty()) {
+                telemetry.addLine("AprilTags: None detected");
+            } else {
+                for (LLResultTypes.FiducialResult tag : tags) {
+                    telemetry.addData(
+                            LimeLightVision.tagIdLookup(tag.getFiducialId()),
+                            tag.getFiducialId()
+                    );
+                }
+            }
+        }
+
 
         telemetry.addData("autoEndPose", robot.autoEndPose.toString());
         telemetry.addData("FollowerX", Math.round(robot.follower.getPose().getX() * 100) / 100.0);
@@ -259,26 +282,16 @@ public class MainTeleOp extends CommandOpMode {
         ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
 
         if (motif != null) {
-            telemetryM.addData(
-                    "Obelisk Motif",
-                    motif[0] + " - " + motif[1] + " - " + motif[2]
+            telemetryM.addData("Obelisk Motif",motif[0] + " - " + motif[1] + " - " + motif[2]
             );
         } else {
             telemetryM.addData("Obelisk Motif", "Not latched");
         }
-//        telemetryM.addData("Obelisk Motif", robot.vision.getLatchedMotifString());
 
-
-        telemetry.addData("Popperstate", robot.popper.getPopperState());
         telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
         telemetry.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
 //        telemetry.addData("Juggler counts", robot.juggler.getCurrentPosition());
 
-
-
-        //telemetryM.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
-        //telemetryM.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
-        //telemetryM.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
         telemetry.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
         telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));
         telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[0]);

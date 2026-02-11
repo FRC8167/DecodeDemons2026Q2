@@ -258,7 +258,7 @@ public class AutoBlueFar extends CommandOpMode {
         //AprilTagDetection tag = robot.vision.getFirstTargetTag();
         robot.follower.update();
 
-
+        telemetry.addData("tag?", robot.vision.getFirstSequence());
         telemetry.addData("X", robot.follower.getPose().getX());
         telemetry.addData("Y", robot.follower.getPose().getY());
         telemetry.addData("Theta", robot.follower.getPose().getHeading());

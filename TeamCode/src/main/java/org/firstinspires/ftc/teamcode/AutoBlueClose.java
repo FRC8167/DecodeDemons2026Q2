@@ -169,12 +169,12 @@ public class AutoBlueClose extends CommandOpMode {
         // INIT loop prior to coach pressing start
         while (opModeInInit()) {
 //            robot.vision.scanForAprilTags();
-//            robot.vision.latchMotif();
-//            if (robot.vision.getMotifPattern() != null) {
-//                robot.rgbLight.setColor(Color.AZURE);
-//            } else {
-//                robot.rgbLight.setColor(Color.RED);
-//            }
+            robot.vision.getLatchedMotif();
+            if (robot.vision.getFirstSequence() != null) {
+                robot.rgbLight.setColor(Color.AZURE);
+            } else {
+                robot.rgbLight.setColor(Color.RED);
+            }
             // Detect the slots
             ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
             ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
