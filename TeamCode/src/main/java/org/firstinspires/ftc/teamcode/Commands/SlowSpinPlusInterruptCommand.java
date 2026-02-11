@@ -25,6 +25,6 @@ public class SlowSpinPlusInterruptCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        juggler.Snap();
+        juggler.snapToNearestSlot();
     }
 }

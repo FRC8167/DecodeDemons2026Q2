@@ -82,13 +82,13 @@ public class Juggler extends SubsystemBase {
         if (!homed) return;
 
         currentSlot = (currentSlot + direction.sign + SLOTS) % SLOTS;
-        jugglerPID.setSetPoint(currentSlot);
+        moveToSlot(currentSlot);
     }
 
     public void rotateTwoSlots(Direction direction) {
         if (!homed) return;
         currentSlot = (currentSlot + 2 * direction.sign + SLOTS) % SLOTS;
-        jugglerPID.setSetPoint(currentSlot);
+        moveToSlot(currentSlot);
     }
 
     public void rotateToSlot(int slotIndex) {
@@ -143,11 +143,11 @@ public void stop(){
         //NECESSARY FOR ABSOLUTE ENCODERS????
         boolean homeNow = limitSwitch.isHome();
 
-        if (homeNow && !lastHomeState) {
-            spindexer.resetEncoder();
-            jugglerPID.reset();
-            currentSlot = 0;
-        }
+//        if (homeNow && !lastHomeState) {
+//            spindexer.resetEncoder();
+//            jugglerPID.reset();
+//            currentSlot = 0;
+//        }
 
         lastHomeState = homeNow;
 
@@ -168,7 +168,11 @@ public void stop(){
             }
 
         } else {
-            spindexer.stopMotor();
+            if (slowSpinEnabled) {
+                spindexer.set(slowSpinPower);
+            } else {
+                spindexer.stopMotor();
+            }
         }
     }
 }

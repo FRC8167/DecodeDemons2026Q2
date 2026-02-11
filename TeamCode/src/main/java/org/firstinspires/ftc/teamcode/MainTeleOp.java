@@ -146,7 +146,7 @@ public class MainTeleOp extends CommandOpMode {
 
         operator.getGamepadButton(GamepadKeys.Button.X)
                 .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(Juggler.Direction.CW), robot.juggler))
-                .whenReleased(new InstantCommand(() -> robot.juggler.Snap(), robot.juggler));
+                .whenReleased(new InstantCommand(() -> robot.juggler.snapToNearestSlot(), robot.juggler));
 
 
 
@@ -272,7 +272,7 @@ public class MainTeleOp extends CommandOpMode {
             }
         }
 
-        telemetry.addData("jugggler count", robot.juggler.getCurrentPos());
+        telemetry.addData("jugggler count", robot.juggler.getCurrentPosition());
         telemetry.addData("autoEndPose", robot.autoEndPose.toString());
         telemetry.addData("FollowerX", Math.round(robot.follower.getPose().getX() * 100) / 100.0);
         telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);
