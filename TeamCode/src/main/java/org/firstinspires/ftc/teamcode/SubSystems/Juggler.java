@@ -3,281 +3,172 @@ package org.firstinspires.ftc.teamcode.SubSystems;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.controller.PIDFController;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 public class Juggler extends SubsystemBase {
 
     private final MotorEx spindexer;
-    private LimitSwitch limitSwitch;
-    private boolean jugglerHome = false;
+    private final LimitSwitch limitSwitch;
+
+    private boolean homed = false;
     private boolean hasTarget = false;
+    private boolean lastHomeState = false;
 
     public static final int PPR = 288;
     public static final int SLOTS = 3;
     public static final int COUNTS_PER_SLOT = PPR / SLOTS;
-    int target;
+
+    private int currentSlot = 0;
+    private int targetPosition = 0;
+
     private boolean slowSpinEnabled = false;
     private double slowSpinPower = 0.0;
 
     private final PIDFController jugglerPID;
 
-    /* wheat 06 FEB 2026 */
-//    private int normalizedCount;
-//    private int revolutions;
-    /*
-        slot 0 -   0 counts to 95  counts, center = 47.5
-        slot 1 -  96 counts to 191 counts, center = 143.5
-        slot 2 - 192 counts to 287 counts, center = 239.5
-
-        if Slot 0 centered is set to 0 counts
-        slot 0 - 240 counts to 47  counts, center = -0.5
-        slot 1 -  48 counts to 143 counts, center = 95.5
-        slot 2 - 144 counts to 239 counts, center = 190.5
-     */
-//    private int SLOT0_CENTER = 1;
-//    private int SLOT1_CENTER = 96;
-//    private int SLOT2_CENTER = 191;
-//
-//    private int currentSlot;
-
-
-    public Juggler(MotorEx motor, LimitSwitch limitSwitch) {
-        this.spindexer = motor;
-        this.limitSwitch = limitSwitch;
-        spindexer.setRunMode(MotorEx.RunMode.RawPower);
-        spindexer.resetEncoder();
-        spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
-        jugglerPID = new PIDFController(.01,0,0,0); // ki, kd, kv);  //was.02
-        jugglerPID.setTolerance(2);
-        target = 0;
-    }
-
-
     public enum Direction {
         CW(1),
         CCW(-1);
-        public int sign;
+
+        public final int sign;
         Direction(int sign) {
             this.sign = sign;
         }
     }
 
+    public Juggler(MotorEx motor, LimitSwitch limitSwitch) {
+        this.spindexer = motor;
+        this.limitSwitch = limitSwitch;
+
+        spindexer.setRunMode(MotorEx.RunMode.RawPower);
+        spindexer.resetEncoder();
+        spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
+
+        jugglerPID = new PIDFController(0.01, 0, 0, 0);
+        jugglerPID.setTolerance(3);
+
+
+    }
+
+    //Return to "HOME"
 
     public void homeSlow() {
-        if (jugglerHome) {
+
+        if (homed) {
             spindexer.stopMotor();
             return;
         }
 
-        // Slow, safe power
         spindexer.set(0.15);
 
         if (limitSwitch.isHome()) {
             spindexer.stopMotor();
             spindexer.resetEncoder();
-            jugglerHome = true;
+            jugglerPID.reset();
+
+            homed = true;
+            currentSlot = 0;
         }
     }
 
-    public void rotateOneSlot(Direction direction) {
-        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT;
-        jugglerPID.setSetPoint(target);
-        hasTarget = true;
-
-//        switch (currentSlot) {
-//            case 0:
-//                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT2_CENTER;
-//                break;
-//            case 1:
-//                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT0_CENTER;
-//                break;
-//            case 2:
-//                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT1_CENTER;
-//                break;
-//        }
-////        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
-//        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
-
-    }
-
-
-    public void rotateTwoSlots(Direction direction) {
-        target = spindexer.getCurrentPosition() + direction.sign * COUNTS_PER_SLOT*2;
-        jugglerPID.setSetPoint(target);
-        hasTarget = true;
-
-
-//        switch (currentSlot) {
-//            case 0:
-//                target = (direction.sign > 0) ? SLOT2_CENTER : SLOT1_CENTER;
-//                break;
-//            case 1:
-//                target = (direction.sign > 0) ? SLOT0_CENTER : SLOT2_CENTER;
-//                break;
-//            case 2:
-//                target = (direction.sign > 0) ? SLOT1_CENTER : SLOT0_CENTER;
-//                break;
-//        }
-////        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
-//        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
-
-    }
-
-
-    public void rotateToSlot(int slotIndex) {
-        if (slotIndex == 1) { rotateOneSlot(Direction.CW);}
-        else if (slotIndex ==2) {rotateOneSlot(Direction.CCW);}
-    }
-
+    // You spin me round (like a record) . . .
 
     public void startSlowSpin(Direction direction) {
         slowSpinEnabled = true;
         slowSpinPower = 0.2 * direction.sign;
     }
 
+    public void rotateOneSlot(Direction direction) {
+        if (!homed) return;
 
-    public void Snap() {
-        slowSpinEnabled = false;
-        int currentPos = spindexer.getCurrentPosition();
-        int nearestSlot = Math.round((float) currentPos / COUNTS_PER_SLOT);
-        int snappedTarget = nearestSlot * COUNTS_PER_SLOT;
-        jugglerPID.setSetPoint(snappedTarget);
-        target = snappedTarget;
+        currentSlot = (currentSlot + direction.sign + SLOTS) % SLOTS;
+        jugglerPID.setSetPoint(currentSlot);
+    }
+
+    public void rotateTwoSlots(Direction direction) {
+        if (!homed) return;
+        currentSlot = (currentSlot + 2 * direction.sign + SLOTS) % SLOTS;
+        jugglerPID.setSetPoint(currentSlot);
+    }
+
+    public void rotateToSlot(int slotIndex) {
+        if (!homed) return;
+
+        currentSlot = ((slotIndex % SLOTS) + SLOTS) % SLOTS;
+        moveToSlot(currentSlot);
+    }
+
+    private void moveToSlot(int slot) {
+        targetPosition = slot * COUNTS_PER_SLOT;
+        jugglerPID.setSetPoint(targetPosition);
         hasTarget = true;
-
-//        slowSpinEnabled = false;
-//
-//        switch (currentSlot) {
-//            case 0:
-//                target = SLOT0_CENTER;
-//                break;
-//            case 1:
-//                target = SLOT1_CENTER;
-//                break;
-//            case 2:
-//                target = SLOT2_CENTER;
-//                break;
-//        }
-//        jugglerPID.setSetPoint(target * revolutions * PPR);  //DMW 2/9
-//        jugglerPID.setSetPoint(revolutions * PPR + target);  //DMW 2/9
-
     }
 
+    // snap to a slot
 
-    public void stop(){
-        spindexer.set(0.0);
+    public void snapToNearestSlot() {
+        if (!homed) return;
+
+        int position = spindexer.getCurrentPosition();
+
+        int nearestSlot = Math.round(position / (float) COUNTS_PER_SLOT);
+        nearestSlot = ((nearestSlot % SLOTS) + SLOTS) % SLOTS;
+
+        currentSlot = nearestSlot;
+        moveToSlot(currentSlot);
     }
 
+    //Other statusy things
 
     public boolean atTarget() {
         return jugglerPID.atSetPoint();
     }
 
-
     public int getSlotIndex() {
-        // unrestricted raw slot number
-        int rawSlot = Math.round(spindexer.getCurrentPosition() / (float) COUNTS_PER_SLOT);
-        // Restrict slots to 0, 1, or 2
-        int slotIndex = ((rawSlot % SLOTS) + SLOTS) % SLOTS;
-        return slotIndex;
+        return currentSlot;
     }
 
+    public int getCurrentPosition() {
+        return spindexer.getCurrentPosition();
+    }
 
-
-
-
+public void stop(){
+        spindexer.stopMotor();
+}
 
     @Override
     public void periodic() {
 
-        //DMW 2/9 trying to fix normalization
-//        int currentPosition = spindexer.getCurrentPosition();
-//
-//
-//        revolutions = Math.floorDiv(currentPosition, PPR);
-//        normalizedCount = Math.floorMod(currentPosition, PPR);
+        //AUTO RE-ZERO EVERY TIME WE PASS HOME????   GOOD, BAD, OR UGLY?
+        //NECESSARY FOR ABSOLUTE ENCODERS????
+        boolean homeNow = limitSwitch.isHome();
 
-
-        /* Added for Debugging Slot Center Error */
-
-//        normalizedCount = currentPosition;
-//        if(normalizedCount > 287) {
-//            normalizedCount -= 288;
-//            revolutions += 1;
-//        }
-//        else if(normalizedCount < 0)
-//            { normalizedCount += 288; revolutions -= 1;
-//            }
-//        updateCurrentSlot();
-
-
-
-
-            // Indexing = w/PID
-        if (!jugglerHome && limitSwitch.isHome()) {
-            spindexer.stopMotor();
+        if (homeNow && !lastHomeState) {
             spindexer.resetEncoder();
             jugglerPID.reset();
-            jugglerHome = true;
-            return;
+            currentSlot = 0;
         }
 
-        if (!jugglerHome) {
-            // Let homeSlow() control the motor
-            return;
+        lastHomeState = homeNow;
+
+        if (!homed) return;
+
+        if (hasTarget) {
+            int currentPosition = spindexer.getCurrentPosition();
+
+            double output = Range.clip(
+                    jugglerPID.calculate(currentPosition),
+                    -0.35, 0.35
+            );
+
+            spindexer.set(output);
+
+            if (jugglerPID.atSetPoint()) {
+                hasTarget = false;
+            }
+
+        } else {
+            spindexer.stopMotor();
         }
-
-        if (slowSpinEnabled) {
-            spindexer.set(slowSpinPower);
-            return;
-        }
-//add if there are unexplained twitches
-//        if (!hasTarget) {
-//            spindexer.stopMotor();
-//            return;
-//        }
-
-        int currentPosition = spindexer.getCurrentPosition();
-        double output = Range.clip(
-                jugglerPID.calculate(currentPosition),
-                -0.3, 0.3
-        );
-        spindexer.set(output);
-
-
-//            updateCurrentSlot();
     }
-
-
-//    public int getNormalizedCount() { return normalizedCount; }
-
-
-    /**
-     * Determines the current slot
-     */
-
-//    public void updateCurrentSlot() {
-//        if (normalizedCount >= 240 || normalizedCount < 48) {
-//            currentSlot = 0;
-//        } else if (normalizedCount < 144) {
-//            currentSlot = 1;
-//        } else {
-//            currentSlot = 2;
-//        }
-//    }
-
-//DMW 2/9  Return to Dave's normalization
-//    public void updateCurrentSlot() {
-//
-//        if(normalizedCount >= 240 || normalizedCount < 47) {
-//            currentSlot = 0;
-//        } else if(normalizedCount >= 48 && normalizedCount < 143) {
-//            currentSlot = 1;
-//        } else if (normalizedCount > 144 && normalizedCount < 239) {
-//            currentSlot = 2;
-//        }
-//    }
-
-
 }
