@@ -9,7 +9,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 public class Slide extends SubsystemBase {
 
     private final MotorEx slideMotor;
-    public static double MAX_POWER = 0.75 ;
+    public static double MAX_POWER = 0.70 ;
     public static final double TICKS_PER_REV = 537.7;
     public static final double MM_PER_REV = 120.0;
     public static final double TICKS_PER_MM = TICKS_PER_REV / MM_PER_REV;//4.5
@@ -23,7 +23,7 @@ public class Slide extends SubsystemBase {
     // PID using ticks
     public static double kP = 0.003; //0.0155;
     public static double kI = 0.0;
-    public static double kD = 0; //2.5E-4;
+    public static double kD = .00005; //2.5E-4;
     public static double kF = 0.0;
 
     public static double TOLERANCE = 10;

@@ -98,6 +98,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
 
         spindexerMotor.resetEncoder();  //added 01-18
+        slideMotor.resetEncoder();
 
         ServoEx popperServoL = new ServoEx(hardwareMap, "popperServoL");
         ServoEx popperServoR = new ServoEx(hardwareMap, "popperServoR");

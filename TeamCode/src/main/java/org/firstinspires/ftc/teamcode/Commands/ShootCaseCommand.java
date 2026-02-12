@@ -10,13 +10,15 @@ import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
+import org.firstinspires.ftc.teamcode.SubSystems.Slide;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 
 public class ShootCaseCommand extends CommandBase {
 
     private final Juggler juggler;
-    private final Popper popper;
+//    private final Popper popper;
     private final Shooter shooter;
+    private final Slide slide;
     private final ColorMatch colorMatch;
     private final
     LimeLightVision vision;
@@ -26,12 +28,14 @@ public class ShootCaseCommand extends CommandBase {
 
     public ShootCaseCommand(
             Juggler juggler,
-            Popper popper,
+//            Popper popper,
+            Slide slide,
             Shooter shooter,
             ColorMatch colorMatch,
             LimeLightVision vision) {
         this.juggler = juggler;
-        this.popper = popper;
+//        this.popper = popper;
+        this.slide = slide;
         this.shooter = shooter;
         this.colorMatch = colorMatch;
         this.vision = vision;
@@ -97,11 +101,13 @@ public class ShootCaseCommand extends CommandBase {
         if(countedTotalArtifacts !=3){
 
             seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-            seq.addCommands(new PopandResetCommand(popper));
+//            seq.addCommands(new PopandResetCommand(popper));
+            seq.addCommands(new KickCommand(slide));
+
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
-            seq.addCommands(new PopandResetCommand(popper));
+//            seq.addCommands(new PopandResetCommand(popper));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
-            seq.addCommands(new PopandResetCommand(popper));
+//            seq.addCommands(new PopandResetCommand(popper));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 
 
@@ -190,7 +196,7 @@ public class ShootCaseCommand extends CommandBase {
             }
 
             seq.addCommands(action);
-            seq.addCommands(new PopandResetCommand(popper));
+//            seq.addCommands(new PopandResetCommand(popper));
 
             // Artifact at 0 is now used/popped.
             virtualSlots[0] = ColorMatch.ArtifactColor.NONE;

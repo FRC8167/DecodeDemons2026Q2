@@ -40,7 +40,7 @@ public class MainTeleOp extends CommandOpMode {
 
     public GamepadEx driver;
     public GamepadEx operator;
-    public ElapsedTime loopTimer;
+//    public ElapsedTime loopTimer;
     private final Robot robot = Robot.getInstance();
     static TelemetryManager telemetryM;
     Pose currentPose;
@@ -214,7 +214,7 @@ public class MainTeleOp extends CommandOpMode {
 //        robot.slide.periodic();
 
         /* Run Loop Timer */
-        loopTimer.reset();;
+//        loopTimer.reset();;
 
         if (!automatedDrive) {
 //            robot.follower.setTeleOpDrive(
@@ -247,24 +247,24 @@ public class MainTeleOp extends CommandOpMode {
 //        }
 
         //Trying to add limelight replacement for above
-        LLResult result = robot.vision.getResult();
-
-        if (result == null) {
-            telemetry.addLine("AprilTags: No valid Limelight result");
-        } else {
-            List<LLResultTypes.FiducialResult> tags = result.getFiducialResults();
-
-            if (tags == null || tags.isEmpty()) {
-                telemetry.addLine("AprilTags: None detected");
-            } else {
-                for (LLResultTypes.FiducialResult tag : tags) {
-                    telemetry.addData(
-                            LimeLightVision.tagIdLookup(tag.getFiducialId()),
-                            tag.getFiducialId()
-                    );
-                }
-            }
-        }
+//        LLResult result = robot.vision.getResult();
+//
+//        if (result == null) {
+//            telemetry.addLine("AprilTags: No valid Limelight result");
+//        } else {
+//            List<LLResultTypes.FiducialResult> tags = result.getFiducialResults();
+//
+//            if (tags == null || tags.isEmpty()) {
+//                telemetry.addLine("AprilTags: None detected");
+//            } else {
+//                for (LLResultTypes.FiducialResult tag : tags) {
+//                    telemetry.addData(
+//                            LimeLightVision.tagIdLookup(tag.getFiducialId()),
+//                            tag.getFiducialId()
+//                    );
+//                }
+//            }
+//        }
 
         telemetry.addData("jugggler count", robot.juggler.getCurrentPosition());
 //        telemetry.addData("autoEndPose", robot.autoEndPose.toString());
@@ -272,6 +272,7 @@ public class MainTeleOp extends CommandOpMode {
 //        telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);
 //        telemetry.addData("FollowerH", Math.round(Math.toDegrees(robot.follower.getPose().getHeading()) * 100) / 100.0);
         telemetry.addData("Distance to Goal", robot.vision.getGoalDistance());
+
 
         ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
 
@@ -301,7 +302,7 @@ public class MainTeleOp extends CommandOpMode {
 //        telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
 //        telemetryM.addData("Current Velocity", current_velocity);
 
-        telemetry.addData("Loop Time [ms]", loopTimer.milliseconds());
+//        telemetry.addData("Loop Time [ms]", loopTimer.milliseconds());
         telemetryM.update(telemetry);
 
     }
