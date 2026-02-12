@@ -1,31 +1,24 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.icu.text.Transliterator;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLFieldMap;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
-import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
-import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.KickCommand;
 import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
@@ -36,9 +29,7 @@ import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
-import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
@@ -49,7 +40,7 @@ public class MainTeleOp extends CommandOpMode {
 
     public GamepadEx driver;
     public GamepadEx operator;
-    public ElapsedTime timer;
+    public ElapsedTime loopTimer;
     private final Robot robot = Robot.getInstance();
     static TelemetryManager telemetryM;
     Pose currentPose;
@@ -222,6 +213,9 @@ public class MainTeleOp extends CommandOpMode {
         super.run();
 //        robot.slide.periodic();
 
+        /* Run Loop Timer */
+        loopTimer.reset();;
+
         if (!automatedDrive) {
 //            robot.follower.setTeleOpDrive(
 //                    -gamepad1.left_stick_y,
@@ -273,10 +267,10 @@ public class MainTeleOp extends CommandOpMode {
         }
 
         telemetry.addData("jugggler count", robot.juggler.getCurrentPosition());
-        telemetry.addData("autoEndPose", robot.autoEndPose.toString());
-        telemetry.addData("FollowerX", Math.round(robot.follower.getPose().getX() * 100) / 100.0);
-        telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);
-        telemetry.addData("FollowerH", Math.round(Math.toDegrees(robot.follower.getPose().getHeading()) * 100) / 100.0);
+//        telemetry.addData("autoEndPose", robot.autoEndPose.toString());
+//        telemetry.addData("FollowerX", Math.round(robot.follower.getPose().getX() * 100) / 100.0);
+//        telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);
+//        telemetry.addData("FollowerH", Math.round(Math.toDegrees(robot.follower.getPose().getHeading()) * 100) / 100.0);
         telemetry.addData("Distance to Goal", robot.vision.getGoalDistance());
 
         ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
@@ -288,24 +282,26 @@ public class MainTeleOp extends CommandOpMode {
             telemetryM.addData("Obelisk Motif", "Not latched");
         }
 
-        telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
-        telemetry.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
+//        telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
+//        telemetry.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
 //        telemetry.addData("Juggler counts", robot.juggler.getCurrentPosition());
 
         telemetry.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
-        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));
-        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[0]);
+//        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));
+//        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_0)[0]);
 
         telemetry.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
-        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_1));
-        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[0]);
+//        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_1));
+//        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_1)[0]);
 
         telemetry.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
-        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_2));
-        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[0]);
+//        telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_2));
+//        telemetry.addData("h",robot.colorMatch.getHSV(ColorMatch.Slot.SLOT_2)[0]);
 
-        telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
-        telemetryM.addData("Current Velocity", current_velocity);
+//        telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
+//        telemetryM.addData("Current Velocity", current_velocity);
+
+        telemetry.addData("Loop Time [ms]", loopTimer.milliseconds());
         telemetryM.update(telemetry);
 
     }
