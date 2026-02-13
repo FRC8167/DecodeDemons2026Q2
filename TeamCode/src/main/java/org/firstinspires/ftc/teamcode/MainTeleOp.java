@@ -4,10 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.RunCommand;
@@ -28,10 +25,7 @@ import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
-import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
-
-import java.util.List;
 
 @Configurable
 //@Disabled
@@ -49,6 +43,9 @@ public class MainTeleOp extends CommandOpMode {
     public double increment = 25;
 
     private boolean automatedDrive = false;
+
+    long startTime, endTime, loopTime;
+
 
     private Pose startPose;
 //    private Pose autoEndPose;
@@ -206,15 +203,14 @@ public class MainTeleOp extends CommandOpMode {
 //                .whenReleased(new InstantCommand(()-> robot.mecanumDrive.setDriveMode(MecanumDrive.DriveMode.NORMAL))
 //                );
 
+        startTime = System.currentTimeMillis();
+
     }
 
     @Override
     public void run() {
-        super.run();
-//        robot.slide.periodic();
 
-        /* Run Loop Timer */
-//        loopTimer.reset();;
+        super.run();
 
         if (!automatedDrive) {
 //            robot.follower.setTeleOpDrive(
@@ -302,7 +298,12 @@ public class MainTeleOp extends CommandOpMode {
 //        telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
 //        telemetryM.addData("Current Velocity", current_velocity);
 
-//        telemetry.addData("Loop Time [ms]", loopTimer.milliseconds());
+        endTime   = System.currentTimeMillis();
+        loopTime  = endTime - startTime;
+        startTime = endTime;
+        telemetry.addData("Loop Time [ms]", loopTime);
+
+
         telemetryM.update(telemetry);
 
     }
