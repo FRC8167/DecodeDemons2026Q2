@@ -44,6 +44,7 @@ public class MainTeleOp extends CommandOpMode {
 
     private boolean automatedDrive = false;
 
+    // For Loop Timer
     long startTime, endTime, loopTime;
 
 
