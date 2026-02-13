@@ -45,6 +45,7 @@ public class Juggler extends SubsystemBase {
         spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
 
         jugglerPID = new PIDFController(0.015, 0, 0.0005, 0);
+
         jugglerPID.setTolerance(3);
 
 
@@ -160,10 +161,15 @@ public void stop(){
 
         if (hasTarget) {
             int currentPosition = spindexer.getCurrentPosition();
+            int error = targetPosition - currentPosition;
+            double maxPower = 0.2;
+            if (Math.abs(error) < 20) {
+                maxPower = 0.12;
+            }
 
             double output = Range.clip(
                     jugglerPID.calculate(currentPosition),
-                    -0.35, 0.35
+                    -maxPower, maxPower
             );
 
             spindexer.set(output);

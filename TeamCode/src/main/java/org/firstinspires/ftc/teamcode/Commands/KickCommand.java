@@ -8,6 +8,7 @@ public class KickCommand extends CommandBase {
     private final Slide slide;
     private long startTime;
     private static final long MAX_DURATION_MS = 500;
+    private static final long MIN_DURATION_MS = 150;
 
     public KickCommand(Slide slide) {
         this.slide = slide;
@@ -26,9 +27,18 @@ public class KickCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        boolean atTarget =  slide.atTarget();
-        boolean timeout = (System.currentTimeMillis() - startTime) > MAX_DURATION_MS;
-        return atTarget || timeout;
+
+        long elapsed = System.currentTimeMillis() - startTime;
+
+        boolean atTarget = slide.atTarget();
+        boolean timeout = elapsed > MAX_DURATION_MS;
+        boolean minTimePassed = elapsed > MIN_DURATION_MS;
+
+        return (atTarget && minTimePassed) || timeout;
+
+//        boolean atTarget =  slide.atTarget();
+//        boolean timeout = (System.currentTimeMillis() - startTime) > MAX_DURATION_MS;
+//        return atTarget || timeout;
     }
 
     @Override

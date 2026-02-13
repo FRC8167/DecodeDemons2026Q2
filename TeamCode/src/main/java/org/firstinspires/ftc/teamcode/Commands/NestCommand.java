@@ -7,7 +7,7 @@ public class NestCommand extends CommandBase {
 
     private final Slide slide;
     private long startTime;
-    private static final long MAX_DURATION_MS = 500;
+    private static final long MAX_DURATION_MS = 750;
 
     public NestCommand(Slide slide) {
         this.slide = slide;

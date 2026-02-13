@@ -108,18 +108,21 @@ public class ShootCaseCommand extends CommandBase {
             seq.addCommands(new NestCommand(slide));
             seq.addCommands(new WaitCommand(250));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+//            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new WaitCommand(250));
             seq.addCommands(new NestCommand(slide));
             seq.addCommands(new WaitCommand(250));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+//            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new WaitCommand(250));
             seq.addCommands(new NestCommand(slide));
             seq.addCommands(new WaitCommand(250));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+//            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
             seq.addCommands(new InstantCommand(shooter::stop));
             return seq;
         }

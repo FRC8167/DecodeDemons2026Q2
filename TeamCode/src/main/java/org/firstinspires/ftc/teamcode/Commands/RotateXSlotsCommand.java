@@ -8,6 +8,8 @@ public class RotateXSlotsCommand extends CommandBase {
     private final Juggler juggler;
     private final Juggler.Direction direction;
     private final int num;
+    private long settleStart = -1;
+    private static final long SETTLE_TIME = 250; //ms
 
     public RotateXSlotsCommand(Juggler juggler, Juggler.Direction direction, int num) {
         this.juggler = juggler;
@@ -27,8 +29,18 @@ public class RotateXSlotsCommand extends CommandBase {
     }
 
     @Override
-    public boolean isFinished() {
-        return juggler.atTarget();
+    public boolean isFinished() {  //DMW 02-13
+        if (!juggler.atTarget()) {
+            settleStart = -1;
+            return false;
+        }
+        if (settleStart < 0) {
+            settleStart = System.currentTimeMillis();
+            return false;
+        }
+        return(System.currentTimeMillis() - settleStart) >= SETTLE_TIME;
+
+        //return juggler.atTarget();
     }
 
     @Override
