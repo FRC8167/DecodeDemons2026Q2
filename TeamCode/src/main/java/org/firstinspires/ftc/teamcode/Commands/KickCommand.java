@@ -29,7 +29,6 @@ public class KickCommand extends CommandBase {
     public boolean isFinished() {
 
         long elapsed = System.currentTimeMillis() - startTime;
-
         boolean atTarget = slide.atTarget();
         boolean timeout = elapsed > MAX_DURATION_MS;
         boolean minTimePassed = elapsed > MIN_DURATION_MS;
