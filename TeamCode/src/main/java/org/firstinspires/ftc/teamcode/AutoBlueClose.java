@@ -134,7 +134,7 @@ public class AutoBlueClose extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, latchToShootClosePath),
 
                                 //shoot pre-loaded artifacts
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
                                 new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 //move to spike 1
                                 new InstantCommand(()-> robot.shooter.setVelocity(2500)),
@@ -153,8 +153,8 @@ public class AutoBlueClose extends CommandOpMode {
 
                                 //shoot artifacts from spike1
                                 new ParallelCommandGroup(
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+//                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 new InstantCommand(()->robot.intake.stop())
                                 ),
                                 //park outside launch zone

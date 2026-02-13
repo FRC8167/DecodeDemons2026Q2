@@ -4,6 +4,7 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
@@ -103,15 +104,22 @@ public class ShootCaseCommand extends CommandBase {
             seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
 //            seq.addCommands(new PopandResetCommand(popper));
             seq.addCommands(new KickCommand(slide));
-
+            seq.addCommands(new WaitCommand(250));
+            seq.addCommands(new NestCommand(slide));
+            seq.addCommands(new WaitCommand(250));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //            seq.addCommands(new PopandResetCommand(popper));
+            seq.addCommands(new KickCommand(slide));
+            seq.addCommands(new WaitCommand(250));
+            seq.addCommands(new NestCommand(slide));
+            seq.addCommands(new WaitCommand(250));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //            seq.addCommands(new PopandResetCommand(popper));
+            seq.addCommands(new KickCommand(slide));
+            seq.addCommands(new WaitCommand(250));
+            seq.addCommands(new NestCommand(slide));
+            seq.addCommands(new WaitCommand(250));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
-
-
-
             seq.addCommands(new InstantCommand(shooter::stop));
             return seq;
         }

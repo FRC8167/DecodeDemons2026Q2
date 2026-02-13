@@ -139,8 +139,8 @@ public class AutoBlueSimpleParkClose extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, latchToShootClosePath),
 
                                 //shoot pre-loaded artifacts
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+//                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 //move to spike 1
 
                                 new FollowPathCommand(robot.follower, shoottoParkPath),

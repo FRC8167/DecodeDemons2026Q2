@@ -135,7 +135,7 @@ public class MainTeleOp extends CommandOpMode {
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
+                .whenPressed(new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.X)
@@ -184,7 +184,7 @@ public class MainTeleOp extends CommandOpMode {
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> automatedDrive = true),
                                 new DriveToPoseCommand(robot.getShootPose(), driver),
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
                                 new InstantCommand(()->robot.shooter.stop()),
                                 new CancelPedroCommand(),
                                 new InstantCommand(() -> automatedDrive = false)

@@ -122,8 +122,8 @@ public class AutoBlueSimpleParkFar extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, rotateToShootPath, true),
 
                                 // Shoot pre-loaded artifacts
-                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+//                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 // Move to spike 1//
 //                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
 //                                new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),

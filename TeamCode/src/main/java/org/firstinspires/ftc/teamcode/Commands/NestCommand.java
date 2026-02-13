@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.SubSystems.Slide;
 public class NestCommand extends CommandBase {
 
     private final Slide slide;
+    private long startTime;
+    private static final long MAX_DURATION_MS = 500;
 
     public NestCommand(Slide slide) {
         this.slide = slide;
@@ -15,6 +17,7 @@ public class NestCommand extends CommandBase {
     @Override
     public void initialize() {
         slide.setTargetTicks(Slide.NEST_POS);
+        startTime = System.currentTimeMillis();
     }
 
     @Override
@@ -23,7 +26,9 @@ public class NestCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return slide.atTarget();
+        boolean atTarget =  slide.atTarget();
+        boolean timeout = (System.currentTimeMillis() - startTime) > MAX_DURATION_MS;
+        return atTarget || timeout;
     }
 
     @Override
