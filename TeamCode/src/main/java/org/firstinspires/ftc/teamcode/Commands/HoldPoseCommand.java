@@ -20,7 +20,7 @@ public class HoldPoseCommand extends CommandBase {
         this.robot = Robot.getInstance();
         this.driver = driver;
         this.targetPose = pose;    // use this specific pose
-        addRequirements(robot.mecanumDrive);
+//        addRequirements(robot.mecanumDrive);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class HoldPoseCommand extends CommandBase {
 
         robot.follower.followPath(
                 robot.follower.pathBuilder()
-                        .addPath(new BezierLine(holdPose, holdPose))
+                        .addPath(new BezierLine(robot.follower.getPose(), holdPose))
                         .setConstantHeadingInterpolation(holdPose.getHeading())
                         .build(),
                 true
@@ -47,14 +47,11 @@ public class HoldPoseCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        // Only stop if holding current pose and driver moves sticks
-//        if (targetPose == null) {
-            return  Math.abs(driver.getLeftY()) > 0.1 ||
-                    Math.abs(driver.getLeftX()) > 0.1 ||
-                    Math.abs(driver.getRightX()) > 0.1;
-//        } else {
-//            return false; // holding a fixed pose ignores stick input
-//        }
+
+//        return !robot.follower.isBusy() || driverOverride;
+        return Math.abs(driver.getLeftY()) > 0.1 ||
+                Math.abs(driver.getLeftX()) > 0.1 ||
+                Math.abs(driver.getRightX()) > 0.1;
     }
 
     @Override

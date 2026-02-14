@@ -16,6 +16,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
+import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.KickCommand;
 import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
@@ -148,8 +149,15 @@ public class MainTeleOp extends CommandOpMode {
 
         /* ****************************** DRIVER CONTROLS ****************************** */
 
-//        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-//                .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> automatedDrive = true),
+                                new HoldPoseCommand(robot.follower.getPose(), driver),
+                                new CancelPedroCommand(),
+                                new InstantCommand(() -> automatedDrive = false)
+                        )
+                );
 
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
