@@ -79,6 +79,18 @@ public class ColorMatch extends SubsystemBase {
         //if (val < 0.15 || sat < 0.35) {return ArtifactColor.UNKNOWN;}
         // Distance threshold (in CM)
         double DETECTION_DISTANCE_CM = 5.05;
+
+        switch (slot) {
+
+            case SLOT_0:
+                DETECTION_DISTANCE_CM = 5.7;
+            case SLOT_1:
+                DETECTION_DISTANCE_CM = 5.8;
+            case SLOT_2:
+                DETECTION_DISTANCE_CM = 9;
+            default:
+                DETECTION_DISTANCE_CM = 5.5;
+        }
         if (distance < DETECTION_DISTANCE_CM) {
             if (hue >= GREEN_HUE_MIN && hue <= GREEN_HUE_MAX) {
                 return ArtifactColor.GREEN;

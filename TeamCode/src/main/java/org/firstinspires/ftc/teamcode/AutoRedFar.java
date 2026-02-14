@@ -139,12 +139,15 @@ public class AutoRedFar extends CommandOpMode {
 
                                 // Move to shoot position and stop intake
                                 new ParallelCommandGroup(
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot()),
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
                                 ),
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot()),
                                         new InstantCommand(()->robot.intake.stop()),
                                         new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
 //                                        new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)

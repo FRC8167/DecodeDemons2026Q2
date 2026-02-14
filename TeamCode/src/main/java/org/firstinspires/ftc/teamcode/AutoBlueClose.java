@@ -41,7 +41,7 @@ public class AutoBlueClose extends CommandOpMode {
 
     private ElapsedTime timer;
     private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(135));
-    private final Pose latchPose = new Pose(56, 110, Math.toRadians(80));
+    private final Pose latchPose = new Pose(56, 105, Math.toRadians(80));
     private final Pose artifactsPPGPose = new Pose(56, 84, Math.toRadians(180));
     private final Pose collectPPGPose = new Pose(18, 84, Math.toRadians(180));
     private final Pose shootClosePose = new Pose(56, 78, Math.toRadians(135));
@@ -148,7 +148,8 @@ public class AutoBlueClose extends CommandOpMode {
                                 //Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, spike1ToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
                                         ),
 
                                 //shoot artifacts from spike1

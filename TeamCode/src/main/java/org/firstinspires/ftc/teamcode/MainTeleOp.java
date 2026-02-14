@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.KickCommand;
 import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
+import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
@@ -107,10 +108,12 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(robot.intake::reverse));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).
-                whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CW));
+                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 1));
+        //whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CW));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).
-                whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CCW));
+                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CCW, 1));
+                //whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CCW));
 
         operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(

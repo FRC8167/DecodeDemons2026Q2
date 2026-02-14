@@ -139,7 +139,8 @@ public class AutoBlueFar extends CommandOpMode {
                                 // Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
                                 ),
 
                                 // Shoot artifacts from spike 1
@@ -182,6 +183,10 @@ public class AutoBlueFar extends CommandOpMode {
         while (opModeInInit()) {
             //robot.vision.scanForAprilTags();
             robot.vision.latchMotif();
+            ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
+            // Moved from telemetryM to telemetry
+
+
             if (robot.vision.getFirstSequence() != null) {
                 robot.rgbLight.setColor(Color.AZURE);
             } else {
@@ -205,6 +210,7 @@ public class AutoBlueFar extends CommandOpMode {
             );
             telemetry.addLine("==============================");
             //String temp = s0 + robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0);
+
             // Show slot colors
             telemetry.addData("Slot 0", s0);
             telemetry.addData("dist",robot.colorMatch.getDistance(ColorMatch.Slot.SLOT_0));

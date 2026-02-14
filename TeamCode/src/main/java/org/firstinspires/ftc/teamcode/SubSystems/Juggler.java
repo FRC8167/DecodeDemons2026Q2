@@ -22,7 +22,7 @@ public class Juggler extends SubsystemBase {
     private int targetPosition = 0;
 
     private boolean slowSpinEnabled = false;
-    private double slowSpinPower = 0.0;
+    private double slowSpinPower = 0.3;
 
     private final PIDFController jugglerPID;
 

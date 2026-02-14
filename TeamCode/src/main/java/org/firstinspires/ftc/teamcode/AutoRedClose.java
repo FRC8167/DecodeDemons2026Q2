@@ -42,7 +42,7 @@ public class AutoRedClose extends CommandOpMode {
 
     private ElapsedTime timer;
     private final Pose startPose = MirrorUtility.mirror(new Pose(26.5, 126.5, Math.toRadians(135)));
-    private final Pose latchPose = new Pose(88, 110, Math.toRadians(105));
+    private final Pose latchPose = new Pose(88, 105, Math.toRadians(105));
 //    private final Pose latchPose = MirrorUtility.mirror(new Pose(56, 110, Math.toRadians(80)));
     private final Pose artifactsPPGPose = MirrorUtility.mirror(new Pose(56, 84, Math.toRadians(180)));
     private final Pose collectPPGPose = MirrorUtility.mirror(new Pose(18, 84, Math.toRadians(180)));
@@ -137,7 +137,7 @@ public class AutoRedClose extends CommandOpMode {
 
                                 //shoot pre-loaded artifacts
                                 new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
-                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                //new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 //move to spike 1
                                 new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootCloseToSpike1Path, true, 1.0),
@@ -150,14 +150,15 @@ public class AutoRedClose extends CommandOpMode {
                                 //Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, spike1ToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
                                 ),
 
                                 //shoot artifacts from spike1
                                 new ParallelCommandGroup(
                                         new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
-                                        new InstantCommand(()->robot.intake.stop()),
-                                        new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
+                                        new InstantCommand(()->robot.intake.stop())
+                                        //new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
                                 ),
                                 //park outside launch zone
                                 new FollowPathCommand(robot.follower, parkPath),
