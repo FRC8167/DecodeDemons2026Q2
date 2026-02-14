@@ -36,7 +36,7 @@ public class MainTeleOp extends CommandOpMode {
     public GamepadEx operator;
 //    public ElapsedTime loopTimer;
     private final Robot robot = Robot.getInstance();
-    static TelemetryManager telemetryM;
+//    static TelemetryManager telemetryM;
     Pose currentPose;
 
     public static double current_velocity = 3200;
@@ -74,7 +74,8 @@ public class MainTeleOp extends CommandOpMode {
 
 //        robot.mecanumDrive.setDefaultCommand(new DriveCommand(robot.mecanumDrive, gamepad1));
 
-        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+        // Comment for increasing loop time experiment
+//        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         //end pose held in robot
         //if auto ran, last pose is used or else default of 24,24,0
@@ -273,11 +274,13 @@ public class MainTeleOp extends CommandOpMode {
 
         ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
 
+
+        // Moved from telemetryM to telemetry
         if (motif != null) {
-            telemetryM.addData("Obelisk Motif",motif[0] + " - " + motif[1] + " - " + motif[2]
+            telemetry.addData("Obelisk Motif",motif[0] + " - " + motif[1] + " - " + motif[2]
             );
         } else {
-            telemetryM.addData("Obelisk Motif", "Not latched");
+            telemetry.addData("Obelisk Motif", "Not latched");
         }
 
 //        telemetry.addData("Shooter Velocity (RPM)", robot.shooter.getRPM());
@@ -304,8 +307,8 @@ public class MainTeleOp extends CommandOpMode {
         startTime = endTime;
         telemetry.addData("Loop Time [ms]", loopTime);
 
-
-        telemetryM.update(telemetry);
+        telemetry.update();
+//        telemetryM.update(telemetry);
 
     }
 
