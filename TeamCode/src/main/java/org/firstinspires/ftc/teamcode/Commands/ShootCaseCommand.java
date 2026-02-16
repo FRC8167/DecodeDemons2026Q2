@@ -23,8 +23,6 @@ public class ShootCaseCommand extends SequentialCommandGroup {
     private final ColorMatch colorMatch;
     private final
     LimeLightVision vision;
-    // private SequentialCommandGroup sequence;
-    // private SeqCmdAuto sequence;
     private SequentialCommandGroup sequence;
 
     public ShootCaseCommand(
@@ -111,13 +109,13 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
-            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+//            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //Still spinning DMW 02-16
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
-            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+//            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //Still spinning DMW 02-16
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
@@ -140,7 +138,8 @@ public class ShootCaseCommand extends SequentialCommandGroup {
         // but only if we don't handle it in the loop logic.
         // Actually, let's trust the loop logic. If we need a color and it's at S1, we
         // will rotate CCW 1 regardless.
-
+        seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //DMW 02-16 spin once at the beginning
+        seq.addCommands(new WaitCommand(250));  //DMW 02-16 wait for spinup once
         for (ColorMatch.ArtifactColor targetColor : motif) {
             // Stop if we ran out of artifacts
             if (totalArtifacts <= 0) {
@@ -173,7 +172,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             //action = new ShooterSmartSpinUpCommand(shooter, vision);
             if (targetIndex == 0) {
                 // Already at 0. Just shoot.
-                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+//                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision)); //DMW 02-16
                 //action = new ShooterSmartSpinUpCommand(shooter, vision);
             } else if (targetIndex == 1) {
 //                action = new ShooterSmartSpinUpCommand(shooter, vision);
@@ -183,7 +182,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 //                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //                //already sping so shoot; distance should not be changing that much
 //                action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1);
-                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+//                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //DMW 02-16
                 seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 
 
@@ -203,7 +202,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 //                        new ShooterSmartSpinUpCommand(shooter, vision),
 //                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //already sping so shoot; distance should not be changing that much
-                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+//                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //DMW 02-16
                 seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
 
