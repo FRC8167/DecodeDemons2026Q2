@@ -10,9 +10,9 @@ public class Juggler extends SubsystemBase {
     private final MotorEx spindexer;
     private final LimitSwitch limitSwitch;
 
-    private boolean homed = true;
+    private boolean homed = false;  //DMW 02-16
     private boolean hasTarget = false;
-    private boolean lastHomeState = false;
+//    private boolean lastHomeState = false;
 
     public static final int PPR = 288;
     public static final int SLOTS = 3;
@@ -53,7 +53,7 @@ public class Juggler extends SubsystemBase {
 
     //Return to "HOME"
 
-    public void homeSlow() {
+    public void homeSlow() {  //TODO:  bind to a TeleOp button DMW 02-17 and FIX MAGNET position offset
 
         if (homed) {
             spindexer.stopMotor();
@@ -70,6 +70,12 @@ public class Juggler extends SubsystemBase {
             homed = true;
             currentSlot = 0;
         }
+    }
+
+    public void confirmHome() {  //TODO:  Bind to TeleOp button 02-17 DMW
+        homed = true;
+        currentSlot = 0;
+        return;
     }
 
 
