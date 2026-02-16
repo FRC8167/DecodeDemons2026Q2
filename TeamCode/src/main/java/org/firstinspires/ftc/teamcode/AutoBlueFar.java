@@ -140,7 +140,9 @@ public class AutoBlueFar extends CommandOpMode {
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
-                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot()),
+                                        new InstantCommand(()-> robot.shooter.setVelocity(2500))  //DMW 02-16
+
                                 ),
 
                                 // Shoot artifacts from spike 1
@@ -236,24 +238,6 @@ public class AutoBlueFar extends CommandOpMode {
 
     }
 
-
-//    @Override
-//    public void run() {
-//
-//
-//        super.run();
-//        AprilTagDetection tag = robot.vision.getFirstTargetTag();
-//        robot.follower.update();
-//        robot.follower.getPose();
-//        telemetry.addData("X:  ", robot.follower.getPose().getX());
-//        telemetry.addData("Y:  ", robot.follower.getPose().getY());
-//        telemetry.addData("Theta:  ", robot.follower.getPose().getHeading());
-//        telemetry.addData("Slot 0", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0));
-//        telemetry.addData("Slot 1", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1));
-//        telemetry.addData("Slot 2", robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2));
-
-//        telemetry.update();
-//    }
 
     @Override
     public void run() {
