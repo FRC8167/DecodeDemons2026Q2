@@ -4,7 +4,6 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -12,13 +11,11 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.Commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Disabled
 @Configurable
@@ -42,7 +39,7 @@ public class TestOp_TagTrackTuning extends CommandOpMode {
 
         //Initialize the robot
         try {
-            robot.init(hardwareMap);
+            robot.init(hardwareMap, true);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +59,7 @@ public class TestOp_TagTrackTuning extends CommandOpMode {
         /* ****************************** DRIVER CONTROLS ****************************** */
 
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileHeld(new HoldPoseCommand(robot.follower.getPose(), driver));
+                .whileHeld(new HoldPoseCommand(driver));
 
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)

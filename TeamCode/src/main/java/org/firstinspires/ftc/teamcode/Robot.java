@@ -11,7 +11,6 @@ import com.seattlesolvers.solverslib.hardware.SensorColor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
@@ -24,7 +23,6 @@ import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Slide;
-import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import com.pedropathing.follower.Follower;
@@ -56,6 +54,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public static final Pose BLUE_SHOOT_FAR_POSE = new Pose(56, 14, Math.toRadians(110.5));
     private static final Pose RED_SHOOT_FAR_POSE = MirrorUtility.mirror(new Pose(56, 14, Math.toRadians(110.5)));
 
+    protected static int initCount = 0;
+
     private static Alliance alliance = Alliance.UNSPECIFIED;
 
     public Telemetry telemetry;
@@ -82,7 +82,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public LimitSwitch limitSwitch;
 
 
-    public void init(HardwareMap hardwareMap) throws InterruptedException {
+    public void init(HardwareMap hardwareMap, boolean reset) throws InterruptedException {
+        initCount ++;
 
         // Hardware
         MotorEx driveMotorRF = new MotorEx(hardwareMap, "RightFront").setCachingTolerance(0.01);
@@ -94,7 +95,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         MotorEx intakeMotor    = new MotorEx(hardwareMap, "Intake").setCachingTolerance(0.01);
         MotorEx shooterMotor   = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
-        MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
+//        MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
         MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
 
 //        spindexerMotor.resetEncoder();  //added 01-18
@@ -115,7 +116,11 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         DigitalChannel jugglerDigitalSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
         jugglerDigitalSwitch.setMode(DigitalChannel.Mode.INPUT);
         limitSwitch = new LimitSwitch(jugglerDigitalSwitch);
-        juggler = new Juggler(spindexerMotor, limitSwitch);
+//        juggler = new Juggler(spindexerMotor, limitSwitch);
+        if (juggler == null || reset) {
+            MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
+            juggler = new Juggler(spindexerMotor, limitSwitch);
+        }
 
 
         ctrlHubs = hardwareMap.getAll(LynxModule.class);

@@ -10,7 +10,7 @@ public class Juggler extends SubsystemBase {
     private final MotorEx spindexer;
     private final LimitSwitch limitSwitch;
 
-    private boolean homed = false;  //DMW 02-16
+    private boolean homed = true;  //DMW 02-16
     private boolean hasTarget = false;
 //    private boolean lastHomeState = false;
 
@@ -44,23 +44,24 @@ public class Juggler extends SubsystemBase {
         spindexer.resetEncoder();
         spindexer.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
 
-        jugglerPID = new PIDFController(0.015, 0, 0.0005, 0);
-
-        jugglerPID.setTolerance(3);
-
+//        jugglerPID = new PIDFController(0.015, 0, 0.0005, 0);
+//        jugglerPID.setTolerance(3);
+        // Higher P = faster start | Higher D = less bounce/overshoot
+        jugglerPID = new PIDFController(0.05, 0, 0.002, 0);
+        jugglerPID.setTolerance(5);
 
     }
 
     //Return to "HOME"
 
-    public void homeSlow() {  //TODO:  bind to a TeleOp button DMW 02-17 and FIX MAGNET position offset
+    public void homeSlow() {
 
         if (homed) {
             spindexer.stopMotor();
             return;
         }
 
-        spindexer.set(0.15);
+        spindexer.set(0.12);
 
         if (limitSwitch.isHome()) {
             spindexer.stopMotor();
@@ -72,10 +73,13 @@ public class Juggler extends SubsystemBase {
         }
     }
 
-    public void confirmHome() {  //TODO:  Bind to TeleOp button 02-17 DMW
+    public void confirmHome() {
         homed = true;
         currentSlot = 0;
-        return;
+    }
+
+    public void panic() {
+        homed = false;
     }
 
 

@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -20,14 +18,12 @@ import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.KickCommand;
 import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
-import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
-import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 
 @Configurable
 //@Disabled
@@ -64,7 +60,7 @@ public class MainTeleOp extends CommandOpMode {
 
         //Initialize the robot
         try {
-            robot.init(hardwareMap);
+            robot.init(hardwareMap, false);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -73,6 +69,9 @@ public class MainTeleOp extends CommandOpMode {
         } else {
             startPose = robot.autoEndPose;
         }
+
+        telemetry.addData("InitCount: ", Robot.initCount);
+        telemetry.update();
 
 //        robot.mecanumDrive.setDefaultCommand(new DriveCommand(robot.mecanumDrive, gamepad1));
 
@@ -109,12 +108,12 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(robot.intake::reverse));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).
-                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 1));
-        //whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CW));
+//                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 1));
+        whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CW));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).
-                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CCW, 1));
-                //whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CCW));
+//                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CCW, 1));
+                whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CCW));
 
         operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(
@@ -145,7 +144,8 @@ public class MainTeleOp extends CommandOpMode {
                 .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(Juggler.Direction.CW), robot.juggler))
                 .whenReleased(new InstantCommand(() -> robot.juggler.snapToNearestSlot(), robot.juggler));
 
-
+        operator.getGamepadButton(GamepadKeys.Button.BACK)
+                        .whenPressed(new InstantCommand(()-> robot.juggler.confirmHome()));
 
         /* ****************************** DRIVER CONTROLS ****************************** */
 
@@ -153,8 +153,7 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> automatedDrive = true),
-                                new HoldPoseCommand(robot.follower.getPose(), driver),
-                                new CancelPedroCommand(),
+                                new HoldPoseCommand(driver),
                                 new InstantCommand(() -> automatedDrive = false)
                         )
                 );
@@ -169,10 +168,10 @@ public class MainTeleOp extends CommandOpMode {
         //once driver releases and moves joystick, the hold ends
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(()->robot.popper.set(Popper.PopperState.KICK)));
+                .whenPressed(new KickCommand(robot.slide));
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new InstantCommand(()->robot.popper.set(Popper.PopperState.RESET)));
+                .whenPressed(new NestCommand(robot.slide));
 
 
 //        driver.getGamepadButton(GamepadKeys.Button.BACK)
@@ -317,6 +316,8 @@ public class MainTeleOp extends CommandOpMode {
         loopTime  = endTime - startTime;
         startTime = endTime;
         telemetry.addData("Loop Time [ms]", loopTime);
+        telemetry.addLine();
+        telemetry.addData("AutoDrive: ", automatedDrive);
 
         telemetry.update();
 //        telemetryM.update(telemetry);

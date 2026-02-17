@@ -15,17 +15,12 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.RotateXSlotsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootLeftoversCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
-import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.Arrays;
 
@@ -97,13 +92,16 @@ public class AutoBlueFar extends CommandOpMode {
         super.reset();
 
         try {
-            robot.init(hardwareMap);
+            robot.init(hardwareMap, true);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        buildPaths();
+        telemetry.addData("InitCount: ", Robot.initCount);
+        telemetry.update();
 
+        buildPaths();
+//        robot.juggler.confirmHome();  //DMW 02-17  TODO:  Check if tis makes a difference
         schedule(
                 new ParallelCommandGroup(
                         // Artifact detection & vision run in background parallel with all else
@@ -140,8 +138,8 @@ public class AutoBlueFar extends CommandOpMode {
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
-                                        new InstantCommand(()->robot.juggler.snapToNearestSlot()),
-                                        new InstantCommand(()-> robot.shooter.setVelocity(2500))  //DMW 02-16
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
+//                                        new InstantCommand(()-> robot.shooter.setVelocity(2500))  //DMW 02-16
 
                                 ),
 
@@ -180,6 +178,7 @@ public class AutoBlueFar extends CommandOpMode {
                         )
                 )
         );
+
 
         // INIT loop prior to coach pressing start
         while (opModeInInit()) {
@@ -262,6 +261,9 @@ public class AutoBlueFar extends CommandOpMode {
         @Override
     public void end() {
         robot.autoEndPose = robot.follower.getPose();
+//        if (isStopRequested()) {
+//            robot.juggler.panic();
+//        }
     }
 
 

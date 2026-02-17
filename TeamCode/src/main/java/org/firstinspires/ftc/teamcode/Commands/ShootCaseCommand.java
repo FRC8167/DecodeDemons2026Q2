@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
+import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
@@ -96,29 +97,43 @@ public class ShootCaseCommand extends SequentialCommandGroup {
                 countedTotalArtifacts++;
             }
         }
+        //check colours again
+        if(countedTotalArtifacts !=3){
+            // Track virtual slots: [Slot 0, Slot 1, Slot 2]
+            virtualSlots[0] = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
+            virtualSlots[1] = colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
+            virtualSlots[2] = colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+
+        }
 
         CommandBase action = null;
+        //seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+//        seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
 
         if(countedTotalArtifacts !=3){
 
             seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-            seq.addCommands(new WaitCommand(250));
+//            seq.addCommands(new WaitCommand(550));
+            seq.addCommands(new WaitUntilCommand(shooter::atTargetVelocity));
 //            seq.addCommands(new PopandResetCommand(popper));
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
+//            seq.addCommands(new WaitUntilCommand(slide::atTarget));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
-//            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //Still spinning DMW 02-16
+//            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
+//            seq.addCommands(new WaitUntilCommand(slide::atTarget));
             seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
-//            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //Still spinning DMW 02-16
+//            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
-            seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+//            seq.addCommands(new WaitUntilCommand(slide::atTarget));
+//            seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
             seq.addCommands(new InstantCommand(shooter::stop));
             return seq;
@@ -138,8 +153,8 @@ public class ShootCaseCommand extends SequentialCommandGroup {
         // but only if we don't handle it in the loop logic.
         // Actually, let's trust the loop logic. If we need a color and it's at S1, we
         // will rotate CCW 1 regardless.
-        seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //DMW 02-16 spin once at the beginning
-        seq.addCommands(new WaitCommand(250));  //DMW 02-16 wait for spinup once
+//        seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+//        seq.addCommands(new WaitCommand(250));
         for (ColorMatch.ArtifactColor targetColor : motif) {
             // Stop if we ran out of artifacts
             if (totalArtifacts <= 0) {
@@ -172,7 +187,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             //action = new ShooterSmartSpinUpCommand(shooter, vision);
             if (targetIndex == 0) {
                 // Already at 0. Just shoot.
-//                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision)); //DMW 02-16
+                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
                 //action = new ShooterSmartSpinUpCommand(shooter, vision);
             } else if (targetIndex == 1) {
 //                action = new ShooterSmartSpinUpCommand(shooter, vision);
@@ -182,7 +197,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 //                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 //                //already sping so shoot; distance should not be changing that much
 //                action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1);
-//                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //DMW 02-16
+                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
                 seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 
 
@@ -202,7 +217,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 //                        new ShooterSmartSpinUpCommand(shooter, vision),
 //                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //already sping so shoot; distance should not be changing that much
-//                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));  //DMW 02-16
+                seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
                 seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
 
