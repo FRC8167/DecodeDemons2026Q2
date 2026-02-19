@@ -20,6 +20,7 @@ public class Juggler extends SubsystemBase {
 
     private int currentSlot = 0;
     private int targetPosition = 0;
+    private boolean isSyncing = false;
 
     private boolean slowSpinEnabled = false;
     private double slowSpinPower = 0.3;
@@ -76,6 +77,7 @@ public class Juggler extends SubsystemBase {
     public void confirmHome() {
         homed = true;
         currentSlot = 0;
+        spindexer.resetEncoder();
     }
 
     public void panic() {
@@ -118,6 +120,13 @@ public class Juggler extends SubsystemBase {
         hasTarget = true;
     }
 
+    public void jogThree(Direction direction) {
+        int jogTarget = direction.sign*(spindexer.getCurrentPosition() + 3);
+        jugglerPID.reset();
+        jugglerPID.setSetPoint(jogTarget);
+        hasTarget = true;
+    }
+
     // snap to a slot
 
     public void snapToNearestSlot() {
@@ -133,6 +142,11 @@ public class Juggler extends SubsystemBase {
     }
 
     //Other statusy things
+    // In Juggler Subsystem
+    public boolean isReadyToFire() {
+        // Return true if we are within a tiny margin of error, even if not "atSetPoint"
+        return Math.abs(targetPosition - spindexer.getCurrentPosition()) < 12;
+    }
 
     public boolean atTarget() {
         return jugglerPID.atSetPoint();
@@ -146,9 +160,22 @@ public class Juggler extends SubsystemBase {
         return spindexer.getCurrentPosition();
     }
 
+    public int getTargetPosition() {
+        return targetPosition;
+    }
+
 public void stop(){
         spindexer.stopMotor();
 }
+
+    public void startSync() {
+        isSyncing = true;
+        hasTarget = false; // Disable PID while we hunt for the magnet
+    }
+
+    public boolean isSyncing() {
+        return isSyncing;
+    }
 
     @Override
     public void periodic() {
@@ -156,7 +183,19 @@ public void stop(){
         //AUTO RE-ZERO EVERY TIME WE PASS HOME????   GOOD, BAD, OR UGLY?
         //NECESSARY FOR ABSOLUTE ENCODERS????
         boolean homeNow = limitSwitch.isHome();
-
+        // PASSIVE ALIGNMENT
+//        if (limitSwitch.isHome()) {
+//
+//            // We just hit the physical 'Home'
+//            int currentPos = spindexer.getCurrentPosition();
+//            // Option A: Reset to 0
+//            spindexer.resetEncoder();
+//            // Update the target so the PID doesn't glitch
+//            if (hasTarget) {
+//                targetPosition -= currentPos;
+//                jugglerPID.setSetPoint(targetPosition);
+//            }
+//        }
 //        if (homeNow && !lastHomeState) {
 //            spindexer.resetEncoder();
 //            jugglerPID.reset();

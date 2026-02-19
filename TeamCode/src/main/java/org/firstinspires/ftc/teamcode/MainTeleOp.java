@@ -173,9 +173,15 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new NestCommand(robot.slide));
 
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whenPressed(new InstantCommand(()->robot.juggler.jogThree(Juggler.Direction.CCW)));
 
-//        driver.getGamepadButton(GamepadKeys.Button.BACK)
-//                .whenPressed(new CancelPedroCommand());
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                .whenPressed(new InstantCommand(()->robot.juggler.jogThree(Juggler.Direction.CCW)));
+
+
+        driver.getGamepadButton(GamepadKeys.Button.BACK)
+                .whenPressed(new InstantCommand(()-> robot.juggler.confirmHome()));
 
         driver.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(
@@ -205,8 +211,15 @@ public class MainTeleOp extends CommandOpMode {
 
 
 
-//        driver.getGamepadButton(GamepadKeys.Button.X).whenPressed(
-//            new InstantCommand(()-> robot.shooter.setVelocity(current_velocity)));
+        driver.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> automatedDrive = true),
+                                new DriveToPoseCommand(robot.getParkPose(), driver),
+                                new CancelPedroCommand(),
+                                new InstantCommand(() -> automatedDrive = false)
+                        )
+                );
 
         // Not Competition Ready - Enable when Limelight is added
 //        driver.getGamepadButton(GamepadKeys.Button.Y)
@@ -275,6 +288,7 @@ public class MainTeleOp extends CommandOpMode {
 //        }
 
         telemetry.addData("jugggler count", robot.juggler.getCurrentPosition());
+        telemetry.addData("jugggler target", robot.juggler.getTargetPosition());
 //        telemetry.addData("autoEndPose", robot.autoEndPose.toString());
 //        telemetry.addData("FollowerX", Math.round(robot.follower.getPose().getX() * 100) / 100.0);
 //        telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);

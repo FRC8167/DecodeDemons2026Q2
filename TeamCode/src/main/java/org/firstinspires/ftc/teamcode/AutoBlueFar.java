@@ -34,7 +34,7 @@ public class AutoBlueFar extends CommandOpMode {
     private final Pose rotatedPose = new Pose(58, 10, Math.toRadians(113.5));
     private final Pose artifactsGPPPose = new Pose(42, 35, Math.toRadians(180));
     private final Pose collectGPPPose = new Pose(16, 35, Math.toRadians(180));
-    private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(113.5));
+    private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(109));
     private final Pose artifactPGPPose = new Pose(56, 57, Math.toRadians(180));
     private final Pose collectPGPPose = new Pose(16, 57, Math.toRadians(180));
 

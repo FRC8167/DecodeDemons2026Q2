@@ -9,6 +9,12 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 public class Slide extends SubsystemBase {
 
     private final MotorEx slideMotor;
+
+    // Increased power for faster kicking
+    public static double KICK_MAX_POWER = 0.9;
+    public static double NEST_MAX_POWER = 0.5;
+
+
     public static double MAX_POWER = 0.6 ;
     public static final double TICKS_PER_REV = 537.7;
     public static final double MM_PER_REV = 120.0;
@@ -41,6 +47,13 @@ public class Slide extends SubsystemBase {
         //setTargetTicks(NEST_POS);
     }
 
+    public void kick() {
+        setTargetTicks(KICK_POS);
+    }
+
+    public void nest() {
+        setTargetTicks(NEST_POS);
+    }
 
     public void setTargetTicks(int ticks) {
         targetTicks = clamp(ticks);
@@ -54,7 +67,13 @@ public class Slide extends SubsystemBase {
 //        slidePID.setTolerance(TOLERANCE);
         double currentPosition = slideMotor.getCurrentPosition();
         double output = slidePID.calculate(currentPosition);
-        output = Range.clip(output, -MAX_POWER, MAX_POWER);
+
+        // Determine which power limit to use based on direction
+        double powerLimit = (targetTicks > currentPosition) ? KICK_MAX_POWER : NEST_MAX_POWER;
+
+        output = Range.clip(output, -powerLimit, powerLimit);
+
+        //output = Range.clip(output, -MAX_POWER, MAX_POWER);
         slideMotor.set(output);
     }
 

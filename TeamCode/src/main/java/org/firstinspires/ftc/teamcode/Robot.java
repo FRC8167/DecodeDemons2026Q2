@@ -53,6 +53,9 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     //field poses
     public static final Pose BLUE_SHOOT_FAR_POSE = new Pose(56, 14, Math.toRadians(110.5));
     private static final Pose RED_SHOOT_FAR_POSE = MirrorUtility.mirror(new Pose(56, 14, Math.toRadians(110.5)));
+    private static final Pose RED_PARK_POSE = new Pose(38, 34.5, Math.toRadians(180));
+    private static final Pose BLUE_PARK_POSE = new Pose(106, 34.5, Math.toRadians(0));
+    private static final Pose NEUTRAL_PARK_POSE = new Pose(72, 34.5, Math.toRadians(90));
 
     protected static int initCount = 0;
 
@@ -176,6 +179,12 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         if (alliance == Alliance.BLUE) return BLUE_SHOOT_FAR_POSE;
         else if (alliance == Alliance.RED) return RED_SHOOT_FAR_POSE;
         else return BLUE_SHOOT_FAR_POSE;  //default if UNSPECIFIED
+    }
+
+    public Pose getParkPose(){
+        if (alliance == Alliance.BLUE) return BLUE_PARK_POSE;
+        else if (alliance == Alliance.RED) return RED_PARK_POSE;
+        else return NEUTRAL_PARK_POSE;  //default if UNSPECIFIED
     }
 
 

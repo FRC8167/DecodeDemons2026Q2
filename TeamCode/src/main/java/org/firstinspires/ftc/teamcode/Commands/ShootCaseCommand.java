@@ -6,6 +6,10 @@ import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
@@ -83,10 +87,17 @@ public class ShootCaseCommand extends SequentialCommandGroup {
         SequentialCommandGroup seq = new SequentialCommandGroup();
 
         // Track virtual slots: [Slot 0, Slot 1, Slot 2]
-        ColorMatch.ArtifactColor[] virtualSlots = new ColorMatch.ArtifactColor[3];
-        virtualSlots[0] = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
-        virtualSlots[1] = colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
-        virtualSlots[2] = colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+//        ColorMatch.ArtifactColor[] virtualSlots = new ColorMatch.ArtifactColor[3];
+//        virtualSlots[0] = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
+//        virtualSlots[1] = colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
+//        virtualSlots[2] = colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+        // 1. Initial Data Collection (Read once, then deduce)
+        ColorMatch.ArtifactColor s0 = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
+        ColorMatch.ArtifactColor s1 = colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
+        ColorMatch.ArtifactColor s2 = colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+
+        ColorMatch.ArtifactColor[] deducedSlots = deduceMissingColors(s0, s1, s2);
+        List<ColorMatch.ArtifactColor> virtualSlots = new ArrayList<>(Arrays.asList(deducedSlots));
 
         // Count total artifacts initially
         int totalArtifacts = 0;
@@ -97,14 +108,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
                 countedTotalArtifacts++;
             }
         }
-        //check colours again
-        if(countedTotalArtifacts !=3){
-            // Track virtual slots: [Slot 0, Slot 1, Slot 2]
-            virtualSlots[0] = colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
-            virtualSlots[1] = colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
-            virtualSlots[2] = colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
 
-        }
 
         CommandBase action = null;
         //seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
@@ -165,12 +169,13 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             int targetIndex = -1;
 
             // Prefer Slot 0, then 1, then 2 (or based on rotation cost? 0 is best).
-            if (virtualSlots[0] == targetColor)
-                targetIndex = 0;
-            else if (virtualSlots[1] == targetColor)
-                targetIndex = 1;
-            else if (virtualSlots[2] == targetColor)
-                targetIndex = 2;
+            targetIndex = virtualSlots.indexOf(targetColor);
+//            if (virtualSlots[0] == targetColor)
+//                targetIndex = 0;
+//            else if (virtualSlots[1] == targetColor)
+//                targetIndex = 1;
+//            else if (virtualSlots[2] == targetColor)
+//                targetIndex = 2;
 
             if (targetIndex == -1) {
                 if (colorMatch.detectColor(ColorMatch.Slot.SLOT_0) != ColorMatch.ArtifactColor.NONE)
@@ -188,6 +193,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             if (targetIndex == 0) {
                 // Already at 0. Just shoot.
                 seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
+
                 //action = new ShooterSmartSpinUpCommand(shooter, vision);
             } else if (targetIndex == 1) {
 //                action = new ShooterSmartSpinUpCommand(shooter, vision);
@@ -198,7 +204,9 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 //                //already sping so shoot; distance should not be changing that much
 //                action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1);
                 seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-                seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+                seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
+
+                //seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 
 
 
@@ -206,38 +214,46 @@ public class ShootCaseCommand extends SequentialCommandGroup {
                 // S0 <- S1
                 // S1 <- S2
                 // S2 <- S0 (old S0)
-                ColorMatch.ArtifactColor temp = virtualSlots[0];
-                virtualSlots[0] = virtualSlots[1];
-                virtualSlots[1] = virtualSlots[2];
-                virtualSlots[2] = temp;
+                Collections.rotate(virtualSlots, -1);
+//                ColorMatch.ArtifactColor temp = virtualSlots[0];
+//                virtualSlots[0] = virtualSlots[1];
+//                virtualSlots[1] = virtualSlots[2];
+//                virtualSlots[2] = temp;
 
             } else {
                 // At Slot 2. Rotate CW 1 to bring S2 -> S0.
-//                action = new ParallelCommandGroup(
-//                        new ShooterSmartSpinUpCommand(shooter, vision),
-//                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //already sping so shoot; distance should not be changing that much
                 seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-                seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
+                seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CCW));
+                //seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
 
                 // Update virtual slots: CW 1
                 // S0 <- S2
                 // S2 <- S1
                 // S1 <- S0 (old S0)
-                ColorMatch.ArtifactColor temp = virtualSlots[0];
-                virtualSlots[0] = virtualSlots[2];
-                virtualSlots[2] = virtualSlots[1];
-                virtualSlots[1] = temp;
+                Collections.rotate(virtualSlots, 1);
+//                ColorMatch.ArtifactColor temp = virtualSlots[0];
+//                virtualSlots[0] = virtualSlots[2];
+//                virtualSlots[2] = virtualSlots[1];
+//                virtualSlots[1] = temp;
             }
 
             //seq.addCommands(action);
-            seq.addCommands(new KickCommand(slide));
-            seq.addCommands(new NestCommand(slide));
+            seq.addCommands(
+                    new WaitUntilCommand(juggler::isReadyToFire),
+                    new WaitUntilCommand(shooter::atTargetVelocity),
+                    new KickCommand(slide),
+                    new NestCommand(slide)
+            );
+//            seq.addCommands(new KickCommand(slide));
+//            seq.addCommands(new NestCommand(slide));
 //            seq.addCommands(new PopandResetCommand(popper));
 
             // Artifact at 0 is now used/popped.
-            virtualSlots[0] = ColorMatch.ArtifactColor.NONE;
+            // Mark slot as empty
+            virtualSlots.set(0, ColorMatch.ArtifactColor.NONE);
+            //virtualSlots[0] = ColorMatch.ArtifactColor.NONE;
             totalArtifacts--;
 
             // Stop shooter at the very end?
@@ -301,6 +317,56 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 
         return false;
 
+    }
+
+    //===========================
+
+    private ColorMatch.ArtifactColor[] deduceMissingColors(ColorMatch.ArtifactColor s0, ColorMatch.ArtifactColor s1, ColorMatch.ArtifactColor s2) {
+        ColorMatch.ArtifactColor[] slots = {s0, s1, s2};
+        int purples = 0, greens = 0;
+        int unknownCount = 0;
+        int lastUnknownIdx = -1;
+        int knownIdx=0;
+
+        for (int i = 0; i < 3; i++) {
+            if (slots[i] == ColorMatch.ArtifactColor.PURPLE)
+                purples++;
+            else if (slots[i] == ColorMatch.ArtifactColor.GREEN)
+                greens++;
+            else {
+                unknownCount++;
+                lastUnknownIdx = i;
+            }
+        }
+
+        // If exactly one is unknown, we can deduce it with 100% certainty
+        if (unknownCount == 1) {
+            if (purples == 2) slots[lastUnknownIdx] = ColorMatch.ArtifactColor.GREEN;
+            else if (greens == 1) slots[lastUnknownIdx] = ColorMatch.ArtifactColor.PURPLE;
+        }
+        // If two are unknown, we fill based on the remaining pool
+        else if (unknownCount == 2) {
+            // Find which slot IS known
+            for (int i = 0; i < 3; i++) {
+                if ((slots[i] == ColorMatch.ArtifactColor.PURPLE) || (slots[i] == ColorMatch.ArtifactColor.GREEN))
+                    knownIdx = i;
+            }
+            // Fill the others with the remaining pieces of the 2P/1G set
+            if (slots[knownIdx] == ColorMatch.ArtifactColor.GREEN) {
+                for(int i=0; i<3; i++) if(i != knownIdx) slots[i] = ColorMatch.ArtifactColor.PURPLE;
+            } else {
+                // One purple known, so one purple and one green remain
+                // (Order is a guess here, but better than skipping)
+                boolean greenAssigned = false;
+                for(int i=0; i<3; i++) {
+                    if(i != knownIdx) {
+                        slots[i] = greenAssigned ? ColorMatch.ArtifactColor.PURPLE : ColorMatch.ArtifactColor.GREEN;
+                        greenAssigned = true;
+                    }
+                }
+            }
+        }
+        return slots;
     }
 
 }
