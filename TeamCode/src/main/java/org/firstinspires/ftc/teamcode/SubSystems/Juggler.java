@@ -20,6 +20,7 @@ public class Juggler extends SubsystemBase {
 
     private int currentSlot = 0;
     private int targetPosition = 0;
+    private boolean isSyncing = false;
 
     private boolean slowSpinEnabled = false;
     private double slowSpinPower = 0.3;
@@ -48,15 +49,7 @@ public class Juggler extends SubsystemBase {
 //        jugglerPID.setTolerance(3);
         // Higher P = faster start | Higher D = less bounce/overshoot
         jugglerPID = new PIDFController(0.05, 0, 0.002, 0);
-
-        /* Wheat 2/19
         jugglerPID.setTolerance(5);
-
-         Reducing PID tolerance. Undo if loop times are to slow to catch the target
-         Each count for the Rev CoreHex motor is 360deg / 288cnts = 1.25deg/cnt
-         at pid tolerance of 2 will be +/- 2.5 degrees
-         */
-        jugglerPID.setTolerance(2);
 
     }
 
@@ -73,7 +66,7 @@ public class Juggler extends SubsystemBase {
 
         if (limitSwitch.isHome()) {
             spindexer.stopMotor();
-//            spindexer.resetEncoder();     // This is a bad idea, contribute to error.
+            spindexer.resetEncoder();
             jugglerPID.reset();
 
             homed = true;
@@ -84,6 +77,7 @@ public class Juggler extends SubsystemBase {
     public void confirmHome() {
         homed = true;
         currentSlot = 0;
+        spindexer.resetEncoder();
     }
 
     public void panic() {
@@ -126,6 +120,13 @@ public class Juggler extends SubsystemBase {
         hasTarget = true;
     }
 
+    public void jogThree(Direction direction) {
+        int jogTarget = direction.sign*(spindexer.getCurrentPosition() + 3);
+        jugglerPID.reset();
+        jugglerPID.setSetPoint(jogTarget);
+        hasTarget = true;
+    }
+
     // snap to a slot
 
     public void snapToNearestSlot() {
@@ -140,18 +141,12 @@ public class Juggler extends SubsystemBase {
         moveToSlot(currentSlot);
     }
 
-    /**
-     * Will command the juggler to return to the zero count initialized position +/- PID tolerance
-     * PID calculation will determine direction - but do we care?
-     * If works and works fast enough, call in autos after intaking balls and moving to shooting position,
-     * in teleOp bind to a joystick button using an InstantCommand
-     */
-    public void goHome() {
-        hasTarget = true;
-        jugglerPID.setSetPoint(0);
-    }
-
     //Other statusy things
+    // In Juggler Subsystem
+    public boolean isReadyToFire() {
+        // Return true if we are within a tiny margin of error, even if not "atSetPoint"
+        return Math.abs(targetPosition - spindexer.getCurrentPosition()) < 12;
+    }
 
     public boolean atTarget() {
         return jugglerPID.atSetPoint();
@@ -165,17 +160,42 @@ public class Juggler extends SubsystemBase {
         return spindexer.getCurrentPosition();
     }
 
-    public void stop(){
+    public int getTargetPosition() {
+        return targetPosition;
+    }
+
+public void stop(){
         spindexer.stopMotor();
 }
+
+    public void startSync() {
+        isSyncing = true;
+        hasTarget = false; // Disable PID while we hunt for the magnet
+    }
+
+    public boolean isSyncing() {
+        return isSyncing;
+    }
 
     @Override
     public void periodic() {
 
-        //AUTO RE-ZERO EVERY TIME WE PASS HOME????   BAD And Really UGLY?
+        //AUTO RE-ZERO EVERY TIME WE PASS HOME????   GOOD, BAD, OR UGLY?
         //NECESSARY FOR ABSOLUTE ENCODERS????
         boolean homeNow = limitSwitch.isHome();
-
+        // PASSIVE ALIGNMENT
+//        if (limitSwitch.isHome()) {
+//
+//            // We just hit the physical 'Home'
+//            int currentPos = spindexer.getCurrentPosition();
+//            // Option A: Reset to 0
+//            spindexer.resetEncoder();
+//            // Update the target so the PID doesn't glitch
+//            if (hasTarget) {
+//                targetPosition -= currentPos;
+//                jugglerPID.setSetPoint(targetPosition);
+//            }
+//        }
 //        if (homeNow && !lastHomeState) {
 //            spindexer.resetEncoder();
 //            jugglerPID.reset();
@@ -183,7 +203,6 @@ public class Juggler extends SubsystemBase {
 //        }
 
 //        lastHomeState = homeNow;
-
 
         if (!homed && hasTarget) {
             return; // don't PID until homed
