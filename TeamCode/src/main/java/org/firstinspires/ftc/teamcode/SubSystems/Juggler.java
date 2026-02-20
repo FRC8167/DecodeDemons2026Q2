@@ -285,5 +285,10 @@ public class Juggler extends SubsystemBase {
 
         return delta;
     }
+
+    // really compact method of above
+    private static int shortestDelta(int current, int target, int mod) {
+    return Math.floorMod(target - current + mod / 2, mod) - mod / 2;
+}
 } */
 
