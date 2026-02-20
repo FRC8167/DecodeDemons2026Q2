@@ -32,6 +32,7 @@ public class Juggler extends SubsystemBase {
         CCW(-1);
 
         public final int sign;
+
         Direction(int sign) {
             this.sign = sign;
         }
@@ -85,7 +86,6 @@ public class Juggler extends SubsystemBase {
     }
 
 
-
     // You spin me round (like a record) . . .
 
     public void startSlowSpin(Direction direction) {
@@ -121,7 +121,7 @@ public class Juggler extends SubsystemBase {
     }
 
     public void jogThree(Direction direction) {
-        int jogTarget = direction.sign*(spindexer.getCurrentPosition() + 3);
+        int jogTarget = direction.sign * (spindexer.getCurrentPosition() + 3);
         jugglerPID.reset();
         jugglerPID.setSetPoint(jogTarget);
         hasTarget = true;
@@ -164,8 +164,8 @@ public class Juggler extends SubsystemBase {
         return targetPosition;
     }
 
-    public void stop(){
-            spindexer.stopMotor();
+    public void stop() {
+        spindexer.stopMotor();
     }
 
     public void startSync() {
@@ -247,4 +247,43 @@ public class Juggler extends SubsystemBase {
             }
         }
     }
+
 }
+
+/*
+    public int closestSlotPosition(int currentPosCnts) {
+        final int PULSES_PER_REV = 288;
+
+//        int revolutions = Math.floorDiv(currentPosCnts, PULSES_PER_REV);
+        int position = Math.floorMod(currentPosCnts, PULSES_PER_REV);
+
+        int[] referencePoints = {0, 95, 191};
+
+        // Initialize with first reference
+        int bestDelta = shortestDelta(position, referencePoints[0], PULSES_PER_REV);
+
+        for (int i = 1; i < referencePoints.length; i++) {
+            int delta = shortestDelta(position, referencePoints[i], PULSES_PER_REV);
+
+            if (Math.abs(delta) < Math.abs(bestDelta)) {
+                bestDelta = delta;
+            }
+        }
+
+        return currentPosCnts + bestDelta;
+    }
+
+    // Computes shortest signed movement from current -> target
+    private static int shortestDelta(int current, int target, int mod) {
+        int delta = target - current;
+
+        if (delta > mod / 2) {
+            delta -= mod;
+        } else if (delta < -mod / 2) {
+            delta += mod;
+        }
+
+        return delta;
+    }
+} */
+
