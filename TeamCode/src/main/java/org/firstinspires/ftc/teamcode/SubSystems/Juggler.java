@@ -65,7 +65,7 @@ public class Juggler extends SubsystemBase {
 
         if (limitSwitch.isHome()) {
             spindexer.stopMotor();
-            spindexer.resetEncoder();
+//            spindexer.resetEncoder();     // This is a bad idea, contribute to error.
             jugglerPID.reset();
 
             homed = true;
@@ -132,6 +132,17 @@ public class Juggler extends SubsystemBase {
         moveToSlot(currentSlot);
     }
 
+    /**
+     * Will command the juggler to return to the zero count initialized position +/- PID tolerance
+     * PID calculation will determine direction - but do we care?
+     * If works and works fast enough, call in autos after intaking balls and moving to shooting position,
+     * in teleOp bind to a joystick button using an InstantCommand
+     */
+    public void goHome() {
+        hasTarget = true;
+        jugglerPID.setSetPoint(0);
+    }
+
     //Other statusy things
 
     public boolean atTarget() {
@@ -146,14 +157,14 @@ public class Juggler extends SubsystemBase {
         return spindexer.getCurrentPosition();
     }
 
-public void stop(){
+    public void stop(){
         spindexer.stopMotor();
 }
 
     @Override
     public void periodic() {
 
-        //AUTO RE-ZERO EVERY TIME WE PASS HOME????   GOOD, BAD, OR UGLY?
+        //AUTO RE-ZERO EVERY TIME WE PASS HOME????   BAD And Really UGLY?
         //NECESSARY FOR ABSOLUTE ENCODERS????
         boolean homeNow = limitSwitch.isHome();
 
@@ -164,6 +175,7 @@ public void stop(){
 //        }
 
 //        lastHomeState = homeNow;
+
 
         if (!homed && hasTarget) {
             return; // don't PID until homed
