@@ -164,9 +164,9 @@ public class Juggler extends SubsystemBase {
         return targetPosition;
     }
 
-public void stop(){
-        spindexer.stopMotor();
-}
+    public void stop(){
+            spindexer.stopMotor();
+    }
 
     public void startSync() {
         isSyncing = true;
@@ -176,6 +176,18 @@ public void stop(){
     public boolean isSyncing() {
         return isSyncing;
     }
+
+    /**
+     * Will command the juggler to return to the zero count initialized position +/- PID tolerance
+     * PID calculation will determine direction - but do we care?
+     * If works and works fast enough, call in autos after intaking balls and moving to shooting position,
+     * in teleOp bind to a joystick button using an InstantCommand
+     */
+    public void goHome() {
+        hasTarget = true;
+        jugglerPID.setSetPoint(0);
+    }
+
 
     @Override
     public void periodic() {
