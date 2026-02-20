@@ -48,7 +48,15 @@ public class Juggler extends SubsystemBase {
 //        jugglerPID.setTolerance(3);
         // Higher P = faster start | Higher D = less bounce/overshoot
         jugglerPID = new PIDFController(0.05, 0, 0.002, 0);
+
+        /* Wheat 2/19
         jugglerPID.setTolerance(5);
+
+         Reducing PID tolerance. Undo if loop times are to slow to catch the target
+         Each count for the Rev CoreHex motor is 360deg / 288cnts = 1.25deg/cnt
+         at pid tolerance of 2 will be +/- 2.5 degrees
+         */
+        jugglerPID.setTolerance(2);
 
     }
 
