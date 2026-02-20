@@ -48,7 +48,7 @@ public class Juggler extends SubsystemBase {
 //        jugglerPID = new PIDFController(0.015, 0, 0.0005, 0);
 //        jugglerPID.setTolerance(3);
         // Higher P = faster start | Higher D = less bounce/overshoot
-        jugglerPID = new PIDFController(0.05, 0, 0.002, 0);
+        jugglerPID = new PIDFController(0.05, 0, 0.002, 0);   //WHY??? Line 48 works and is native to seattle solvers
         jugglerPID.setTolerance(5);
 
     }
