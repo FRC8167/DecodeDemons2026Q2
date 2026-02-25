@@ -110,6 +110,7 @@ public class AutoBlueFar extends CommandOpMode {
 
                         new SequentialCommandGroup(
 //
+                                new InstantCommand(()-> robot.vision.latchMotif()),
                                 // Move to rotated shoot pose
                                 new FollowPathCommand(robot.follower, rotateToShootPath, true),
 
@@ -142,6 +143,7 @@ public class AutoBlueFar extends CommandOpMode {
 //                                        new InstantCommand(()-> robot.shooter.setVelocity(2500))  //DMW 02-16
 
                                 ),
+//                                new InstantCommand(()->robot.juggler.goHome()),
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(

@@ -121,7 +121,7 @@ public class AutoRedClose extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, startToLatchPath, true),
 
                                 //latch
-//                                new InstantCommand(()-> robot.vision.latchMotif()),
+                                new InstantCommand(()-> robot.vision.latchMotif()),
 
                                 //move to launch zone
                                 new FollowPathCommand(robot.follower, latchToShootClosePath),

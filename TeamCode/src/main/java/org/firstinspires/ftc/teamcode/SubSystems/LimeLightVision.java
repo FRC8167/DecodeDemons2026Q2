@@ -286,6 +286,7 @@ public class LimeLightVision extends SubsystemBase implements TeamConstants {
         }
     }
 
+
     public ColorMatch.ArtifactColor[] getLatchedMotif() {
         return latchedMotif;
     }
@@ -297,6 +298,29 @@ public class LimeLightVision extends SubsystemBase implements TeamConstants {
 //        if (result == null) return null;
 //        return result.getBotpose_MT2();
 //    }
+public double getTX() {
+    LLResult result = getResult();
+    if (result != null && result.isValid()) {
+        // Priority: Check if the goal fiducials are being tracked specifically
+        List<LLResultTypes.FiducialResult> goals = getGoalFiducials(result);
+        if (goals != null && !goals.isEmpty()) {
+            // Return the Tx of the first tracked Goal tag
+            //return goals.get(0).getTX();
+
+        }
+        // Fallback: Return the Tx of whatever the primary target is
+        return result.getTx();
+    }
+    return 0.0;
+}
+
+    /**
+     * Checks if Limelight sees a valid target to align to.
+     */
+    public boolean hasTarget() {
+        LLResult result = getResult();
+        return result != null && result.isValid();
+    }
 
     public void takePhoto(String string) {
         limelight.captureSnapshot(string);

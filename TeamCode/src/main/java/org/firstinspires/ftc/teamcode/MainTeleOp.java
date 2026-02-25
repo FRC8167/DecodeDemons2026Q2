@@ -124,8 +124,8 @@ public class MainTeleOp extends CommandOpMode {
                         )
                 );
 
-        operator.getGamepadButton(GamepadKeys.Button.START)
-                .whenPressed(new InstantCommand(() -> robot.popper.midServo()));
+//        operator.getGamepadButton(GamepadKeys.Button.START)
+//                .whenPressed(new InstantCommand(() -> robot.popper.midServo()));
 
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
@@ -133,7 +133,7 @@ public class MainTeleOp extends CommandOpMode {
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(
-                        new InstantCommand(()->robot.juggler.homeSlow())
+                        new InstantCommand(()->robot.juggler.goHome())
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
@@ -173,15 +173,15 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new NestCommand(robot.slide));
 
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(new InstantCommand(()->robot.juggler.jogThree(Juggler.Direction.CCW)));
+//        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+//                .whenPressed(new InstantCommand(()->robot.juggler.jogThree(Juggler.Direction.CCW)));
+//
+//        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+//                .whenPressed(new InstantCommand(()->robot.juggler.jogThree(Juggler.Direction.CCW)));
 
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new InstantCommand(()->robot.juggler.jogThree(Juggler.Direction.CCW)));
 
-
-        driver.getGamepadButton(GamepadKeys.Button.BACK)
-                .whenPressed(new InstantCommand(()-> robot.juggler.confirmHome()));
+//        driver.getGamepadButton(GamepadKeys.Button.BACK)
+//                .whenPressed(new CancelPedroCommand());
 
         driver.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(

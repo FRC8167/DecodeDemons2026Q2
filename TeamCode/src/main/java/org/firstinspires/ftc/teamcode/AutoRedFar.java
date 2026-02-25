@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
+import org.firstinspires.ftc.teamcode.Commands.AlignToAprilTagCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
@@ -32,10 +33,10 @@ public class AutoRedFar extends CommandOpMode {
     Robot robot = Robot.getInstance();
     private ElapsedTime timer;
     private final Pose startPose = MirrorUtility.mirror(new Pose(61, 9, Math.toRadians(90)));
-    private final Pose rotatedPose = MirrorUtility.mirror(new Pose(58, 10, Math.toRadians(113.5)));
+    private final Pose rotatedPose = MirrorUtility.mirror(new Pose(58, 10, Math.toRadians(116)));
     private final Pose artifactsGPPPose = MirrorUtility.mirror(new Pose(42, 35, Math.toRadians(180)));
     private final Pose collectGPPPose = MirrorUtility.mirror(new Pose(16, 35, Math.toRadians(180)));
-    private final Pose shootFarPose = MirrorUtility.mirror(new Pose(56, 12, Math.toRadians(113.5)));
+    private final Pose shootFarPose = MirrorUtility.mirror(new Pose(56, 12, Math.toRadians(115)));
     private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(56, 57, Math.toRadians(180)));
     private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 57, Math.toRadians(180)));
 
@@ -107,7 +108,7 @@ public class AutoRedFar extends CommandOpMode {
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
-//
+                             new InstantCommand(()-> robot.vision.latchMotif()),
                                 // Move to rotated shoot pose
                                 new FollowPathCommand(robot.follower, rotateToShootPath, true),
 
@@ -142,6 +143,7 @@ public class AutoRedFar extends CommandOpMode {
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
+                                        new InstantCommand(()-> robot.vision.latchMotif()),
                                         new InstantCommand(()->robot.juggler.snapToNearestSlot()),
                                         new InstantCommand(()->robot.intake.stop()),
                                         new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
@@ -180,7 +182,7 @@ public class AutoRedFar extends CommandOpMode {
         // INIT loop prior to coach pressing start
         while (opModeInInit()) {
             //robot.vision.scanForAprilTags();
-            robot.vision.latchMotif();
+            //robot.vision.latchMotif();
             if (robot.vision.getFirstSequence() != null) {
                 robot.rgbLight.setColor(Color.AZURE);
             } else {
