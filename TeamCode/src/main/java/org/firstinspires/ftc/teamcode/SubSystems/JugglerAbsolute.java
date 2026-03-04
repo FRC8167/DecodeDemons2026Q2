@@ -135,9 +135,11 @@ public class JugglerAbsolute extends SubsystemBase {
     }
 
 
-    public void isReadyToFire() {
-        return Math.abs(targetPosition - spindexer.getCurrentPosition()) < 12;
+    public boolean isReadyToFire() {
+        double curr = motor.getCurrentPosition();
+        double nearestSlot = nearestSlotSetpoint(curr);
 
+        return Math.abs(curr - nearestSlot) < 12;
     }
 
     /**
