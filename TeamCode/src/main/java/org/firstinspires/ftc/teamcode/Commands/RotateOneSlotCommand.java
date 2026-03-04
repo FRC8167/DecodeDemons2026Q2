@@ -9,7 +9,7 @@ public class RotateOneSlotCommand extends CommandBase {
     private final JugglerAbsolute juggler;
     private final JugglerAbsolute.Direction direction;
 
-    public RotateOneSlotCommand(JugglerAbsolute juggler, JugglerAbsolute.Direction Direction) {
+    public RotateOneSlotCommand(JugglerAbsolute juggler, JugglerAbsolute.Direction direction) {
         this.juggler = juggler;
         this.direction = direction;
         addRequirements(juggler);

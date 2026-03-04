@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 
 @Configurable
 //@Disabled
@@ -109,11 +110,11 @@ public class MainTeleOp extends CommandOpMode {
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).
 //                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 1));
-        whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CW));
+        whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute.Direction.CW));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).
 //                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CCW, 1));
-                whenPressed(new RotateOneSlotCommand(robot.juggler, Juggler.Direction.CCW));
+                whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute.Direction.CCW));
 
         operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(
@@ -131,21 +132,21 @@ public class MainTeleOp extends CommandOpMode {
         operator.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(robot.vision::latchMotif));
 
-        operator.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(
-                        new InstantCommand(()->robot.juggler.goHome())
-                );
+//        operator.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+//                .whenPressed(
+//                        new InstantCommand(()->robot.juggler.goHome())
+//                );
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.X)
-                .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(Juggler.Direction.CW), robot.juggler))
+                .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(JugglerAbsolute.Direction.CW), robot.juggler))
                 .whenReleased(new InstantCommand(() -> robot.juggler.snapToNearestSlot(), robot.juggler));
 
-        operator.getGamepadButton(GamepadKeys.Button.BACK)
-                        .whenPressed(new InstantCommand(()-> robot.juggler.confirmHome()));
+//        operator.getGamepadButton(GamepadKeys.Button.BACK)
+//                        .whenPressed(new InstantCommand(()-> robot.juggler.confirmHome()));
 
         /* ****************************** DRIVER CONTROLS ****************************** */
 
@@ -287,8 +288,8 @@ public class MainTeleOp extends CommandOpMode {
 //            }
 //        }
 
-        telemetry.addData("jugggler count", robot.juggler.getCurrentPosition());
-        telemetry.addData("jugggler target", robot.juggler.getTargetPosition());
+//        telemetry.addData("jugggler count", robot.juggler.getCurrentPosition());
+//        telemetry.addData("jugggler target", robot.juggler.getTargetPosition());
 //        telemetry.addData("autoEndPose", robot.autoEndPose.toString());
 //        telemetry.addData("FollowerX", Math.round(robot.follower.getPose().getX() * 100) / 100.0);
 //        telemetry.addData("FollowerY", Math.round(robot.follower.getPose().getY() * 100) / 100.0);

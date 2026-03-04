@@ -143,7 +143,7 @@ public class ShootLeftoversCommand extends CommandBase {
                 // At Slot 1. Rotate CCW 1 to bring S1 -> S0.
                 action = new ParallelCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
-                        new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+                        new RotateXSlotsCommand(juggler, JugglerAbsolute.Direction.CW, 1));
 
                 // Update virtual slots: CCW 1
                 // S0 <- S1
@@ -158,7 +158,7 @@ public class ShootLeftoversCommand extends CommandBase {
                 // At Slot 2. Rotate CW 1 to bring S2 -> S0.
                 action = new ParallelCommandGroup(
                         new ShooterSmartSpinUpCommand(shooter, vision),
-                        new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
+                        new RotateXSlotsCommand(juggler, JugglerAbsolute.Direction.CCW, 1));
 
                 // Update virtual slots: CW 1
                 // S0 <- S2

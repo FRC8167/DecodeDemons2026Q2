@@ -124,14 +124,14 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
 //            seq.addCommands(new WaitUntilCommand(slide::atTarget));
-            seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+            seq.addCommands(new RotateXSlotsCommand(juggler, JugglerAbsolute.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
 //            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
 //            seq.addCommands(new WaitUntilCommand(slide::atTarget));
-            seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
+            seq.addCommands(new RotateXSlotsCommand(juggler, JugglerAbsolute.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
 //            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
@@ -205,7 +205,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 //                //already sping so shoot; distance should not be changing that much
 //                action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1);
                 seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-                seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
+                seq.addCommands(new RotateOneSlotCommand(juggler, JugglerAbsolute.Direction.CW));
 
                 //seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 
@@ -225,7 +225,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
                 // At Slot 2. Rotate CW 1 to bring S2 -> S0.
                 //already sping so shoot; distance should not be changing that much
                 seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-                seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CCW));
+                seq.addCommands(new RotateOneSlotCommand(juggler, JugglerAbsolute.Direction.CCW));
                 //seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
 
@@ -242,7 +242,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 
             //seq.addCommands(action);
             seq.addCommands(
-                    new WaitUntilCommand(juggler::isReadyToFire),
+//                    new WaitUntilCommand(juggler::isReadyToFire),
                     new WaitUntilCommand(shooter::atTargetVelocity),
                     new KickCommand(slide),
                     new NestCommand(slide)

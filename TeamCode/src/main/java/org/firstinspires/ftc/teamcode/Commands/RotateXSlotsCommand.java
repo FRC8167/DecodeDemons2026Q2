@@ -7,12 +7,12 @@ import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 public class RotateXSlotsCommand extends CommandBase {
 
     private final JugglerAbsolute juggler;
-    private final Juggler.Direction direction;
+    private final JugglerAbsolute.Direction direction;
     private final int num;
     private long settleStart = -1;
     private static final long SETTLE_TIME = 250; //ms
 
-    public RotateXSlotsCommand(JugglerAbsolute juggler, Juggler.Direction direction, int num) {
+    public RotateXSlotsCommand(JugglerAbsolute juggler, JugglerAbsolute.Direction direction, int num) {
         this.juggler = juggler;
         this.direction = direction;
         this.num = num;

@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 public class SlowSpinPlusInterruptCommand extends CommandBase {
 
     private final JugglerAbsolute juggler;
-    private final Juggler.Direction direction;
+    private final JugglerAbsolute.Direction direction;
 
-    public SlowSpinPlusInterruptCommand(JugglerAbsolute juggler, Juggler.Direction direction) {
+    public SlowSpinPlusInterruptCommand(JugglerAbsolute juggler, JugglerAbsolute.Direction direction) {
         this.juggler = juggler;
         this.direction = direction;
         addRequirements(juggler);
