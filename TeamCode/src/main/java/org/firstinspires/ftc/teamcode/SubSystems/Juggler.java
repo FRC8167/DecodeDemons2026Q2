@@ -10,6 +10,7 @@ public class Juggler extends SubsystemBase {
     private final MotorEx spindexer;
     private final LimitSwitch limitSwitch;
 
+
     private boolean homed = true;  //DMW 02-16
     private boolean hasTarget = false;
 //    private boolean lastHomeState = false;
