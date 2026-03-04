@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -10,30 +11,20 @@ public class JugglerAbsolute extends SubsystemBase {
 
     private MotorEx motor;
     private double encoderCount;
-    private static double MAX_POWER = 0.5;
+    private static double MAX_POWER = 0.3;
     private static double SLOW_SPIN_POWER = 0.2;
 
     private PIDFController jugglerPID;
-    private static int pidTolerance = 3;
-    private static double kp, kd, kf;
+    private static int pidTolerance = 8;
+    private static double kp, ki, kd, kf;
 
-    /** Pulses per full 360° revolution (encoder resolution). */
+    /** Pulses per full revolution (encoder resolution). */
+    // private static final double PULSES_PER_REV = 288;
     private static final double PULSES_PER_REV = 1425.1;
 
-    /** Slot center positions, indexed 0‑2. */
-    private static final double[] SLOT_POSITIONS = {0.0, 95.0, 191.0};
-
-    /* --------------------------------------------------------------------
-    1️⃣ Class‑level variables that remember the outcome of the last
-        nearest‑slot query.
-    -------------------------------------------------------------------- */
-    private static int    slotIndex   = -1;   // -1 means “no query yet”
-    private static double deltaCounts = 0.0;  // signed error for that slot
-
-    private double slowSpinPower = 0.3;
-
-    enum Mode {POSITION, SLOW_SPIN};
-    Mode jugglerMode = Mode.POSITION;
+    /** Pre‑defined slot centres (pulse counts). */
+    // private static final double[] SLOT_CENTRES = {0.0, 96.0, 192.0};
+    private static final double[] SLOT_CENTRES = {0.0, 475.0, 950.0};
 
     public enum Direction {
         CW(1),
@@ -46,168 +37,125 @@ public class JugglerAbsolute extends SubsystemBase {
         }
     }
 
+    enum Mode {POSITION, SLOW_SPIN};
+    Mode jugglerMode = Mode.POSITION;
 
-
-    public JugglerAbsolute(MotorEx jugglerMotor) {
+    /* --------------------------------------------------------------
+     * 1️⃣  Constructor
+     * -------------------------------------------------------------- */
+    private JugglerAbsolute(MotorEx jugglerMotor) {
         motor = jugglerMotor;
         motor.setRunMode(MotorEx.RunMode.RawPower);
         motor.resetEncoder();
         motor.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
 
-        kp = 0.001;
-        kd = 0;
-        kf = 0;
-        jugglerPID = new PIDFController(kp, 0, kd, kf);
+        kp = 0.01;
+        kd = 0.0;
+        ki = 0.0;
+        kf = 0.0;
+        jugglerPID = new PIDFController(kp, ki, kd, kf);
         jugglerPID.setTolerance(pidTolerance);
     }
 
-
-    /* --------------------------------------------------------------------
-   2️⃣  Core helper – normalise any raw encoder reading to [0, PPR).
-   -------------------------------------------------------------------- */
-    private double normalize(double raw) {
-        double norm = raw % PULSES_PER_REV;
-        if (norm < 0) {
-            norm += PULSES_PER_REV;
-        }
-        return norm;
+    /* --------------------------------------------------------------
+     * 1️⃣  Legacy call wrappers
+     * -------------------------------------------------------------- */
+    public void rotateOneSlot(Direction direction) {
+        boolean dir = (direction.sign == 1) ? true : false;
+        startMotion(nextSlotSetpoint(motor.getCurrentPosition(), dir));
     }
-
-
-    /** Finds the slot whose centre is closest to the given normalised position. */
-    private int nearestSlotIndex(double normPos) {
-        int bestIdx = -1;
-        double bestDist = Double.MAX_VALUE;
-
-        for (int i = 0; i < SLOT_POSITIONS.length; i++) {
-            double diff = Math.abs(normPos - SLOT_POSITIONS[i]);
-            double modDist = diff > PULSES_PER_REV / 2 ? PULSES_PER_REV - diff : diff;
-            if (modDist < bestDist) {
-                bestDist = modDist;
-                bestIdx = i;
-            }
-        }
-        return bestIdx;
-    }
-
 
     /**
-     * Updates the static result fields with the nearest slot information.
-     */
-    public void updatePosData() {
-        encoderCount = motor.getCurrentPosition();
-        double normPos = normalize(encoderCount);
-        int nearestIdx = nearestSlotIndex(normPos);
-
-        // signed error = currentPosition - slotCenter
-        double signedError = normPos - SLOT_POSITIONS[nearestIdx];
-        if (Math.abs(signedError) > PULSES_PER_REV / 2) {
-            signedError = (signedError > 0)
-                    ? signedError - PULSES_PER_REV
-                    : signedError + PULSES_PER_REV;
-        }
-
-        // Store results in the static fields
-        slotIndex   = nearestIdx;
-        deltaCounts = signedError;
-    }
-
-
-    /* --------------------------------------------------------------------
-       3️⃣  Motion‑generation helpers (use the static result fields when needed)
-       -------------------------------------------------------------------- */
-
-    /**
-     * Returns the signed error required to move from the current encoder count
-     * to the *exact* center of the requested slot.
      *
-     * @param targetSlot   slot index (0, 1 or 2)
-     * @return signed error (pulses). Positive → rotate forward,
-     *         Negative → rotate backward.
+     * @param direction
      */
-//    private double rotate(int targetSlot) {
-    private void rotate(int targetSlot) {
-        if (targetSlot < 0 || targetSlot >= SLOT_POSITIONS.length) {
-            throw new IllegalArgumentException(
-                    "targetSlot must be 0, 1, or 2 – received " + targetSlot);
-        }
-
-        updatePosData();
-        double normPos = normalize(encoderCount);
-        double error = normPos - SLOT_POSITIONS[targetSlot];
-
-        if (Math.abs(error) > PULSES_PER_REV / 2) {
-            error = (error > 0) ? error - PULSES_PER_REV : error + PULSES_PER_REV;
-        }
-
-        jugglerPID.setSetPoint(encoderCount - error);
-        jugglerMode = Mode.POSITION;
-//        return error;
+    public void rotateTwoSlots(Direction direction) {
+        int slots = (direction.sign == 1) ? 2 : -2;
+        double newTarget = rotateBySlots(motor.getCurrentPosition(), slots);
+        startMotion(newTarget);
     }
-
 
     /**
-     * Moves the disc by a relative number of slots.
      *
-     * @param numSlots     number of slots to move (positive = forward,
-     *                     negative = backward). Larger magnitudes wrap automatically.
-     * @return             signed error (pulses) that will place the disc on the target slot.
+     * @param direction
      */
-    public void moveBySlots(int numSlots) {
-        // Populate the static result fields first
-        updatePosData();
-        int curIdx = getSlotIndex();
-
-        // Compute target index with proper wrap‑around
-        int targetIdx = Math.floorMod(curIdx + numSlots, SLOT_POSITIONS.length);
-        rotate(targetIdx);
+    public void jogThree(Direction direction) {
+        int slots = (direction.sign == 1) ? 3 : -3;
+        double newTarget = rotateBySlots(motor.getCurrentPosition(), slots);
+        startMotion(newTarget);
     }
 
-
-    /** Shortcut: move exactly one slot in the direction specified. */
-    public void rotateOneSlot(Juggler.Direction direction) {
-        moveBySlots(direction.sign);
+    /**
+     *
+     * @param slotIndex
+     */
+    public void rotateToSlot(int slotIndex) {
+        startMotion(moveToSlotByIndex(motor.getCurrentPosition(), slotIndex));
     }
 
-
-    /** Shortcut: move exactly one slot in the direction specified. */
-    public void rotateTwoSlots(Juggler.Direction direction) {
-        moveBySlots(2 * direction.sign);
-    }
-
-
+    /**
+     *
+     */
     public void snapToNearestSlot() {
-        // TODO Add code here
+        startMotion(nearestSlotSetpoint(motor.getCurrentPosition()));
     }
 
+    /**
+     *
+     * @param counts
+     */
+    private void startMotion(double counts) {
+        jugglerMode = Mode.POSITION;
+        jugglerPID.setSetPoint ((int) counts);
+    }
 
-    public void startSlowSpin(Juggler.Direction direction) {
+    /**
+     *
+     * @param direction
+     */
+    public void startSlowSpin(Direction direction) {
         jugglerMode = Mode.SLOW_SPIN;
-        motor.set(SLOW_SPIN_POWER * direction.sign);
+        double slowSpinPower = (direction.sign==1) ? SLOW_SPIN_POWER : -SLOW_SPIN_POWER;
+        motor.set(slowSpinPower);
     }
 
+    /**
+     *
+     */
+    public void stop() {
+        motor.stopMotor();
+    }
 
+    /**
+     *
+     * @return
+     */
+    public boolean atTarget() {
+        return jugglerPID.atSetPoint();
+    }
 
-    /** @return index (0‑2) of the slot found by the most recent {@code nearestSlot} call */
+    /**
+     *
+     * @return
+     */
     public int getSlotIndex() {
-        return slotIndex;
-    }
-
-
-    /** @return signed error (pulses) from the most recent {@code nearestSlot} call */
-    public double getDeltaCounts() {
-        return deltaCounts;
+        return nearestSlotIndex(motor.getCurrentPosition());
     }
 
 
     @Override
     public void periodic() {
-        jugglerPID.setPIDF(kp, 0, kd, kf);
+
+        // TODO: Remove next two lines for competition - for tuning purposes only
+        jugglerPID.setPIDF(kp, ki, kd, kf);
         jugglerPID.setTolerance(pidTolerance);
 
         switch(jugglerMode) {
             case POSITION:
-                // TODO Add PID update code
+                int currentPosition = motor.getCurrentPosition();
+                double controlOutput = Range.clip(jugglerPID.calculate(currentPosition), -MAX_POWER, MAX_POWER);
+                motor.set(controlOutput);
+                // double error = jugglerPID.get
                 break;
             case SLOW_SPIN:
                 // Do something here? motor is set in motion in start slow spin
@@ -215,13 +163,133 @@ public class JugglerAbsolute extends SubsystemBase {
         }
     }
 
+    /* --------------------------------------------------------------
+     * 1️⃣  Core public API
+     * -------------------------------------------------------------- */
+
+    public static double nearestSlotSetpoint(double currentCount) {
+        int nearestIdx = nearestSlotIndex(currentCount);
+        return slotSetpoint(currentCount, nearestIdx);
+    }
+
+    public static int nearestSlotIndex(double currentCount) {
+        double normPos = mod(currentCount, PULSES_PER_REV);
+        int bestIdx = -1;
+        double bestAbsDelta = Double.MAX_VALUE;
+
+        for (int i = 0; i < SLOT_CENTRES.length; i++) {
+            double delta = shortestSignedDelta(normPos, SLOT_CENTRES[i]);
+            double abs   = Math.abs(delta);
+            if (abs < bestAbsDelta) {
+                bestAbsDelta = abs;
+                bestIdx = i;
+            }
+        }
+        return bestIdx;
+    }
+
+    public static double slotSetpoint(double currentCount, int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= SLOT_CENTRES.length) {
+            throw new IllegalArgumentException(
+                    "slotIndex must be 0, 1, or 2 (was " + slotIndex + ')');
+        }
+        double normPos = mod(currentCount, PULSES_PER_REV);
+        double delta   = shortestSignedDelta(normPos, SLOT_CENTRES[slotIndex]);
+        return currentCount + delta;
+    }
+
+    public static double nextSlotSetpoint(double currentCount) {
+        return nextSlotSetpoint(currentCount, true);
+    }
+
+    public static double nextSlotSetpoint(double currentCount, boolean clockwise) {
+        int nearestIdx = nearestSlotIndex(currentCount);
+        int nextIdx = clockwise
+                ? (nearestIdx + 1) % SLOT_CENTRES.length
+                : (nearestIdx - 1 + SLOT_CENTRES.length) % SLOT_CENTRES.length;
+        return slotSetpoint(currentCount, nextIdx);
+    }
+
+    /**
+     * Moves to an **arbitrary slot center** supplied as a pulse count.
+     *
+     * @param currentCount     The current raw encoder count (any sign/value).
+     * @param slotCenterPulse  The pulse position of the desired slot centre.
+     *                         It may be inside [0, PULSES_PER_REV) or outside;
+     *                         the method automatically normalises it.
+     * @return absolute encoder set‑point that reaches the supplied slot centre
+     *         using the shortest angular travel (clockwise or counter‑clockwise).
+     */
+    public static double moveToSlot(double currentCount, double slotCenterPulse) {
+        // Normalise the target centre to the same 0‑rev range as the current pos.
+        double normalisedTarget = mod(slotCenterPulse, PULSES_PER_REV);
+        double normPos          = mod(currentCount, PULSES_PER_REV);
+
+        double delta = shortestSignedDelta(normPos, normalisedTarget);
+        return currentCount + delta;
+    }
+
+    /**
+     * Convenience wrapper that accepts a slot index (0‑2) and forwards to
+     * {@link #moveToSlot(double,double)}. This illustrates how you could
+     * expose the same interface for a dynamic list of slots.
+     *
+     * @param currentCount the present raw encoder count
+     * @param slotIndex    0, 1 or 2 – selects one of the three fixed slots
+     * @return target encoder count for the requested slot
+     */
+    public static double moveToSlotByIndex(double currentCount, int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= SLOT_CENTRES.length) {
+            throw new IllegalArgumentException(
+                    "slotIndex must be 0, 1, or 2 (was " + slotIndex + ')');
+        }
+        return moveToSlot(currentCount, SLOT_CENTRES[slotIndex]);
+    }
+
+    /**
+     * Returns the set‑point that moves **N slots** from the *nearest* slot.
+     *
+     * @param currentCount   Current raw encoder count.
+     * @param slotShift      Number of slots to move.
+     *                       Positive → clockwise, Negative → counter‑clockwise.
+     * @return               Absolute encoder count for the target slot.
+     */
+    public static double rotateBySlots(double currentCount, int slotShift) {
+        // 1️⃣ Find the nearest slot index.
+        int nearestIdx = nearestSlotIndex(currentCount);
+
+        // 2️⃣ Compute the index of the destination slot.
+        //    Use modulo arithmetic to wrap around the three slots.
+        int destinationIdx = ((nearestIdx + slotShift) % SLOT_CENTRES.length
+                + SLOT_CENTRES.length) % SLOT_CENTRES.length;
+
+        // 3️⃣ Return the set‑point for that destination slot.
+        return slotSetpoint(currentCount, destinationIdx);
+    }
+
+
+    /* --------------------------------------------------------------
+     * 3️⃣  Private helper utilities (unchanged)
+     * -------------------------------------------------------------- */
+
+    /** Normalises a value into the interval [0, modulus). */
+    private static double mod(double value, double modulus) {
+        double result = value % modulus;
+        return (result < 0) ? result + modulus : result;
+    }
+
+    /**
+     * Signed angular distance from {@code from} to {@code to},
+     * wrapped to the shortest path (‑½ rev … +½ rev).
+     *
+     * Positive → clockwise, Negative → counter‑clockwise
+     */
+    private static double shortestSignedDelta(double from, double to) {
+        double rawDelta = to - from;
+        if (rawDelta >  PULSES_PER_REV / 2) rawDelta -= PULSES_PER_REV;
+        if (rawDelta < -PULSES_PER_REV / 2) rawDelta += PULSES_PER_REV;
+        return rawDelta;
+    }
+
 }
 
-// double currentCount = encoder.getCount();   // your encoder reading
-// DiscPositioner.nearestSlot(currentCount);   // updates static fields
-// int    slotIdx      = DiscPositioner.getLastSlotIndex();
-// double errorToSlot  = DiscPositioner.getLastErrorPulses();
-
-// // Example: move to the next slot
-// double cmdError = DiscPositioner.nextSlotError(currentCount);
-// feed `cmdError` into your PID / motor controller
