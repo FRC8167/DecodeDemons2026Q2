@@ -134,6 +134,19 @@ public class JugglerAbsolute extends SubsystemBase {
         return jugglerPID.atSetPoint();
     }
 
+
+    public void isReadyToFire() {
+        return Math.abs(targetPosition - spindexer.getCurrentPosition()) < 12;
+
+    }
+
+    /**
+     * Should not need this function once new motor is installed
+     */
+    public void goHome() {
+        startMotion(0);
+    }
+
     /**
      *
      * @return
