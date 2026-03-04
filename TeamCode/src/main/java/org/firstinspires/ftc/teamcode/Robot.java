@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
@@ -73,7 +74,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public MecanumDrive mecanumDrive;
     public Intake intake;
     public Shooter shooter;
-    public Juggler juggler;
+    public JugglerAbsolute juggler;
     public SensorColor colorSensor;
 //    public Vision vision;
     public LimeLightVision vision;
@@ -122,7 +123,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 //        juggler = new Juggler(spindexerMotor, limitSwitch);
         if (juggler == null || reset) {
             MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
-            juggler = new Juggler(spindexerMotor, limitSwitch);
+            juggler = new JugglerAbsolute(spindexerMotor);
+//            juggler = new Juggler(spindexerMotor, limitSwitch);
         }
 
 

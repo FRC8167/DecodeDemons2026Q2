@@ -2,16 +2,17 @@ package org.firstinspires.ftc.teamcode.Commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 
 public class RotateXSlotsCommand extends CommandBase {
 
-    private final Juggler juggler;
+    private final JugglerAbsolute juggler;
     private final Juggler.Direction direction;
     private final int num;
     private long settleStart = -1;
     private static final long SETTLE_TIME = 250; //ms
 
-    public RotateXSlotsCommand(Juggler juggler, Juggler.Direction direction, int num) {
+    public RotateXSlotsCommand(JugglerAbsolute juggler, Juggler.Direction direction, int num) {
         this.juggler = juggler;
         this.direction = direction;
         this.num = num;

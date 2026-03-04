@@ -145,6 +145,8 @@ public class AutoBlueFar extends CommandOpMode {
                                 ),
 //                                new InstantCommand(()->robot.juggler.goHome()),
 
+//                                new InstantCommand(()->robot.juggler.goHome()),  TODO:  Try this in auto.
+
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
                                     new InstantCommand(()->robot.intake.stop()),

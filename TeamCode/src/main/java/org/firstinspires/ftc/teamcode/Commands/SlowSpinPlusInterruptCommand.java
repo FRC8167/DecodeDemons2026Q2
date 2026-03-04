@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.Commands;
 import com.seattlesolvers.solverslib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 
 public class SlowSpinPlusInterruptCommand extends CommandBase {
 
-    private final Juggler juggler;
+    private final JugglerAbsolute juggler;
     private final Juggler.Direction direction;
 
-    public SlowSpinPlusInterruptCommand(Juggler juggler, Juggler.Direction direction) {
+    public SlowSpinPlusInterruptCommand(JugglerAbsolute juggler, Juggler.Direction direction) {
         this.juggler = juggler;
         this.direction = direction;
         addRequirements(juggler);

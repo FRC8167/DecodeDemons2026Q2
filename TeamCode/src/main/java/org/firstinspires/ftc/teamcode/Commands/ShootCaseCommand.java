@@ -13,6 +13,7 @@ import java.util.Collections;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
@@ -21,7 +22,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 
 public class ShootCaseCommand extends SequentialCommandGroup {
 
-    private final Juggler juggler;
+    private final JugglerAbsolute juggler;
 //    private final Popper popper;
     private final Shooter shooter;
     private final Slide slide;
@@ -31,7 +32,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
     private SequentialCommandGroup sequence;
 
     public ShootCaseCommand(
-            Juggler juggler,
+            JugglerAbsolute juggler,
 //            Popper popper,
             Slide slide,
             Shooter shooter,

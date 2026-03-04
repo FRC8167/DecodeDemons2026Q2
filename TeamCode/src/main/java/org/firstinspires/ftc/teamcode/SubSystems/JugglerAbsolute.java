@@ -43,7 +43,7 @@ public class JugglerAbsolute extends SubsystemBase {
     /* --------------------------------------------------------------
      * 1️⃣  Constructor
      * -------------------------------------------------------------- */
-    private JugglerAbsolute(MotorEx jugglerMotor) {
+    public JugglerAbsolute(MotorEx jugglerMotor) {
         motor = jugglerMotor;
         motor.setRunMode(MotorEx.RunMode.RawPower);
         motor.resetEncoder();

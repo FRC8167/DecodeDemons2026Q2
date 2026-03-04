@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 
 public class ShootLeftoversCommand extends CommandBase {
 
-    private final Juggler juggler;
+    private final JugglerAbsolute juggler;
     private final Popper popper;
     private final Shooter shooter;
     private final ColorMatch colorMatch;
@@ -24,7 +25,7 @@ public class ShootLeftoversCommand extends CommandBase {
     private SequentialCommandGroup sequence;
 
     public ShootLeftoversCommand(
-            Juggler juggler,
+            JugglerAbsolute juggler,
             Popper popper,
             Shooter shooter,
             ColorMatch colorMatch,
