@@ -19,12 +19,12 @@ public class JugglerAbsolute extends SubsystemBase {
     private static double kp, ki, kd, kf;
 
     /** Pulses per full revolution (encoder resolution). */
-    // private static final double PULSES_PER_REV = 288;
-    private static final double PULSES_PER_REV = 1425.1;
+     private static final double PULSES_PER_REV = 288;
+//    private static final double PULSES_PER_REV = 1425.1;
 
     /** Pre‑defined slot centres (pulse counts). */
-    // private static final double[] SLOT_CENTRES = {0.0, 96.0, 192.0};
-    private static final double[] SLOT_CENTRES = {0.0, 475.0, 950.0};
+     private static final double[] SLOT_CENTRES = {0.0, 96.0, 192.0};
+//    private static final double[] SLOT_CENTRES = {0.0, 475.0, 950.0};
 
     public enum Direction {
         CW(1),
@@ -49,8 +49,8 @@ public class JugglerAbsolute extends SubsystemBase {
         motor.resetEncoder();
         motor.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
 
-        kp = 0.01;
-        kd = 0.0;
+        kp = 0.015;
+        kd = 0.0004;
         ki = 0.0;
         kf = 0.0;
         jugglerPID = new PIDFController(kp, ki, kd, kf);
