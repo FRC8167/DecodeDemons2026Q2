@@ -1,92 +1,115 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.controller.PIDFController;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+
 
 @Configurable
 public class Slide extends SubsystemBase {
 
-    private final MotorEx slideMotor;
+    private final DcMotorEx slideMotor;
 
     // Increased power for faster kicking
-    public static double KICK_MAX_POWER = 0.9;
-    public static double NEST_MAX_POWER = 0.5;
+    // public static double KICK_MAX_POWER = 0.8;
+    // public static double NEST_MAX_POWER = 0.5;
 
-
-    public static double MAX_POWER = 0.6 ;
-    public static final double TICKS_PER_REV = 537.7;
-    public static final double MM_PER_REV = 120.0;
-    public static final double TICKS_PER_MM = TICKS_PER_REV / MM_PER_REV;//4.5
+    // public static final double TICKS_PER_REV = 537.7;
+    // public static final double MM_PER_REV = 120.0;
+    // public static final double TICKS_PER_MM = TICKS_PER_REV / MM_PER_REV; //4.5
     public static int NEST_POS = 8;
     public static int KICK_POS = 460;  //units are ticks
+    public static double RATE = Math.abs(KICK_POS - NEST_POS) / 0.5; // Travel full range in 0.5s
+    // Equates to 904 ticks/sec * 1rev/537.7 ticks * 60s/1min = 101rpm (315 rpm motor installed)
+    // fastest theoretical rate: 2822 tick/sec
 
     //Limits
     public static int DOWN_LIMIT = 5;
     public static int UP_LIMIT   = 470;  //units are ticks
 
     // PID using ticks
-    public static double kP = 0.0035; //.003
-    public static double kI = 0.0;
-    public static double kD = .00018; //.00015
-    public static double kF = 0.0;
-
+    public static double kp= 0.0035; //.003
+//    public static double ki = 0.0;
+//    public static double kd= .00018; //.00015
+//    public static double kf = 0.0;
     public static double TOLERANCE = 6;
-    private final PIDFController slidePID;
-    private int targetTicks = 0;
+    private PIDFCoefficients coeffs;
 
 
-    public Slide(MotorEx slideMotor) {
+    public Slide(DcMotorEx slideMotor) {
         this.slideMotor = slideMotor;
-        slideMotor.setRunMode(MotorEx.RunMode.RawPower);
-        slideMotor.resetEncoder();
-        slideMotor.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
-        slidePID = new PIDFController(kP, kI, kD, kF);
-        slidePID.setTolerance(TOLERANCE);
+        slideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        slideMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor.setPositionPIDFCoefficients(kp);
         //setTargetTicks(NEST_POS);
     }
 
     public void kick() {
-        setTargetTicks(KICK_POS);
+        moveToSetPoint(KICK_POS);
     }
 
     public void nest() {
-        setTargetTicks(NEST_POS);
+        moveToSetPoint(NEST_POS);
     }
 
-    public void setTargetTicks(int ticks) {
-        targetTicks = clamp(ticks);
-        slidePID.setSetPoint(targetTicks);
+    private void moveToSetPoint(int setPointCounts) {
+
+        double trgtPosCnts = clamp(setPointCounts);
+
+        /** https://docs.revrobotics.com/duo-control/programming/using-encoder-feedback#choosing-a-motor-mode
+         *  https://ftctechnh.github.io/ftc_app/doc/javadoc/com/qualcomm/robotcore/hardware/DcMotorEx.html
+         *
+         *  DcMotorEx method RUN_TO_POSITION must be done in the following order:
+         *      1. Set target position [encoder counts]
+         *      2. Set motor mode to RUN_TO_POSITION
+         *      3. Set the maximum velocity or power you want the motor to use
+         *          motor.setVelocity(rate) [counts/sec]
+         *          motor.setVelocity(rate, units) [ AngleUnit.DEGREES/sec or AngleUnit.RADIANS/sec]
+         *          motor.setPower(%); 0.0 - 1.0
+         */
+
+        slideMotor.setTargetPosition(clamp((int)trgtPosCnts));
+        slideMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        slideMotor.setVelocity(RATE);
     }
 
 
     @Override
     public void periodic() {
-//        slidePID.setPIDF(kP, kI, kD, kF);
-//        slidePID.setTolerance(TOLERANCE);
-        double currentPosition = slideMotor.getCurrentPosition();
-        double output = slidePID.calculate(currentPosition);
-
-        // Determine which power limit to use based on direction
-        double powerLimit = (targetTicks > currentPosition) ? KICK_MAX_POWER : NEST_MAX_POWER;
-
-        output = Range.clip(output, -powerLimit, powerLimit);
-
-        //output = Range.clip(output, -MAX_POWER, MAX_POWER);
-        slideMotor.set(output);
+        /** For tuning purposes only! Comment/Delete for competition */
+        if(!slideMotor.isBusy()){
+            slideMotor.setPositionPIDFCoefficients(kp);
+            slideMotor.setTargetPositionTolerance((int)TOLERANCE);
+        }
     }
 
 
     public void stop() {
-        slidePID.setSetPoint(NEST_POS);
+        slideMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor.setPower(0);
     }
 
 
     private int clamp(int ticks) {
-        if (ticks > UP_LIMIT) return UP_LIMIT;
-        else if (ticks < DOWN_LIMIT) return DOWN_LIMIT;
-        return ticks;
+        int setPt = ticks;
+        if      (ticks > UP_LIMIT)   setPt = UP_LIMIT;
+        else if (ticks < DOWN_LIMIT) setPt = DOWN_LIMIT;
+        return setPt;
+    }
+
+
+    public void setTargetTicks(int targetCount) {
+        moveToSetPoint(targetCount);
+    }
+
+
+    public boolean atTarget() {
+        return !slideMotor.isBusy();
+        /* OR
+        int error = Math.abs(slideMotor.getCurrentPosition() - slideMotor.getTargetPosition());
+        return (error < POS_TOLERANCE) ? true : false;
+        */
     }
 
 
@@ -94,10 +117,9 @@ public class Slide extends SubsystemBase {
         return slideMotor.getCurrentPosition();
     }
 
-    public int getPidSetpoint() { return (int)slidePID.getSetPoint(); }
 
-    public boolean atTarget() {
-        return slidePID.atSetPoint();
-    }
+    public int getPidSetpoint() { return (int)slideMotor.getTargetPosition(); }
+
+
 
 }

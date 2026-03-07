@@ -7,6 +7,7 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Slide;
@@ -34,7 +35,7 @@ public class TestOp_SlideTuning extends OpMode {
 
     @Override
     public void init() {
-        MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
+        DcMotorEx slideMotor = hardwareMap.get(DcMotorEx.class, "Slide");
         slide = new Slide(slideMotor);
         tmPanels = PanelsTelemetry.INSTANCE.getTelemetry();
     }

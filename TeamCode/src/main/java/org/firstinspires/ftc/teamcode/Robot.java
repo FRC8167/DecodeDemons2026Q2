@@ -5,6 +5,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
@@ -100,7 +101,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         MotorEx intakeMotor    = new MotorEx(hardwareMap, "Intake").setCachingTolerance(0.01);
         MotorEx shooterMotor   = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
 //        MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
-        MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
+//        MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
+        DcMotorEx slideMotor = hardwareMap.get(DcMotorEx.class, "Slide");
 
 //        spindexerMotor.resetEncoder();  //added 01-18
 //        slideMotor.resetEncoder();
