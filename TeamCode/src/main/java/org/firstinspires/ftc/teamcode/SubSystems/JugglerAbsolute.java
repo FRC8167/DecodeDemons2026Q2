@@ -19,12 +19,12 @@ public class JugglerAbsolute extends SubsystemBase {
     private static double kp, ki, kd, kf;
 
     /** Pulses per full revolution (encoder resolution). */
-     private static final double PULSES_PER_REV = 288;
-//    private static final double PULSES_PER_REV = 1425.1;
+//     private static final double PULSES_PER_REV = 288;
+    private static final double PULSES_PER_REV = 1425.1;
 
     /** Pre‑defined slot centres (pulse counts). */
-     private static final double[] SLOT_CENTRES = {0.0, 96.0, 192.0};
-//    private static final double[] SLOT_CENTRES = {0.0, 475.0, 950.0};
+//     private static final double[] SLOT_CENTRES = {0.0, 96.0, 192.0};
+    private static final double[] SLOT_CENTRES = {0.0, 475.0, 950.0};
 
     public enum Direction {
         CW(1),

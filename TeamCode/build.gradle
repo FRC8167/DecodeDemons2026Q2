@@ -65,5 +65,5 @@ dependencies {
     implementation 'com.pedropathing:telemetry:1.0.0'
 
     // Panels Dashboard
-    implementation "com.bylazar:fullpanels:1.0.5"
+    implementation "com.bylazar:fullpanels:1.0.12"//1.0.5
 }
