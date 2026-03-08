@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
@@ -28,12 +29,12 @@ public class Slide extends SubsystemBase {
     public static int UP_LIMIT   = 470;  //units are ticks
 
     // PID using ticks
-    public static double kp= 0.0035; //.003
-//    public static double ki = 0.0;
-//    public static double kd= .00018; //.00015
-//    public static double kf = 0.0;
-    public static double TOLERANCE = 6;
-    private PIDFCoefficients coeffs;
+    public static double kpp = 0.0035; //.003       // Position P Gain
+    public static double kp = 0.0035;               // Velocity P Gain
+    public static double ki = 0.0;                  // Velocity I Gain
+    public static double kd = 0.00018; //.00015     // Velocity D Gain
+    public static double kf = 0.0;                  // Velocity F Gain
+    public static double TOLERANCE = 6;             // Position Tolerance
 
 
     public Slide(DcMotorEx slideMotor) {
@@ -41,7 +42,9 @@ public class Slide extends SubsystemBase {
         slideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         slideMotor.setDirection(DcMotorEx.Direction.FORWARD);
         slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        slideMotor.setPositionPIDFCoefficients(kp);
+        slideMotor.setPositionPIDFCoefficients(kpp);
+        slideMotor.setVelocityPIDFCoefficients(kp, ki, kd, kf);
+
         //setTargetTicks(NEST_POS);
     }
 
@@ -78,10 +81,10 @@ public class Slide extends SubsystemBase {
     @Override
     public void periodic() {
         /** For tuning purposes only! Comment/Delete for competition */
-        if(!slideMotor.isBusy()){
-            slideMotor.setPositionPIDFCoefficients(kp);
-            slideMotor.setTargetPositionTolerance((int)TOLERANCE);
-        }
+//        if(!slideMotor.isBusy()){
+//            slideMotor.setPositionPIDFCoefficients(kpp);
+//            slideMotor.setTargetPositionTolerance((int)TOLERANCE);
+//        }
     }
 
 
