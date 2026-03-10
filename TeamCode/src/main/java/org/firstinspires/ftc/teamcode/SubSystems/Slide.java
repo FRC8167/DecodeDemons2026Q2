@@ -32,12 +32,12 @@ public class Slide extends SubsystemBase {
     public static int UP_LIMIT   = 470;  //units are ticks
 
     // PID using ticks
-    public static double kpp = 10; //.003       // Position P Gain
-    public static double kp = 4;               // Velocity P Gain
-    public static double ki = 1;                  // Velocity I Gain
-    public static double kd = 0; //.00015     // Velocity D Gain
-    public static double kf = 9;                  // Velocity F Gain
-    public static double TOLERANCE = 12;             // Position Tolerance
+    public static double kpp = 10;            // Position P Gain
+    public static double kp = 4;              // Velocity P Gain
+    public static double ki = 1;              // Velocity I Gain
+    public static double kd = 0;              // Velocity D Gain
+    public static double kf = 9;              // Velocity F Gain
+    public static double PID_TOLERANCE = 12;  // Position Tolerance
 
 
     public Slide(BetterMotor slideMotor) {
@@ -48,7 +48,7 @@ public class Slide extends SubsystemBase {
         slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         slideMotor.setPositionPIDFCoefficients(kpp);
         slideMotor.setVelocityPIDFCoefficients(kp, ki, kd, kf);
-        slideMotor.setTargetPositionTolerance((int) TOLERANCE);
+        slideMotor.setTargetPositionTolerance((int) PID_TOLERANCE);
         //setTargetTicks(NEST_POS);
     }
 
@@ -112,11 +112,7 @@ public class Slide extends SubsystemBase {
 
 
     public boolean atTarget() {
-        return !slideMotor.isBusy();
-        /* OR
-        int error = Math.abs(slideMotor.getCurrentPosition() - slideMotor.getTargetPosition());
-        return (error < POS_TOLERANCE) ? true : false;
-        */
+        return Math.abs(slideMotor.getTargetPosition() - slideMotor.getCurrentPosition()) < PID_TOLERANCE;
     }
 
 
