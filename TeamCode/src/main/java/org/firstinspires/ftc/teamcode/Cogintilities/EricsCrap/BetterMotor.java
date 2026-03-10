@@ -59,7 +59,7 @@ public class BetterMotor extends DcMotorImplEx {
     }
 
     public double getTicksPerRev() {
-        return motorType.getTicksPerRev();
+        return getMotorType().getTicksPerRev();
     }
 
     public double getTicksPerDeg() {

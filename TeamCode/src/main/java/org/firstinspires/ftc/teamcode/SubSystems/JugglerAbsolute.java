@@ -24,7 +24,7 @@ public class JugglerAbsolute extends SubsystemBase {
 
     /** Pre‑defined slot centres (pulse counts). */
 //     private static final double[] SLOT_CENTRES = {0.0, 96.0, 192.0};
-    private static final double[] SLOT_CENTRES = {0.0, 475.0, 950.0};
+    private static final double[] SLOT_CENTERS = {0.0, 475.0, 950.0};
 
     public enum Direction {
         CW(1),
@@ -61,7 +61,7 @@ public class JugglerAbsolute extends SubsystemBase {
      * 1️⃣  Legacy call wrappers
      * -------------------------------------------------------------- */
     public void rotateOneSlot(Direction direction) {
-        boolean dir = (direction.sign == 1) ? true : false;
+        boolean dir = direction.sign == 1;
         startMotion(nextSlotSetpoint(motor.getCurrentPosition(), dir));
     }
 
@@ -192,8 +192,8 @@ public class JugglerAbsolute extends SubsystemBase {
         int bestIdx = -1;
         double bestAbsDelta = Double.MAX_VALUE;
 
-        for (int i = 0; i < SLOT_CENTRES.length; i++) {
-            double delta = shortestSignedDelta(normPos, SLOT_CENTRES[i]);
+        for (int i = 0; i < SLOT_CENTERS.length; i++) {
+            double delta = shortestSignedDelta(normPos, SLOT_CENTERS[i]);
             double abs   = Math.abs(delta);
             if (abs < bestAbsDelta) {
                 bestAbsDelta = abs;
@@ -204,12 +204,12 @@ public class JugglerAbsolute extends SubsystemBase {
     }
 
     public static double slotSetpoint(double currentCount, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= SLOT_CENTRES.length) {
+        if (slotIndex < 0 || slotIndex >= SLOT_CENTERS.length) {
             throw new IllegalArgumentException(
                     "slotIndex must be 0, 1, or 2 (was " + slotIndex + ')');
         }
         double normPos = mod(currentCount, PULSES_PER_REV);
-        double delta   = shortestSignedDelta(normPos, SLOT_CENTRES[slotIndex]);
+        double delta   = shortestSignedDelta(normPos, SLOT_CENTERS[slotIndex]);
         return currentCount + delta;
     }
 
@@ -220,8 +220,8 @@ public class JugglerAbsolute extends SubsystemBase {
     public static double nextSlotSetpoint(double currentCount, boolean clockwise) {
         int nearestIdx = nearestSlotIndex(currentCount);
         int nextIdx = clockwise
-                ? (nearestIdx + 1) % SLOT_CENTRES.length
-                : (nearestIdx - 1 + SLOT_CENTRES.length) % SLOT_CENTRES.length;
+                ? (nearestIdx + 1) % SLOT_CENTERS.length
+                : (nearestIdx - 1 + SLOT_CENTERS.length) % SLOT_CENTERS.length;
         return slotSetpoint(currentCount, nextIdx);
     }
 
@@ -254,11 +254,11 @@ public class JugglerAbsolute extends SubsystemBase {
      * @return target encoder count for the requested slot
      */
     public static double moveToSlotByIndex(double currentCount, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= SLOT_CENTRES.length) {
+        if (slotIndex < 0 || slotIndex >= SLOT_CENTERS.length) {
             throw new IllegalArgumentException(
                     "slotIndex must be 0, 1, or 2 (was " + slotIndex + ')');
         }
-        return moveToSlot(currentCount, SLOT_CENTRES[slotIndex]);
+        return moveToSlot(currentCount, SLOT_CENTERS[slotIndex]);
     }
 
     /**
@@ -275,8 +275,8 @@ public class JugglerAbsolute extends SubsystemBase {
 
         // 2️⃣ Compute the index of the destination slot.
         //    Use modulo arithmetic to wrap around the three slots.
-        int destinationIdx = ((nearestIdx + slotShift) % SLOT_CENTRES.length
-                + SLOT_CENTRES.length) % SLOT_CENTRES.length;
+        int destinationIdx = ((nearestIdx + slotShift) % SLOT_CENTERS.length
+                + SLOT_CENTERS.length) % SLOT_CENTERS.length;
 
         // 3️⃣ Return the set‑point for that destination slot.
         return slotSetpoint(currentCount, destinationIdx);

@@ -84,6 +84,7 @@ public class TeleOpTestPidTuner extends LinearOpMode implements TeamConstants {
             tmPanels.addData("TargetDegs", rawMotor.getTargetPosition(AngleUnit.DEGREES));
             tmPanels.addData("CurrentDegs", rawMotor.getCurrentPosition(AngleUnit.DEGREES));
             tmPanels.addData("CurrentTicks", rawMotor.getCurrentPosition());
+            tmPanels.addData("CountsPerRev", rawMotor.getMotorType().getTicksPerRev());
             tmPanels.update();
         }
     }
