@@ -28,6 +28,6 @@ public class RotateOneSlotCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         // Stop motor when done
-        juggler.stop();
+//        juggler.stop();
     }
 }
