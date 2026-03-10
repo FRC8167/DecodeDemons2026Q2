@@ -11,6 +11,7 @@ import com.seattlesolvers.solverslib.hardware.SensorColor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.BetterMotor;
 import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
@@ -100,7 +101,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         MotorEx intakeMotor    = new MotorEx(hardwareMap, "Intake").setCachingTolerance(0.01);
         MotorEx shooterMotor   = new MotorEx(hardwareMap, "Shooter").setCachingTolerance(0.01);
 //        MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
-        MotorEx slideMotor = new MotorEx(hardwareMap, "Slide").setCachingTolerance(0.01);
+        BetterMotor slideMotor = new BetterMotor(hardwareMap, "Slide");
 
 //        spindexerMotor.resetEncoder();  //added 01-18
 //        slideMotor.resetEncoder();
@@ -122,7 +123,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         limitSwitch = new LimitSwitch(jugglerDigitalSwitch);
 //        juggler = new Juggler(spindexerMotor, limitSwitch);
         if (juggler == null || reset) {
-            MotorEx spindexerMotor = new MotorEx(hardwareMap, "Juggler").setCachingTolerance(0.01);
+            BetterMotor spindexerMotor = new BetterMotor(hardwareMap, "Juggler");
             juggler = new JugglerAbsolute(spindexerMotor);
 //            juggler = new Juggler(spindexerMotor, limitSwitch);
         }

@@ -120,7 +120,6 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(
                         new SequentialCommandGroup(
                                 new KickCommand(robot.slide),
-                                new WaitCommand(50),
                                 new NestCommand(robot.slide)
                         )
                 );

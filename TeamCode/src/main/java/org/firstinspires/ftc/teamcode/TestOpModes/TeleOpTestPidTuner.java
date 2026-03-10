@@ -26,8 +26,8 @@ public class TeleOpTestPidTuner extends LinearOpMode implements TeamConstants {
 
 
 //        initializeRobot(true);
-        BetterMotor rawMotor = new BetterMotor(hardwareMap,"Juggler");
-        DefaultMotorInfo.GOBILDA_117RPM.adjustMotor(rawMotor);
+        BetterMotor rawMotor = new BetterMotor(hardwareMap,"Slide");
+        DefaultMotorInfo.GOBILDA_312RPM.adjustMotor(rawMotor);
 
         rawMotor.setVelocityPIDFCoefficients(
                 ConfigurableConstants.kP,
@@ -41,7 +41,7 @@ public class TeleOpTestPidTuner extends LinearOpMode implements TeamConstants {
         rawMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rawMotor.setPower(1);
 
-        rawMotor.setVelocityRPM(20);
+        rawMotor.setVelocityRPM(ConfigurableConstants.MAX_RPM);
 
 
         tmPanels = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -77,6 +77,8 @@ public class TeleOpTestPidTuner extends LinearOpMode implements TeamConstants {
                 rawMotor.setPositionPIDFCoefficients(
                         ConfigurableConstants.kP_Pos
                 );
+
+                rawMotor.setVelocityRPM(ConfigurableConstants.MAX_RPM);
             }
 
             tmPanels.addData("Target", target);

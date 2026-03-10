@@ -1,26 +1,25 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.controller.PIDFController;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+
+import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.BetterMotor;
+import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.DefaultMotorInfo;
 
 @Configurable
 public class JugglerAbsolute extends SubsystemBase {
 
-    private MotorEx motor;
-    private double encoderCount;
-    private static double MAX_POWER = 0.3;
-    private static double SLOW_SPIN_POWER = 0.2;
+    private BetterMotor motor;
+    private static double SLOW_SPIN_RPM = 20;
 
-    private PIDFController jugglerPID;
-    private static int pidTolerance = 8;
-    private static double kp, ki, kd, kf;
+    private static int pidTolerance = 50;
+    private static double kp, ki, kd, kf, kp_pos, maxRPM;
 
     /** Pulses per full revolution (encoder resolution). */
 //     private static final double PULSES_PER_REV = 288;
-    private static final double PULSES_PER_REV = 1425.1;
+//    private static final double PULSES_PER_REV = 1425.1;
 
     /** Pre‑defined slot centres (pulse counts). */
 //     private static final double[] SLOT_CENTRES = {0.0, 96.0, 192.0};
@@ -43,18 +42,24 @@ public class JugglerAbsolute extends SubsystemBase {
     /* --------------------------------------------------------------
      * 1️⃣  Constructor
      * -------------------------------------------------------------- */
-    public JugglerAbsolute(MotorEx jugglerMotor) {
+    public JugglerAbsolute(BetterMotor jugglerMotor) {
         motor = jugglerMotor;
-        motor.setRunMode(MotorEx.RunMode.RawPower);
-        motor.resetEncoder();
-        motor.setZeroPowerBehavior(MotorEx.ZeroPowerBehavior.BRAKE);
+        motor.adjustMotorInformation(DefaultMotorInfo.GOBILDA_117RPM);
 
-        kp = 0.015;
-        kd = 0.0004;
-        ki = 0.0;
-        kf = 0.0;
-        jugglerPID = new PIDFController(kp, ki, kd, kf);
-        jugglerPID.setTolerance(pidTolerance);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        kp = 10.0;
+        ki = 0.25;
+        kd = 0.0;
+        kf = 14.0;
+        kp_pos = 8;
+
+        maxRPM = 35;
+
+        motor.setVelocityPIDFCoefficients(kp, ki, kd, kf);
+        motor.setPositionPIDFCoefficients(kp_pos);
+        motor.setTargetPositionTolerance(pidTolerance);
     }
 
     /* --------------------------------------------------------------
@@ -106,7 +111,10 @@ public class JugglerAbsolute extends SubsystemBase {
      */
     private void startMotion(double counts) {
         jugglerMode = Mode.POSITION;
-        jugglerPID.setSetPoint ((int) counts);
+        motor.setTargetPosition((int) counts);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setVelocityRPM(maxRPM);
+
     }
 
     /**
@@ -115,15 +123,17 @@ public class JugglerAbsolute extends SubsystemBase {
      */
     public void startSlowSpin(Direction direction) {
         jugglerMode = Mode.SLOW_SPIN;
-        double slowSpinPower = (direction.sign==1) ? SLOW_SPIN_POWER : -SLOW_SPIN_POWER;
-        motor.set(slowSpinPower);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        double slowSpinRPM = (direction.sign==1) ? SLOW_SPIN_RPM : -SLOW_SPIN_RPM;
+        motor.setVelocityRPM(slowSpinRPM);
     }
 
     /**
      *
      */
     public void stop() {
-        motor.stopMotor();
+        motor.setPower(0);
     }
 
     /**
@@ -131,7 +141,7 @@ public class JugglerAbsolute extends SubsystemBase {
      * @return
      */
     public boolean atTarget() {
-        return jugglerPID.atSetPoint();
+        return motor.isBusy(); //TODO: FIX!
     }
 
 
@@ -161,34 +171,19 @@ public class JugglerAbsolute extends SubsystemBase {
     @Override
     public void periodic() {
 
-        // TODO: Remove next two lines for competition - for tuning purposes only
-        jugglerPID.setPIDF(kp, ki, kd, kf);
-        jugglerPID.setTolerance(pidTolerance);
-
-        switch(jugglerMode) {
-            case POSITION:
-                int currentPosition = motor.getCurrentPosition();
-                double controlOutput = Range.clip(jugglerPID.calculate(currentPosition), -MAX_POWER, MAX_POWER);
-                motor.set(controlOutput);
-                // double error = jugglerPID.get
-                break;
-            case SLOW_SPIN:
-                // Do something here? motor is set in motion in start slow spin
-                break;
-        }
     }
 
     /* --------------------------------------------------------------
      * 1️⃣  Core public API
      * -------------------------------------------------------------- */
 
-    public static double nearestSlotSetpoint(double currentCount) {
+    public double nearestSlotSetpoint(double currentCount) {
         int nearestIdx = nearestSlotIndex(currentCount);
         return slotSetpoint(currentCount, nearestIdx);
     }
 
-    public static int nearestSlotIndex(double currentCount) {
-        double normPos = mod(currentCount, PULSES_PER_REV);
+    public int nearestSlotIndex(double currentCount) {
+        double normPos = mod(currentCount, motor.getTicksPerRev());
         int bestIdx = -1;
         double bestAbsDelta = Double.MAX_VALUE;
 
@@ -203,21 +198,21 @@ public class JugglerAbsolute extends SubsystemBase {
         return bestIdx;
     }
 
-    public static double slotSetpoint(double currentCount, int slotIndex) {
+    public double slotSetpoint(double currentCount, int slotIndex) {
         if (slotIndex < 0 || slotIndex >= SLOT_CENTERS.length) {
             throw new IllegalArgumentException(
                     "slotIndex must be 0, 1, or 2 (was " + slotIndex + ')');
         }
-        double normPos = mod(currentCount, PULSES_PER_REV);
+        double normPos = mod(currentCount, motor.getTicksPerRev());
         double delta   = shortestSignedDelta(normPos, SLOT_CENTERS[slotIndex]);
         return currentCount + delta;
     }
 
-    public static double nextSlotSetpoint(double currentCount) {
+    public double nextSlotSetpoint(double currentCount) {
         return nextSlotSetpoint(currentCount, true);
     }
 
-    public static double nextSlotSetpoint(double currentCount, boolean clockwise) {
+    public double nextSlotSetpoint(double currentCount, boolean clockwise) {
         int nearestIdx = nearestSlotIndex(currentCount);
         int nextIdx = clockwise
                 ? (nearestIdx + 1) % SLOT_CENTERS.length
@@ -235,10 +230,10 @@ public class JugglerAbsolute extends SubsystemBase {
      * @return absolute encoder set‑point that reaches the supplied slot centre
      *         using the shortest angular travel (clockwise or counter‑clockwise).
      */
-    public static double moveToSlot(double currentCount, double slotCenterPulse) {
+    public double moveToSlot(double currentCount, double slotCenterPulse) {
         // Normalise the target centre to the same 0‑rev range as the current pos.
-        double normalisedTarget = mod(slotCenterPulse, PULSES_PER_REV);
-        double normPos          = mod(currentCount, PULSES_PER_REV);
+        double normalisedTarget = mod(slotCenterPulse, motor.getTicksPerRev());
+        double normPos          = mod(currentCount, motor.getTicksPerRev());
 
         double delta = shortestSignedDelta(normPos, normalisedTarget);
         return currentCount + delta;
@@ -253,7 +248,7 @@ public class JugglerAbsolute extends SubsystemBase {
      * @param slotIndex    0, 1 or 2 – selects one of the three fixed slots
      * @return target encoder count for the requested slot
      */
-    public static double moveToSlotByIndex(double currentCount, int slotIndex) {
+    public double moveToSlotByIndex(double currentCount, int slotIndex) {
         if (slotIndex < 0 || slotIndex >= SLOT_CENTERS.length) {
             throw new IllegalArgumentException(
                     "slotIndex must be 0, 1, or 2 (was " + slotIndex + ')');
@@ -269,7 +264,7 @@ public class JugglerAbsolute extends SubsystemBase {
      *                       Positive → clockwise, Negative → counter‑clockwise.
      * @return               Absolute encoder count for the target slot.
      */
-    public static double rotateBySlots(double currentCount, int slotShift) {
+    public double rotateBySlots(double currentCount, int slotShift) {
         // 1️⃣ Find the nearest slot index.
         int nearestIdx = nearestSlotIndex(currentCount);
 
@@ -288,7 +283,7 @@ public class JugglerAbsolute extends SubsystemBase {
      * -------------------------------------------------------------- */
 
     /** Normalises a value into the interval [0, modulus). */
-    private static double mod(double value, double modulus) {
+    private double mod(double value, double modulus) {
         double result = value % modulus;
         return (result < 0) ? result + modulus : result;
     }
@@ -299,10 +294,10 @@ public class JugglerAbsolute extends SubsystemBase {
      *
      * Positive → clockwise, Negative → counter‑clockwise
      */
-    private static double shortestSignedDelta(double from, double to) {
+    private double shortestSignedDelta(double from, double to) {
         double rawDelta = to - from;
-        if (rawDelta >  PULSES_PER_REV / 2) rawDelta -= PULSES_PER_REV;
-        if (rawDelta < -PULSES_PER_REV / 2) rawDelta += PULSES_PER_REV;
+        if (rawDelta >  motor.getTicksPerRev() / 2.0) rawDelta -= motor.getTicksPerRev();
+        if (rawDelta < -motor.getTicksPerRev() / 2.0) rawDelta += motor.getTicksPerRev();
         return rawDelta;
     }
 
