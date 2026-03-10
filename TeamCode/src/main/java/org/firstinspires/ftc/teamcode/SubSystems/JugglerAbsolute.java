@@ -125,7 +125,7 @@ public class JugglerAbsolute extends SubsystemBase {
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         double slowSpinRPM = (direction.sign==1) ? SLOW_SPIN_RPM : -SLOW_SPIN_RPM;
-        motor.setVelocityRPM(slowSpinRPM);
+        motor.setVelocityRPM(slowSpinRPM);motor.isBusy();
     }
 
     /**
