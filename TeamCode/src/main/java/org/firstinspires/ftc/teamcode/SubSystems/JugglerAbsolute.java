@@ -140,8 +140,7 @@ public class JugglerAbsolute extends SubsystemBase {
      * @return
      */
     public boolean atTarget() {
-        double error = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
-        return error < PID_TOLERANCE;
+        return Math.abs(motor.getTargetPosition() - motor.getCurrentPosition()) < PID_TOLERANCE;
     }
 
 
