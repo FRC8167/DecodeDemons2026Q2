@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.BetterMotor;
@@ -14,7 +13,7 @@ public class JugglerAbsolute extends SubsystemBase {
     private BetterMotor motor;
     private static double SLOW_SPIN_RPM = 20;
 
-    private static int pidTolerance = 50;
+    private static int PID_TOLERANCE = 8;   // 8/1425.1*360 = 2 degrees
     private static double kp, ki, kd, kf, kp_pos, maxRPM;
 
     /** Pulses per full revolution (encoder resolution). */
@@ -59,7 +58,7 @@ public class JugglerAbsolute extends SubsystemBase {
 
         motor.setVelocityPIDFCoefficients(kp, ki, kd, kf);
         motor.setPositionPIDFCoefficients(kp_pos);
-        motor.setTargetPositionTolerance(pidTolerance);
+        motor.setTargetPositionTolerance(PID_TOLERANCE);
     }
 
     /* --------------------------------------------------------------
@@ -141,7 +140,8 @@ public class JugglerAbsolute extends SubsystemBase {
      * @return
      */
     public boolean atTarget() {
-        return motor.isBusy(); //TODO: FIX!
+        double error = Math.abs(motor.getTargetPosition() - motor.getCurrentPosition());
+        return error < PID_TOLERANCE;
     }
 
 
