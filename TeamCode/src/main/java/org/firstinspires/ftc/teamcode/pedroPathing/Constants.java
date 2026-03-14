@@ -39,9 +39,9 @@ public class Constants {
 //            .centripetalScaling(.0005)
 
 
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.08, 0.0, 0.008, 0.005))
-            .headingPIDFCoefficients(new PIDFCoefficients(0.7, 0.0, 0.01, 0.02))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(.006, 0.0, .0006, 0.6, 0.007))
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.08, 0.0, 0.008, 0.003))
+            .headingPIDFCoefficients(new PIDFCoefficients(0.7, 0.0, 0.01, 0.008))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(.008, 0.0, .001, 0.6, 0.007))
             .centripetalScaling(0.0003);
 
 
@@ -53,7 +53,7 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(
         0.99,   // max power?
         100,     // max velocity?
-        0.5,    // accel?
+        1.4,    // accel?
         1.0     // decel?
 );
 

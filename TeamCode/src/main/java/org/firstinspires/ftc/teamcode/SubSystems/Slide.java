@@ -112,7 +112,7 @@ public class Slide extends SubsystemBase {
 
 
     public boolean atTarget() {
-        return Math.abs(slideMotor.getTargetPosition() - slideMotor.getCurrentPosition()) < PID_TOLERANCE;
+        return Math.abs(slideMotor.getTargetPosition() - slideMotor.getCurrentPosition()) < PID_TOLERANCE && slideMotor.getVelocityRPM() < 0.2;
     }
 
 

@@ -52,7 +52,7 @@ public class JugglerAbsolute extends SubsystemBase {
         ki = 0.25;
         kd = 0.0;
         kf = 14.0;
-        kp_pos = 8;
+        kp_pos = 9.0;
 
         maxRPM = 35;
 
@@ -124,7 +124,7 @@ public class JugglerAbsolute extends SubsystemBase {
         jugglerMode = Mode.SLOW_SPIN;
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        double slowSpinRPM = (direction.sign==1) ? SLOW_SPIN_RPM : -SLOW_SPIN_RPM;
+        double slowSpinRPM = (direction.sign==1) ? -SLOW_SPIN_RPM : SLOW_SPIN_RPM;
         motor.setVelocityRPM(slowSpinRPM);motor.isBusy();
     }
 
