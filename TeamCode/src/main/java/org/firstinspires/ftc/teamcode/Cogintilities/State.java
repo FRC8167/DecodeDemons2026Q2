@@ -2,7 +2,11 @@ package org.firstinspires.ftc.teamcode.Cogintilities;
 
 import androidx.annotation.NonNull;
 
+import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.jetbrains.annotations.Contract;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public enum State {
     GREEN("Green", 'G'),
@@ -34,6 +38,49 @@ public enum State {
             }
             return string.toString();
         }
+    }
+
+    public ColorMatch.ArtifactColor revert() {
+        switch (this) {
+            case GREEN:
+                return ColorMatch.ArtifactColor.GREEN;
+            case PURPLE:
+                return ColorMatch.ArtifactColor.PURPLE;
+            case UNKNOWN:
+                return ColorMatch.ArtifactColor.UNKNOWN;
+            default:
+                return ColorMatch.ArtifactColor.NONE;
+        }
+    }
+
+    @Contract(pure = true)
+    public static State migrate(@NonNull ColorMatch.ArtifactColor color) {
+        switch (color) {
+            case GREEN:
+                return GREEN;
+            case PURPLE:
+                return PURPLE;
+            case UNKNOWN:
+                return UNKNOWN;
+            default:
+                return NONE;
+        }
+    }
+
+    public static State[] sequenceMigrate(@NonNull ColorMatch.ArtifactColor... colors) {
+        List<State> states = new ArrayList<>();
+        for (ColorMatch.ArtifactColor color: colors) {
+            states.add(migrate(color));
+        }
+        return states.toArray(new State[0]);
+    }
+
+    public static ColorMatch.ArtifactColor[] sequenceRevert(@NonNull State... states) {
+        List<ColorMatch.ArtifactColor> colors = new ArrayList<>();
+        for (State state: states) {
+            colors.add(state.revert());
+        }
+        return colors.toArray(new ColorMatch.ArtifactColor[0]);
     }
 
     @NonNull

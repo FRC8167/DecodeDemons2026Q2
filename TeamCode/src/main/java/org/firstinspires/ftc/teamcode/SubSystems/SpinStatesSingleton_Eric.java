@@ -7,16 +7,25 @@ import org.firstinspires.ftc.teamcode.Cogintilities.State;
 import org.firstinspires.ftc.teamcode.Cogintilities.TeamConstants;
 import org.jetbrains.annotations.Contract;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+/**
+ * A thread-safe Singleton class that manages the inventory state of a three-slot spindexer mechanism.
+ *
+ * <p>This class tracks the contents of three slots (slot0, slot1, slot2) using {@link State} enums.
+ */
 public class SpinStatesSingleton_Eric implements TeamConstants {
     private volatile State slot0;
     private volatile State slot1;
     private volatile State slot2;
     //Note: these slots are different from their original position on Devils.
     //slot0 is positioned under the shooter with increasing ccw to correlate with sensors at initial position
-    //Note2: rotating juggler to index 1 results in a cw movement of the spindexer rotating the positions to now be 2,0,1 ccw
+    //Note2: rotating juggler to index 1 results in a cw movement of the spindexer rotating the positions to now be 2,0,1 ccw TODO: Confirm
     //In other words index 0 is slot 0, index 1 is slot 2, index 2 is slot 1 (annoying, I know)
+    //Note3: ColorMatch slots refer to fixed slots that only line up at a normalized rotation of zero
+    //Must be accounted for when storing data
 
     private static volatile SpinStatesSingleton_Eric single_instance = null;
 
@@ -26,11 +35,24 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
         slot2 = State.NONE;
     }
 
-    public static synchronized SpinStatesSingleton_Eric getInstance()
-    {
+    public static synchronized SpinStatesSingleton_Eric getInstance() {
         if (single_instance == null)
             single_instance = new SpinStatesSingleton_Eric();
         return single_instance;
+    }
+
+    public static synchronized void deleteInstance() {
+        single_instance = null;
+    }
+
+    public synchronized void reset() {
+        slot0 = State.NONE;
+        slot1 = State.NONE;
+        slot2 = State.NONE;
+    }
+
+    public static synchronized void resetInstance() {
+        getInstance().reset();
     }
 
     public synchronized void setSlot(int index, State state) {
@@ -128,21 +150,21 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
 
     public static State get1stNextToShoot(int scored, State[] sequence) {
         if (sequence == null)
-            return State.NONE;
+            return null;
         int index = scored % 3;
         return sequence[index];
     }
 
     public static State get2ndNextToShoot(int scored, State[] sequence) {
         if (sequence == null)
-            return State.NONE;
+            return null;
         int index = (scored+1) % 3;
         return sequence[index];
     }
 
     public static State get3rdNextToShoot(int scored, State[] sequence) {
         if (sequence == null)
-            return State.NONE;
+            return null;
         int index = (scored+2) % 3;
         return sequence[index];
     }
@@ -158,6 +180,16 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
         }
     }
 
+    public static int rotateColorIndexesToSlots(int index, int jugglerIndex) {
+        if (index < 0 || jugglerIndex < 0) return -1;
+
+        // Calculate the physical-to-logical offset
+        int offsetIndex = (index + jugglerIndex) % 3;
+
+        // Return the mapped slot ID
+        return convertJugglerIndexesAndSlots(offsetIndex);
+    }
+
     public synchronized int findClosestSlotOfState(int currentSlot, State desiredState) {
         if (!isStateInStates(desiredState)) return -1;
         else if (getSlot(currentSlot) == desiredState) return currentSlot;
@@ -170,5 +202,79 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
 
     public synchronized int findClosestJugglerIndexOfState(int jugglerIndex, State desiredState) {
         return convertJugglerIndexesAndSlots(findClosestSlotOfState(convertJugglerIndexesAndSlots(jugglerIndex), desiredState));
+    }
+
+    public synchronized void forceSetByColorMatchColors(@NonNull ColorMatch.SlotColors colors, int jugglerIndex) {
+        // This maps Physical Sensor 0, 1, and 2 to the correct logical slots
+        if (jugglerIndex < 0 || jugglerIndex > 2) return;
+        this.setSlot(rotateColorIndexesToSlots(0, jugglerIndex), State.migrate(colors.slot0));
+        this.setSlot(rotateColorIndexesToSlots(1, jugglerIndex), State.migrate(colors.slot1));
+        this.setSlot(rotateColorIndexesToSlots(2, jugglerIndex), State.migrate(colors.slot2));
+    }
+
+    public synchronized void updateByColorMatchColors(@NonNull ColorMatch.SlotColors colors, int jugglerIndex) {
+        // This maps Physical Sensor 0, 1, and 2 to the correct logical slots
+        if (jugglerIndex < 0 || jugglerIndex > 2) return;
+        int sensor0SlotNum = rotateColorIndexesToSlots(0, jugglerIndex);
+        int sensor1SlotNum = rotateColorIndexesToSlots(1, jugglerIndex);
+        int sensor2SlotNum = rotateColorIndexesToSlots(2, jugglerIndex);
+
+        if (getSlot(sensor0SlotNum) == State.UNKNOWN || getSlot(sensor0SlotNum) == State.NONE)
+            setSlot(sensor0SlotNum, State.migrate(colors.slot0));
+        if (getSlot(sensor1SlotNum) == State.UNKNOWN || getSlot(sensor1SlotNum) == State.NONE)
+            setSlot(sensor1SlotNum, State.migrate(colors.slot1));
+        if (getSlot(sensor2SlotNum) == State.UNKNOWN || getSlot(sensor2SlotNum) == State.NONE)
+            setSlot(sensor2SlotNum, State.migrate(colors.slot2));
+    }
+
+    public synchronized void deleteByJugglerIndex(int jugglerIndex) {
+        if (jugglerIndex < 0 || jugglerIndex > 2) return;
+        setSlot(convertJugglerIndexesAndSlots(jugglerIndex), State.NONE);
+    }
+
+    public synchronized void deleteBySlot(int slot) {
+        if (slot < 0 || slot > 2) return;
+        setSlot(slot, State.NONE);
+    }
+
+    public synchronized State[] toBestStatesAvailable(State[] states) {
+        List<State> stateList = new ArrayList<>();
+        int purples = getCountOfStateInStates(State.PURPLE);
+        int greens = getCountOfStateInStates(State.GREEN);
+        int unknowns = getCountOfStateInStates(State.UNKNOWN);
+        for (int i = 0; i < 3; i++) {
+            if (states != null) {
+                if (states[i] == State.PURPLE && purples > 0) {
+                    purples--;
+                    stateList.add(states[i]);
+                } else if (states[i] == State.GREEN && greens > 0) {
+                    greens--;
+                    stateList.add(states[i]);
+                } else {
+                    if (unknowns > 0) {
+                        unknowns--;
+                        stateList.add(State.UNKNOWN);
+                    } else if (greens > 0) {
+                        greens--;
+                        stateList.add(State.GREEN);
+                    } else if (purples > 0) {
+                        purples--;
+                        stateList.add(State.PURPLE);
+                    }
+                }
+            } else {
+                if (unknowns > 0) {
+                    unknowns--;
+                    stateList.add(State.UNKNOWN);
+                } else if (greens > 0) {
+                    greens--;
+                    stateList.add(State.GREEN);
+                } else if (purples > 0) {
+                    purples--;
+                    stateList.add(State.PURPLE);
+                }
+            }
+        }
+        return stateList.toArray(new State[0]);
     }
 }

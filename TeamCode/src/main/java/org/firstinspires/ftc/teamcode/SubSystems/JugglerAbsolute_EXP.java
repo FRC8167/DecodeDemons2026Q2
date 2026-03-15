@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
+import androidx.annotation.NonNull;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.BetterMotor;
 import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.DefaultMotorInfo;
+import org.firstinspires.ftc.teamcode.Cogintilities.State;
 
 @Configurable
 public class JugglerAbsolute_EXP extends SubsystemBase {
@@ -64,7 +67,7 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
     /* --------------------------------------------------------------
      * 1️⃣  Legacy call wrappers
      * -------------------------------------------------------------- */
-    public void rotateOneSlot(Direction direction) {
+    public void rotateOneSlot(@NonNull Direction direction) {
         boolean dir = direction.sign == 1;
         startMotion(nextSlotSetpoint(motor.getCurrentPosition(), dir));
     }
@@ -73,7 +76,7 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
      *
      * @param direction
      */
-    public void rotateTwoSlots(Direction direction) {
+    public void rotateTwoSlots(@NonNull Direction direction) {
         int slots = (direction.sign == 1) ? 2 : -2;
         double newTarget = rotateBySlots(motor.getCurrentPosition(), slots);
         startMotion(newTarget);
@@ -83,7 +86,7 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
      *
      * @param direction
      */
-    public void jogThree(Direction direction) {
+    public void jogThree(@NonNull Direction direction) {
         int slots = (direction.sign == 1) ? 3 : -3;
         double newTarget = rotateBySlots(motor.getCurrentPosition(), slots);
         startMotion(newTarget);
@@ -95,6 +98,12 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
      */
     public void rotateToSlot(int slotIndex) { //TODO: Implement Smart Functionality
         startMotion(moveToSlotByIndex(motor.getCurrentPosition(), slotIndex));
+    }
+
+    public void rotateToState(State state) {
+        int targetIndex = SpinStatesSingleton_Eric.getInstance().findClosestJugglerIndexOfState(getSlotIndex(), state);
+        if (targetIndex != -1)
+            rotateToSlot(targetIndex);
     }
 
     /**
@@ -120,7 +129,7 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
      *
      * @param direction
      */
-    public void startSlowSpin(Direction direction) {
+    public void startSlowSpin(@NonNull Direction direction) {
         jugglerMode = Mode.SLOW_SPIN;
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -164,6 +173,10 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
      */
     public int getSlotIndex() { //TODO: Implement Smart Functionality
         return nearestSlotIndex(motor.getCurrentPosition());
+    }
+
+    public State getSlotState() {
+        return SpinStatesSingleton_Eric.getInstance().getSlot(getSlotIndex());
     }
 
 

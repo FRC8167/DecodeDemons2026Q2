@@ -39,7 +39,7 @@ public class TestOp_TagTrackTuning extends CommandOpMode {
 
         //Initialize the robot
         try {
-            robot.init(hardwareMap, true);
+            robot.init(hardwareMap);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

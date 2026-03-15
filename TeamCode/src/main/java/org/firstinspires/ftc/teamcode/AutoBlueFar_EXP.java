@@ -15,21 +15,24 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.Commands.ScanArtifactsCommand_EXP;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_EXP;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
+import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand_EXP;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
 import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
 
 import java.util.Arrays;
 
 
 //@Disabled
-@Autonomous(name = "AutoBlueFar", preselectTeleOp = "MainTeleOp", group = "Competition")
-public class AutoBlueFar extends CommandOpMode {
-    Robot robot = Robot.getInstance();
+@Autonomous(name = "AutoBlueFar_EXP", preselectTeleOp = "MainTeleOp", group = "Competition")
+public class AutoBlueFar_EXP extends CommandOpMode {
+    Robot_EXP robot = Robot_EXP.getInstance();
     private ElapsedTime timer;
     private final Pose startPose = new Pose(61, 9, Math.toRadians(90));
     private final Pose rotatedPose = new Pose(58, 10, Math.toRadians(113.5));
@@ -85,7 +88,7 @@ public class AutoBlueFar extends CommandOpMode {
 
     public void initialize() {
         Robot.OP_MODE_TYPE = Robot.OpModeType.AUTO;
-        robot.setAlliance(Robot.Alliance.BLUE);
+        robot.setAlliance(Robot_EXP.Alliance.BLUE);
         timer = new ElapsedTime();
         timer.reset();
 
@@ -107,6 +110,7 @@ public class AutoBlueFar extends CommandOpMode {
                 new ParallelCommandGroup(
                         // Artifact detection & vision run in background parallel with all else
                         new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
+                        new ScanArtifactsCommand_EXP(robot.colorMatch, robot.juggler),
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
@@ -116,7 +120,7 @@ public class AutoBlueFar extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, rotateToShootPath, true),
 
                                 // Shoot pre-loaded artifacts
-                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand_EXP(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 0),
 //                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 // Move to spike 1//
 //                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
@@ -126,7 +130,7 @@ public class AutoBlueFar extends CommandOpMode {
                                 new ParallelDeadlineGroup(
                                     new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
                                     new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-                                    new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                    new SlowSpinPlusInterruptCommand_EXP(robot.juggler, JugglerAbsolute_EXP.Direction.CW)
                                 ),
 
 //                                new ParallelCommandGroup(
@@ -147,11 +151,12 @@ public class AutoBlueFar extends CommandOpMode {
 //                                new InstantCommand(()->robot.juggler.goHome()),
 
 //                                new InstantCommand(()->robot.juggler.goHome()),  TODO:  Try this in auto.
+                                new ScanArtifactsCommand_EXP(robot.colorMatch, robot.juggler),
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
                                     new InstantCommand(()->robot.intake.stop()),
-                                    new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
+                                    new ShootCaseCommand_EXP(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 3)
 //                                    new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
                                 ),
 
@@ -191,6 +196,8 @@ public class AutoBlueFar extends CommandOpMode {
             robot.vision.latchMotif();
             ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
             // Moved from telemetryM to telemetry
+
+            robot.colorMatch.forceUpdateSpinStates(robot.juggler.getSlotIndex());
 
 
             if (robot.vision.getFirstSequence() != null) {

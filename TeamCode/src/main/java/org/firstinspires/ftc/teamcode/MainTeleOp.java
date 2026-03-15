@@ -61,7 +61,7 @@ public class MainTeleOp extends CommandOpMode {
 
         //Initialize the robot
         try {
-            robot.init(hardwareMap, false);
+            robot.init(hardwareMap);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -103,7 +103,7 @@ public class AutoBlueSimpleParkClose extends CommandOpMode {
         super.reset();
 
         try {
-            robot.init(hardwareMap, true);
+            robot.init(hardwareMap);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

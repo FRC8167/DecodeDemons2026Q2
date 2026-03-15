@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.BetterMotor;
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
@@ -28,17 +31,13 @@ import org.firstinspires.ftc.teamcode.SubSystems.Slide;
 import org.firstinspires.ftc.teamcode.SubSystems.SpinStatesSingleton_Eric;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-import com.pedropathing.follower.Follower;
-import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
-
-
 import java.util.List;
 
 
-public class Robot extends com.seattlesolvers.solverslib.command.Robot {
+public class Robot_EXP extends com.seattlesolvers.solverslib.command.Robot {
 
-    private static final Robot instance = new Robot();
-    public static Robot getInstance() {
+    private static final Robot_EXP instance = new Robot_EXP();
+    public static Robot_EXP getInstance() {
         return instance;
     }
 
@@ -67,7 +66,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public Telemetry telemetry;
 
     public Pose autoEndPose = null;
-    public static OpModeType OP_MODE_TYPE; //Note: Is likely unnecessary. TODO: replace with determineOpModeType() method
+    public static OpModeType OP_MODE_TYPE; //Note: Is likely unnecessary.
     static List<LynxModule> ctrlHubs;
 
     public GoBildaPinpointDriver pinpoint;
@@ -76,7 +75,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public MecanumDrive mecanumDrive;
     public Intake intake;
     public Shooter shooter;
-    public JugglerAbsolute juggler;
+    public JugglerAbsolute_EXP juggler; //TODO: Implement this change to main when tested. It is the only significant change in this file
     public SensorColor colorSensor;
 //    public Vision vision;
     public LimeLightVision vision;
@@ -123,13 +122,13 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         jugglerDigitalSwitch.setMode(DigitalChannel.Mode.INPUT);
         limitSwitch = new LimitSwitch(jugglerDigitalSwitch);
 //        juggler = new Juggler(spindexerMotor, limitSwitch);
-        if (juggler == null || OpModeType.AUTO.equals(determineOpModeType())) {
+        if (juggler == null || OpModeCheckerUtility.isAutonomous(this.getClass())) {
             BetterMotor spindexerMotor = new BetterMotor(hardwareMap, "Juggler");
-            juggler = new JugglerAbsolute(spindexerMotor);
+            juggler = new JugglerAbsolute_EXP(spindexerMotor);
 //            juggler = new Juggler(spindexerMotor, limitSwitch);
         }
 
-        if (OpModeType.AUTO.equals(determineOpModeType())) {
+        if (OpModeCheckerUtility.isAutonomous(this.getClass())) {
             SpinStatesSingleton_Eric.resetInstance();
         }
 
@@ -172,7 +171,6 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     }
 
     public void initHasMovement() {
-        //TODO what goes here??
     }
 
     public void setAlliance(Alliance ally) {
@@ -195,9 +193,9 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         else return NEUTRAL_PARK_POSE;  //default if UNSPECIFIED
     }
 
-    public OpModeType determineOpModeType() {
-        return OpModeCheckerUtility.getOpModeType(this.getClass());
-    }
+//    public OpModeType determineOpModeType() {
+//        return OpModeCheckerUtility.getOpModeType(this.getClass());
+//    }
 
 
 }

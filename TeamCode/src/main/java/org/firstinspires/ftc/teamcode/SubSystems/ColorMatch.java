@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
+import androidx.annotation.NonNull;
+
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -21,9 +23,9 @@ public class ColorMatch extends SubsystemBase {
     private final double GREEN_HUE_MAX = 170;
 
     public ColorMatch(
-            RevColorSensorV3 slot0Sensor,
-            RevColorSensorV3 slot1Sensor,
-            RevColorSensorV3 slot2Sensor
+            @NonNull RevColorSensorV3 slot0Sensor,
+            @NonNull RevColorSensorV3 slot1Sensor,
+            @NonNull RevColorSensorV3 slot2Sensor
     ) {
         sensors.put(Slot.SLOT_0, slot0Sensor);
         sensors.put(Slot.SLOT_1, slot1Sensor);
@@ -52,13 +54,11 @@ public class ColorMatch extends SubsystemBase {
         final float[] hsvValues = new float[3];
         // Define the sensor
         RevColorSensorV3 sensor = sensors.get(slot);
+        if (sensor == null) return new float[]{0, 0, 0};
+
         sensor.setGain(2.0f);
         //turn off/on led
         sensor.enableLed(false);
-
-        if (sensor == null) {
-            return new float[]{0, 0, 0};
-        }
 
         NormalizedRGBA colors = sensor.getNormalizedColors();
         android.graphics.Color.colorToHSV(colors.toColor(), hsvValues);
@@ -70,27 +70,18 @@ public class ColorMatch extends SubsystemBase {
     //Trying to distinguish empty from unknown
 
     public ArtifactColor detectColor(Slot slot) {
+        RevColorSensorV3 sensor = sensors.get(slot);
+        if (sensor == null) return null;
+
         float[] hsv = getHSV(slot);
 
         float hue = hsv[0];
         float sat = hsv[1];
         float val = hsv[2];
-        float distance = (float) sensors.get(slot).getDistance(DistanceUnit.CM);
+        float distance = (float) sensor.getDistance(DistanceUnit.CM);
         //if (val < 0.15 || sat < 0.35) {return ArtifactColor.UNKNOWN;}
         // Distance threshold (in CM)
-        double DETECTION_DISTANCE_CM = 5.05;
-
-        switch (slot) {
-
-            case SLOT_0:
-                DETECTION_DISTANCE_CM = 5.7;
-            case SLOT_1:
-                DETECTION_DISTANCE_CM = 5.8;
-            case SLOT_2:
-                DETECTION_DISTANCE_CM = 9;
-            default:
-                DETECTION_DISTANCE_CM = 5.5;
-        }
+        double DETECTION_DISTANCE_CM = getDetectionDistanceCm(slot);
         if (distance < DETECTION_DISTANCE_CM) {
             if (hue >= GREEN_HUE_MIN && hue <= GREEN_HUE_MAX) {
                 return ArtifactColor.GREEN;
@@ -106,6 +97,26 @@ public class ColorMatch extends SubsystemBase {
 
 
 
+    }
+
+    private static double getDetectionDistanceCm(Slot slot) {
+        double DETECTION_DISTANCE_CM = 5.05;
+
+        // NOTE: Review fall-through logic here. Currently, all
+        // values are overwritten by default case because 'break' is missing.
+
+        switch (slot) {
+
+            case SLOT_0:
+                DETECTION_DISTANCE_CM = 5.7;
+            case SLOT_1:
+                DETECTION_DISTANCE_CM = 5.8;
+            case SLOT_2:
+                DETECTION_DISTANCE_CM = 9;
+            default:
+                DETECTION_DISTANCE_CM = 5.5;
+        }
+        return DETECTION_DISTANCE_CM;
     }
 
 
@@ -161,6 +172,15 @@ public class ColorMatch extends SubsystemBase {
 
     public double getDistance(Slot slot){
         RevColorSensorV3 sensor = sensors.get(slot);
+        if (sensor == null) return Double.NaN;
         return sensor.getDistance(DistanceUnit.CM);
+    }
+
+    public void updateSpinStates(int jugglerIndex) {
+        SpinStatesSingleton_Eric.getInstance().updateByColorMatchColors(getSlotColors(), jugglerIndex);
+    }
+
+    public void forceUpdateSpinStates(int jugglerIndex) {
+        SpinStatesSingleton_Eric.getInstance().forceSetByColorMatchColors(getSlotColors(), jugglerIndex);
     }
 }
