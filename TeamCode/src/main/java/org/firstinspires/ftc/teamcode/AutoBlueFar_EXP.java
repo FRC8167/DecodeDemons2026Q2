@@ -16,14 +16,11 @@ import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.ScanArtifactsCommand_EXP;
-import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_EXP;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
-import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand_EXP;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
 
 import java.util.Arrays;
@@ -32,7 +29,7 @@ import java.util.Arrays;
 //@Disabled
 @Autonomous(name = "AutoBlueFar_EXP", preselectTeleOp = "MainTeleOp", group = "Competition")
 public class AutoBlueFar_EXP extends CommandOpMode {
-    Robot_EXP robot = Robot_EXP.getInstance();
+    Robot robot = Robot.getInstance();
     private ElapsedTime timer;
     private final Pose startPose = new Pose(61, 9, Math.toRadians(90));
     private final Pose rotatedPose = new Pose(58, 10, Math.toRadians(113.5));
@@ -88,7 +85,7 @@ public class AutoBlueFar_EXP extends CommandOpMode {
 
     public void initialize() {
         Robot.OP_MODE_TYPE = Robot.OpModeType.AUTO;
-        robot.setAlliance(Robot_EXP.Alliance.BLUE);
+        robot.setAlliance(Robot.Alliance.BLUE);
         timer = new ElapsedTime();
         timer.reset();
 
@@ -130,7 +127,7 @@ public class AutoBlueFar_EXP extends CommandOpMode {
                                 new ParallelDeadlineGroup(
                                     new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
                                     new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-                                    new SlowSpinPlusInterruptCommand_EXP(robot.juggler, JugglerAbsolute_EXP.Direction.CW)
+                                    new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute_EXP.Direction.CW)
                                 ),
 
 //                                new ParallelCommandGroup(

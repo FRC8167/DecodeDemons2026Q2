@@ -119,7 +119,8 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
     }
 
     @Contract(pure = true)
-    public static boolean isNotExcluded(int index, @NonNull int... excludedIndexes) {
+    public static boolean isNotExcluded(int index, int... excludedIndexes) {
+        if (excludedIndexes == null) return true;
         for (int ex : excludedIndexes) {
             if (ex == index) return false;
         }
@@ -204,17 +205,19 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
         return convertJugglerIndexesAndSlots(findClosestSlotOfState(convertJugglerIndexesAndSlots(jugglerIndex), desiredState));
     }
 
-    public synchronized void forceSetByColorMatchColors(@NonNull ColorMatch.SlotColors colors, int jugglerIndex) {
+    public synchronized void forceSetByColorMatchColors(ColorMatch.SlotColors colors, int jugglerIndex) {
         // This maps Physical Sensor 0, 1, and 2 to the correct logical slots
         if (jugglerIndex < 0 || jugglerIndex > 2) return;
+        if (colors == null) return;
         this.setSlot(rotateColorIndexesToSlots(0, jugglerIndex), State.migrate(colors.slot0));
         this.setSlot(rotateColorIndexesToSlots(1, jugglerIndex), State.migrate(colors.slot1));
         this.setSlot(rotateColorIndexesToSlots(2, jugglerIndex), State.migrate(colors.slot2));
     }
 
-    public synchronized void updateByColorMatchColors(@NonNull ColorMatch.SlotColors colors, int jugglerIndex) {
+    public synchronized void updateByColorMatchColors(ColorMatch.SlotColors colors, int jugglerIndex) {
         // This maps Physical Sensor 0, 1, and 2 to the correct logical slots
         if (jugglerIndex < 0 || jugglerIndex > 2) return;
+        if (colors == null) return;
         int sensor0SlotNum = rotateColorIndexesToSlots(0, jugglerIndex);
         int sensor1SlotNum = rotateColorIndexesToSlots(1, jugglerIndex);
         int sensor2SlotNum = rotateColorIndexesToSlots(2, jugglerIndex);
@@ -242,7 +245,7 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
         int purples = getCountOfStateInStates(State.PURPLE);
         int greens = getCountOfStateInStates(State.GREEN);
         int unknowns = getCountOfStateInStates(State.UNKNOWN);
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < Math.min(3, states == null ? 3 : states.length); i++) { //Logic to account for partial sequences, not tested nor likely necessary
             if (states != null) {
                 if (states[i] == State.PURPLE && purples > 0) {
                     purples--;

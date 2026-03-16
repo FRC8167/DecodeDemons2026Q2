@@ -7,7 +7,6 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
-import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
@@ -23,8 +22,7 @@ import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
-import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
 
 @Configurable
 //@Disabled
@@ -110,11 +108,11 @@ public class MainTeleOp extends CommandOpMode {
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).
 //                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 1));
-        whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute.Direction.CW));
+        whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute_EXP.Direction.CW));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).
 //                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CCW, 1));
-                whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute.Direction.CCW));
+                whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute_EXP.Direction.CCW));
 
         operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(
@@ -141,7 +139,7 @@ public class MainTeleOp extends CommandOpMode {
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.X)
-                .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(JugglerAbsolute.Direction.CW), robot.juggler))
+                .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(JugglerAbsolute_EXP.Direction.CW), robot.juggler))
                 .whenReleased(new InstantCommand(() -> robot.juggler.snapToNearestSlot(), robot.juggler));
 
 //        operator.getGamepadButton(GamepadKeys.Button.BACK)

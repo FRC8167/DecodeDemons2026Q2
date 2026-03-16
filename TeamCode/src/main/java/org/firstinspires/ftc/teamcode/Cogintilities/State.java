@@ -41,7 +41,12 @@ public enum State {
     }
 
     public ColorMatch.ArtifactColor revert() {
-        switch (this) {
+        return revert(this);
+    }
+
+    @Contract(pure = true)
+    public static ColorMatch.ArtifactColor revert(@NonNull State state) {
+        switch (state) {
             case GREEN:
                 return ColorMatch.ArtifactColor.GREEN;
             case PURPLE:

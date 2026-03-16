@@ -49,11 +49,10 @@ public class ShootCaseCommand_EXP extends SequentialCommandGroup {
         super.initialize();
         // Attempt to read the motif
         ColorMatch.ArtifactColor[] motif = vision.getLatchedMotif();
-        ColorMatch.ArtifactColor[] adjustedMotif = State.sequenceRevert(SpinStatesSingleton_Eric.getNextToShoot(scoredArtifacts, State.sequenceMigrate(motif)));
 
         colorMatch.updateSpinStates(juggler.getSlotIndex());
 
-        sequence = buildAutoSequence(adjustedMotif);
+        sequence = buildAutoSequence(motif);
 
         sequence.initialize();
 
@@ -81,7 +80,9 @@ public class ShootCaseCommand_EXP extends SequentialCommandGroup {
             };
         }
 
-        State[] sequence = State.sequenceMigrate(motif);
+        ColorMatch.ArtifactColor[] adjustedMotif = State.sequenceRevert(SpinStatesSingleton_Eric.getNextToShoot(scoredArtifacts, State.sequenceMigrate(motif)));
+
+        State[] sequence = State.sequenceMigrate(adjustedMotif);
         State[] bestToShoot = SpinStatesSingleton_Eric.getInstance().toBestStatesAvailable(sequence);
 
         SequentialCommandGroup seq = new SequentialCommandGroup();
@@ -95,6 +96,9 @@ public class ShootCaseCommand_EXP extends SequentialCommandGroup {
 
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
+
+            seq.addCommands(new DeleteArtifactCommand_EXP(juggler));
+
         }
 
         seq.addCommands(new InstantCommand(shooter::stop));

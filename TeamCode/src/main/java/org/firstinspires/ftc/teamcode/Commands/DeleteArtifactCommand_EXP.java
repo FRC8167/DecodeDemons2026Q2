@@ -5,22 +5,20 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
+import org.firstinspires.ftc.teamcode.SubSystems.SpinStatesSingleton_Eric;
 
 
-public class ScanArtifactsCommand_EXP extends CommandBase {
+public class DeleteArtifactCommand_EXP extends CommandBase {
 
-    private final ColorMatch colorMatch;
     private final JugglerAbsolute_EXP juggler;
-    Robot robot = Robot.getInstance();
 
-    public ScanArtifactsCommand_EXP(ColorMatch colorMatch, JugglerAbsolute_EXP juggler) {
-        this.colorMatch = colorMatch;
+    public DeleteArtifactCommand_EXP(JugglerAbsolute_EXP juggler) {
         this.juggler = juggler;
     }
 
     @Override
     public void execute() {
-        colorMatch.updateSpinStates(juggler.getSlotIndex());
+        SpinStatesSingleton_Eric.getInstance().deleteByJugglerIndex(juggler.getSlotIndex());
     }
 
     @Override

@@ -21,8 +21,7 @@ import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
 
 import java.util.Arrays;
 
@@ -137,7 +136,7 @@ public class AutoRedClose extends CommandOpMode {
                                 new ParallelDeadlineGroup(
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
                                         new FollowPathCommand(robot.follower, collectPPGArtifactsPath, true, 0.9),
-                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute_EXP.Direction.CW)
                                 ),
                                 //Move to shoot position and stop intake
                                 new ParallelCommandGroup(

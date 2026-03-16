@@ -2,9 +2,7 @@ package org.firstinspires.ftc.teamcode.Commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
-import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 import java.util.List;
 import java.util.ArrayList;
@@ -12,17 +10,14 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
-import org.firstinspires.ftc.teamcode.SubSystems.Juggler;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
-import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Slide;
-import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 
 public class ShootCaseCommand extends SequentialCommandGroup {
 
-    private final JugglerAbsolute juggler;
+    private final JugglerAbsolute_EXP juggler;
 //    private final Popper popper;
     private final Shooter shooter;
     private final Slide slide;
@@ -32,7 +27,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
     private SequentialCommandGroup sequence;
 
     public ShootCaseCommand(
-            JugglerAbsolute juggler,
+            JugglerAbsolute_EXP juggler,
 //            Popper popper,
             Slide slide,
             Shooter shooter,
@@ -124,14 +119,14 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
 //            seq.addCommands(new WaitUntilCommand(slide::atTarget));
-            seq.addCommands(new RotateXSlotsCommand(juggler, JugglerAbsolute.Direction.CW, 1));
+            seq.addCommands(new RotateXSlotsCommand(juggler, JugglerAbsolute_EXP.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
 //            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
 //            seq.addCommands(new WaitUntilCommand(slide::atTarget));
-            seq.addCommands(new RotateXSlotsCommand(juggler, JugglerAbsolute.Direction.CW, 1));
+            seq.addCommands(new RotateXSlotsCommand(juggler, JugglerAbsolute_EXP.Direction.CW, 1));
 //            seq.addCommands(new RotateOneSlotCommand(juggler, Juggler.Direction.CW));
 //            seq.addCommands(new PopandResetCommand(popper));
 //            seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
@@ -205,7 +200,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
 //                //already sping so shoot; distance should not be changing that much
 //                action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1);
                 seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-                seq.addCommands(new RotateOneSlotCommand(juggler, JugglerAbsolute.Direction.CW));
+                seq.addCommands(new RotateOneSlotCommand(juggler, JugglerAbsolute_EXP.Direction.CW));
 
                 //seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CW, 1));
 
@@ -225,7 +220,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
                 // At Slot 2. Rotate CW 1 to bring S2 -> S0.
                 //already sping so shoot; distance should not be changing that much
                 seq.addCommands(new ShooterSmartSpinUpCommand(shooter, vision));
-                seq.addCommands(new RotateOneSlotCommand(juggler, JugglerAbsolute.Direction.CCW));
+                seq.addCommands(new RotateOneSlotCommand(juggler, JugglerAbsolute_EXP.Direction.CCW));
                 //seq.addCommands(new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1));
                 //action =  new RotateXSlotsCommand(juggler, Juggler.Direction.CCW, 1);
 

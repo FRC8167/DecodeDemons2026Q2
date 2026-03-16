@@ -12,7 +12,7 @@ public class RotateToStateCommand_EXP extends CommandBase {
     private long settleStart = -1;
     private static final long SETTLE_TIME = 250; //ms
 
-    public RotateToStateCommand_EXP(JugglerAbsolute_EXP juggler, State state) {
+    public   RotateToStateCommand_EXP(JugglerAbsolute_EXP juggler, State state) {
         this.juggler = juggler;
         this.state = state;
         addRequirements(juggler);
