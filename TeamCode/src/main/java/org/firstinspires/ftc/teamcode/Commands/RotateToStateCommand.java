@@ -3,16 +3,16 @@ package org.firstinspires.ftc.teamcode.Commands;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.State;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 
-public class RotateToStateCommand_EXP extends CommandBase {
+public class RotateToStateCommand extends CommandBase {
 
-    private final JugglerAbsolute_EXP juggler;
+    private final JugglerAbsolute juggler;
     private final State state;
     private long settleStart = -1;
     private static final long SETTLE_TIME = 250; //ms
 
-    public   RotateToStateCommand_EXP(JugglerAbsolute_EXP juggler, State state) {
+    public RotateToStateCommand(JugglerAbsolute juggler, State state) {
         this.juggler = juggler;
         this.state = state;
         addRequirements(juggler);

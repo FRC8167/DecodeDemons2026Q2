@@ -177,10 +177,10 @@ public class ColorMatch extends SubsystemBase {
     }
 
     public void updateSpinStates(int jugglerIndex) {
-        SpinStatesSingleton_Eric.getInstance().updateByColorMatchColors(getSlotColors(), jugglerIndex);
+        SpinStatesSingleton.getInstance().updateByColorMatchColors(getSlotColors(), jugglerIndex);
     }
 
     public void forceUpdateSpinStates(int jugglerIndex) {
-        SpinStatesSingleton_Eric.getInstance().forceSetByColorMatchColors(getSlotColors(), jugglerIndex);
+        SpinStatesSingleton.getInstance().forceSetByColorMatchColors(getSlotColors(), jugglerIndex);
     }
 }

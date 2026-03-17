@@ -13,7 +13,7 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_Old;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 
@@ -103,7 +103,7 @@ public class AutoBlueSimpleParkClose extends CommandOpMode {
         super.reset();
 
         try {
-            robot.init(hardwareMap);
+            robot.init(hardwareMap, true);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -125,7 +125,7 @@ public class AutoBlueSimpleParkClose extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, latchToShootClosePath),
 
                                 //shoot pre-loaded artifacts
-                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
 //                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 //move to spike 1
 

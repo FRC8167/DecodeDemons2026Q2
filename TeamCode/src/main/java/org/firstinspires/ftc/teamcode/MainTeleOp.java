@@ -10,19 +10,24 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.Cogintilities.State;
 import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
+import org.firstinspires.ftc.teamcode.Commands.DeleteArtifactCommand_EXP;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.KickCommand;
 import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.RotateToStateCommand;
+import org.firstinspires.ftc.teamcode.Commands.ScanArtifactsCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_Old;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
+import org.firstinspires.ftc.teamcode.SubSystems.SpinStatesSingleton;
 
 @Configurable
 //@Disabled
@@ -59,7 +64,7 @@ public class MainTeleOp extends CommandOpMode {
 
         //Initialize the robot
         try {
-            robot.init(hardwareMap);
+            robot.init(hardwareMap, false);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -108,11 +113,11 @@ public class MainTeleOp extends CommandOpMode {
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).
 //                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 1));
-        whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute_EXP.Direction.CW));
+        whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute.Direction.CW));
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).
 //                whenPressed(new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CCW, 1));
-                whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute_EXP.Direction.CCW));
+                whenPressed(new RotateOneSlotCommand(robot.juggler, JugglerAbsolute.Direction.CCW));
 
         operator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(
@@ -135,11 +140,11 @@ public class MainTeleOp extends CommandOpMode {
 //                );
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
+                .whenPressed(new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.X)
-                .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(JugglerAbsolute_EXP.Direction.CW), robot.juggler))
+                .whileHeld(new RunCommand(() -> robot.juggler.startSlowSpin(JugglerAbsolute.Direction.CW), robot.juggler))
                 .whenReleased(new InstantCommand(() -> robot.juggler.snapToNearestSlot(), robot.juggler));
 
 //        operator.getGamepadButton(GamepadKeys.Button.BACK)
@@ -166,10 +171,19 @@ public class MainTeleOp extends CommandOpMode {
         //once driver releases and moves joystick, the hold ends
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new KickCommand(robot.slide));
+//                .whenPressed(new KickCommand(robot.slide));
+        .whenPressed(new ScanArtifactsCommand(robot.colorMatch, robot.juggler));
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new NestCommand(robot.slide));
+//                .whenPressed(new NestCommand(robot.slide));
+        .whenPressed(new DeleteArtifactCommand_EXP(robot.juggler));
+
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+//                .whenPressed(new NestCommand(robot.slide));
+                .whenPressed(new RotateToStateCommand(robot.juggler, State.PURPLE));
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+//                .whenPressed(new NestCommand(robot.slide));
+                .whenPressed(new RotateToStateCommand(robot.juggler, State.GREEN));
 
 //        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
 //                .whenPressed(new InstantCommand(()->robot.juggler.jogThree(Juggler.Direction.CCW)));
@@ -197,7 +211,7 @@ public class MainTeleOp extends CommandOpMode {
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> automatedDrive = true),
                                 new DriveToPoseCommand(robot.getShootPose(), driver),
-                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
                                 new InstantCommand(()->robot.shooter.stop()),
                                 new CancelPedroCommand(),
                                 new InstantCommand(() -> automatedDrive = false)
@@ -323,6 +337,11 @@ public class MainTeleOp extends CommandOpMode {
 
 //        telemetryM.addData("Shooter Ready?", robot.shooter.atTargetVelocity());
 //        telemetryM.addData("Current Velocity", current_velocity);
+
+        telemetry.addData("Slot 0-Spin", SpinStatesSingleton.getInstance().getSlot(0));
+        telemetry.addData("Slot 1-Spin", SpinStatesSingleton.getInstance().getSlot(1));
+        telemetry.addData("Slot 2-Spin", SpinStatesSingleton.getInstance().getSlot(2));
+        telemetry.addData("JugglerIndex", robot.juggler.getSlotIndex());
 
         endTime   = System.currentTimeMillis();
         loopTime  = endTime - startTime;

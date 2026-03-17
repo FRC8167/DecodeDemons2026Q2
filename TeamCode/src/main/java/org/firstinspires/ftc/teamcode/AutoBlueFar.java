@@ -15,12 +15,12 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_Old;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 
 import java.util.Arrays;
 
@@ -92,7 +92,7 @@ public class AutoBlueFar extends CommandOpMode {
         super.reset();
 
         try {
-            robot.init(hardwareMap);
+            robot.init(hardwareMap, true);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -115,7 +115,7 @@ public class AutoBlueFar extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, rotateToShootPath, true),
 
                                 // Shoot pre-loaded artifacts
-                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
 //                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 // Move to spike 1//
 //                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
@@ -125,7 +125,7 @@ public class AutoBlueFar extends CommandOpMode {
                                 new ParallelDeadlineGroup(
                                     new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
                                     new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-                                    new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute_EXP.Direction.CW)
+                                    new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
 
 //                                new ParallelCommandGroup(
@@ -150,7 +150,7 @@ public class AutoBlueFar extends CommandOpMode {
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
                                     new InstantCommand(()->robot.intake.stop()),
-                                    new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
+                                    new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
 //                                    new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
                                 ),
 

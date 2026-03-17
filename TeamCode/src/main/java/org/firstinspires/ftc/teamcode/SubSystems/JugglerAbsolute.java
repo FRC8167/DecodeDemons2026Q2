@@ -4,20 +4,27 @@ import androidx.annotation.NonNull;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.ProxyScheduleCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.BetterMotor;
 import org.firstinspires.ftc.teamcode.Cogintilities.EricsCrap.DefaultMotorInfo;
 import org.firstinspires.ftc.teamcode.Cogintilities.State;
+import org.jetbrains.annotations.Contract;
 
 @Configurable
-public class JugglerAbsolute_EXP extends SubsystemBase {
+public class JugglerAbsolute extends SubsystemBase {
 
     private BetterMotor motor;
     private static double SLOW_SPIN_RPM = 20;
 
     private static int PID_TOLERANCE = 8;   // 8/1425.1*360 = 2 degrees
     private static double kp, ki, kd, kf, kp_pos, maxRPM;
+
+    private volatile Command singleCommand = null;
 
     /** Pulses per full revolution (encoder resolution). */
 //     private static final double PULSES_PER_REV = 288;
@@ -44,24 +51,28 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
     /* --------------------------------------------------------------
      * 1️⃣  Constructor
      * -------------------------------------------------------------- */
-    public JugglerAbsolute_EXP(BetterMotor jugglerMotor) {
+    public JugglerAbsolute(BetterMotor jugglerMotor) {
         motor = jugglerMotor;
         motor.adjustMotorInformation(DefaultMotorInfo.GOBILDA_117RPM);
 
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         kp = 10.0;
         ki = 0.25;
         kd = 0.0;
         kf = 14.0;
-        kp_pos = 9.0;
+        kp_pos = 14.0;
 
         maxRPM = 35;
 
         motor.setVelocityPIDFCoefficients(kp, ki, kd, kf);
         motor.setPositionPIDFCoefficients(kp_pos);
         motor.setTargetPositionTolerance(PID_TOLERANCE);
+    }
+
+    public void reset() {
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     /* --------------------------------------------------------------
@@ -101,7 +112,7 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
     }
 
     public void rotateToState(State state) {
-        int targetIndex = SpinStatesSingleton_Eric.getInstance().findClosestJugglerIndexOfState(getSlotIndex(), state);
+        int targetIndex = SpinStatesSingleton.getInstance().findClosestJugglerIndexOfState(getSlotIndex(), state);
         if (targetIndex != -1)
             rotateToSlot(targetIndex);
     }
@@ -176,7 +187,7 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
     }
 
     public State getSlotState() {
-        return SpinStatesSingleton_Eric.getInstance().getSlot(getSlotIndex());
+        return SpinStatesSingleton.getInstance().getSlot(getSlotIndex());
     }
 
 
@@ -312,6 +323,18 @@ public class JugglerAbsolute_EXP extends SubsystemBase {
         if (rawDelta < -motor.getTicksPerRev() / 2.0) rawDelta += motor.getTicksPerRev();
         return rawDelta;
     }
+
+//    @NonNull
+//    @Contract("_ -> new")
+//    public synchronized SequentialCommandGroup singleCommand(@NonNull Command command) {
+//        return new SequentialCommandGroup(
+//                new InstantCommand(() -> {
+//                    if (singleCommand != null && !singleCommand.isFinished()) singleCommand.cancel();
+//                    singleCommand = command;
+//                }),
+//                new ProxyScheduleCommand(singleCommand)
+//        );
+//    }
 
 }
 

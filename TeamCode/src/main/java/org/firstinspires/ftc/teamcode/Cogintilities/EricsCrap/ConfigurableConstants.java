@@ -32,16 +32,16 @@ public class ConfigurableConstants {
     public static double CAMERA_PITCH = 0;
     public static double CAMERA_ROLL = 0;
 
-    public static double kP = 4;
-    public static double kI = 1;
+    public static double kP = 10;
+    public static double kI = 0.25;
     public static double kD = 0;
-    public static double kF = 9;
-    public static double kP_Pos = 10;
+    public static double kF = 14;
+    public static double kP_Pos = 14.0;
 
     public static double VEL_LOW_RPM = 0;
-    public static double VEL_HIGH_RPM = 308;
+    public static double VEL_HIGH_RPM = 360;
 
-    public static double MAX_RPM = 300;
+    public static double MAX_RPM = 36;
 
     public static double ALTERNATION_PERIOD = 8;
 

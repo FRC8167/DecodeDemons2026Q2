@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.LimitSwitch;
 import org.firstinspires.ftc.teamcode.SubSystems.MecanumDrive;
@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Popper;
 import org.firstinspires.ftc.teamcode.SubSystems.RGBLight;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Slide;
-import org.firstinspires.ftc.teamcode.SubSystems.SpinStatesSingleton_Eric;
+import org.firstinspires.ftc.teamcode.SubSystems.SpinStatesSingleton;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import com.pedropathing.follower.Follower;
@@ -76,7 +76,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public MecanumDrive mecanumDrive;
     public Intake intake;
     public Shooter shooter;
-    public JugglerAbsolute_EXP juggler;
+    public JugglerAbsolute juggler;
     public SensorColor colorSensor;
 //    public Vision vision;
     public LimeLightVision vision;
@@ -88,7 +88,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public LimitSwitch limitSwitch;
 
 
-    public void init(HardwareMap hardwareMap) throws InterruptedException {
+    public void init(HardwareMap hardwareMap, boolean reset) throws InterruptedException {
         initCount ++;
 
         // Hardware
@@ -123,14 +123,14 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         jugglerDigitalSwitch.setMode(DigitalChannel.Mode.INPUT);
         limitSwitch = new LimitSwitch(jugglerDigitalSwitch);
 //        juggler = new Juggler(spindexerMotor, limitSwitch);
-        if (juggler == null || OpModeType.AUTO.equals(determineOpModeType())) {
-            BetterMotor spindexerMotor = new BetterMotor(hardwareMap, "Juggler");
-            juggler = new JugglerAbsolute_EXP(spindexerMotor);
-//            juggler = new Juggler(spindexerMotor, limitSwitch);
-        }
 
-        if (OpModeType.AUTO.equals(determineOpModeType())) {
-            SpinStatesSingleton_Eric.resetInstance();
+        BetterMotor spindexerMotor = new BetterMotor(hardwareMap, "Juggler");
+        juggler = new JugglerAbsolute(spindexerMotor);
+//            juggler = new Juggler(spindexerMotor, limitSwitch);
+
+        if (reset) {
+            SpinStatesSingleton.resetInstance();
+            juggler.reset(); //TODO: Implement for slide
         }
 
 

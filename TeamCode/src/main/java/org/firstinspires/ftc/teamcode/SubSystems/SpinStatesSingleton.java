@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
 
-import androidx.annotation.NonNull;
-
 import org.firstinspires.ftc.teamcode.Cogintilities.State;
 import org.firstinspires.ftc.teamcode.Cogintilities.TeamConstants;
 import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,7 +13,7 @@ import java.util.List;
  *
  * <p>This class tracks the contents of three slots (slot0, slot1, slot2) using {@link State} enums.
  */
-public class SpinStatesSingleton_Eric implements TeamConstants {
+public class SpinStatesSingleton implements TeamConstants {
     private volatile State slot0;
     private volatile State slot1;
     private volatile State slot2;
@@ -27,17 +24,17 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
     //Note3: ColorMatch slots refer to fixed slots that only line up at a normalized rotation of zero
     //Must be accounted for when storing data
 
-    private static volatile SpinStatesSingleton_Eric single_instance = null;
+    private static volatile SpinStatesSingleton single_instance = null;
 
-    private SpinStatesSingleton_Eric() {
+    private SpinStatesSingleton() {
         slot0 = State.NONE;
         slot1 = State.NONE;
         slot2 = State.NONE;
     }
 
-    public static synchronized SpinStatesSingleton_Eric getInstance() {
+    public static synchronized SpinStatesSingleton getInstance() {
         if (single_instance == null)
-            single_instance = new SpinStatesSingleton_Eric();
+            single_instance = new SpinStatesSingleton();
         return single_instance;
     }
 
@@ -181,14 +178,11 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
         }
     }
 
-    public static int rotateColorIndexesToSlots(int index, int jugglerIndex) {
-        if (index < 0 || jugglerIndex < 0) return -1;
+    public static int rotateColorIndexesToSpinSlots(int sensorIndex, int jugglerIndex) {
+        if (sensorIndex < 0 || jugglerIndex < 0) return -1;
 
         // Calculate the physical-to-logical offset
-        int offsetIndex = (index + jugglerIndex) % 3;
-
-        // Return the mapped slot ID
-        return convertJugglerIndexesAndSlots(offsetIndex);
+        return Math.floorMod(sensorIndex - jugglerIndex, 3);
     }
 
     public synchronized int findClosestSlotOfState(int currentSlot, State desiredState) {
@@ -209,20 +203,20 @@ public class SpinStatesSingleton_Eric implements TeamConstants {
         // This maps Physical Sensor 0, 1, and 2 to the correct logical slots
         if (jugglerIndex < 0 || jugglerIndex > 2) return;
         if (colors == null) return;
-        this.setSlot(rotateColorIndexesToSlots(0, jugglerIndex), State.migrate(colors.slot0));
-        this.setSlot(rotateColorIndexesToSlots(1, jugglerIndex), State.migrate(colors.slot1));
-        this.setSlot(rotateColorIndexesToSlots(2, jugglerIndex), State.migrate(colors.slot2));
+        this.setSlot(rotateColorIndexesToSpinSlots(0, jugglerIndex), State.migrate(colors.slot0));
+        this.setSlot(rotateColorIndexesToSpinSlots(1, jugglerIndex), State.migrate(colors.slot1));
+        this.setSlot(rotateColorIndexesToSpinSlots(2, jugglerIndex), State.migrate(colors.slot2));
     }
 
     public synchronized void updateByColorMatchColors(ColorMatch.SlotColors colors, int jugglerIndex) {
         // This maps Physical Sensor 0, 1, and 2 to the correct logical slots
         if (jugglerIndex < 0 || jugglerIndex > 2) return;
         if (colors == null) return;
-        int sensor0SlotNum = rotateColorIndexesToSlots(0, jugglerIndex);
-        int sensor1SlotNum = rotateColorIndexesToSlots(1, jugglerIndex);
-        int sensor2SlotNum = rotateColorIndexesToSlots(2, jugglerIndex);
+        int sensor0SlotNum = rotateColorIndexesToSpinSlots(0, jugglerIndex);
+        int sensor1SlotNum = rotateColorIndexesToSpinSlots(1, jugglerIndex);
+        int sensor2SlotNum = rotateColorIndexesToSpinSlots(2, jugglerIndex);
 
-        if (getSlot(sensor0SlotNum) == State.UNKNOWN || getSlot(sensor0SlotNum) == State.NONE)
+        if (getSlot(sensor0SlotNum) == State.UNKNOWN || getSlot(sensor0SlotNum) == State.NONE) //TODO: Adjust to replace known color with new detection
             setSlot(sensor0SlotNum, State.migrate(colors.slot0));
         if (getSlot(sensor1SlotNum) == State.UNKNOWN || getSlot(sensor1SlotNum) == State.NONE)
             setSlot(sensor1SlotNum, State.migrate(colors.slot1));

@@ -2,14 +2,14 @@ package org.firstinspires.ftc.teamcode.Commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute_EXP;
+import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 
 public class RotateOneSlotCommand extends CommandBase {
 
-    private final JugglerAbsolute_EXP juggler;
-    private final JugglerAbsolute_EXP.Direction direction;
+    private final JugglerAbsolute juggler;
+    private final JugglerAbsolute.Direction direction;
 
-    public RotateOneSlotCommand(JugglerAbsolute_EXP juggler, JugglerAbsolute_EXP.Direction direction) {
+    public RotateOneSlotCommand(JugglerAbsolute juggler, JugglerAbsolute.Direction direction) {
         this.juggler = juggler;
         this.direction = direction;
         addRequirements(juggler);

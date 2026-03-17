@@ -29,9 +29,10 @@ public class KickCommand extends CommandBase {
 
         long elapsed = System.currentTimeMillis() - startTime;
         boolean atTarget = slide.atTarget();
+        boolean farEnough = slide.getPositionTicks() >= 440;
         boolean timeout = elapsed > MAX_DURATION_MS;
 
-        return (atTarget) || timeout;
+        return (atTarget) || timeout || farEnough;
 
 //        boolean atTarget =  slide.atTarget();
 //        boolean timeout = (System.currentTimeMillis() - startTime) > MAX_DURATION_MS;
