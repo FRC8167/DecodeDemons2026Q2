@@ -263,12 +263,12 @@ public class SpinStatesSingleton implements TeamConstants {
                 if (unknowns > 0) {
                     unknowns--;
                     stateList.add(State.UNKNOWN);
-                } else if (greens > 0) {
-                    greens--;
-                    stateList.add(State.GREEN);
                 } else if (purples > 0) {
                     purples--;
                     stateList.add(State.PURPLE);
+                } else if (greens > 0) {
+                    greens--;
+                    stateList.add(State.GREEN);
                 }
             }
         }
