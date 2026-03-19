@@ -36,7 +36,7 @@ public class AutoBlueFar_EXP extends CommandOpMode {
     private final Pose rotatedPose = new Pose(58, 10, Math.toRadians(113.5));
     private final Pose artifactsGPPPose = new Pose(42, 35, Math.toRadians(180));
     private final Pose collectGPPPose = new Pose(16, 35, Math.toRadians(180));
-    private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(109));
+    private final Pose shootFarPose = new Pose(56, 12, Math.toRadians(113.5));
     private final Pose artifactPGPPose = new Pose(56, 57, Math.toRadians(180));
     private final Pose collectPGPPose = new Pose(16, 57, Math.toRadians(180));
 
@@ -103,7 +103,6 @@ public class AutoBlueFar_EXP extends CommandOpMode {
         telemetry.update();
 
         buildPaths();
-//        robot.juggler.confirmHome();  //DMW 02-17  TODO:  Check if tis makes a difference
         schedule(
                 new ParallelCommandGroup(
                         // Artifact detection & vision run in background parallel with all else
@@ -119,66 +118,54 @@ public class AutoBlueFar_EXP extends CommandOpMode {
 
                                 // Shoot pre-loaded artifacts
                                 new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 0),
-//                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 // Move to spike 1//
-//                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath, true, 1.0),
 
 
                                 new ParallelDeadlineGroup(
-                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 1000, 0.75),
                                     new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
                                     new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
 
-//                                new ParallelCommandGroup(
-//                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
-//                                        new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-//                                        new RotateXSlotsCommand(robot.juggler, Juggler.Direction.CW, 2)
-//
-//                                ),
-
                                 // Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 1000, 0.75),
                                         new InstantCommand(()->robot.juggler.snapToNearestSlot())
-//                                        new InstantCommand(()-> robot.shooter.setVelocity(2500))  //DMW 02-16
-
                                 ),
-//                                new InstantCommand(()->robot.juggler.goHome()),
 
-//                                new InstantCommand(()->robot.juggler.goHome()),  TODO:  Try this in auto.
                                 new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
                                     new InstantCommand(()->robot.intake.stop()),
                                     new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 3)
-//                                    new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision)
                                 ),
 
                                 // Move to spike 2
-//                                new ShooterSpinUpCommand(robot.shooter,2500),
-//                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
+                                new FollowPathCommand(robot.follower, shootToPGPSpikePath, true, 1.0),
+//
+                                new ParallelDeadlineGroup(
+                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 1000, 0.75),
+                                    new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),
+                                    new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                ),
 
-//                                new FollowPathCommand(robot.follower, shootToPGPSpikePath),
-//
-//                                // Collect balls on spike 2
-//                                new ParallelDeadlineGroup(
-//                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
-//                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.75),
-//                                        new SlowSpinPlusInterruptCommand(robot.juggler, Juggler.Direction.CW)
-//                                ),
-//
-//                                // Move to shoot position and stop intake
-//                                new ParallelCommandGroup(
-//                                        new FollowPathCommand(robot.follower, endPGPToShootPath, true, 1.0),
-//                                        new InstantCommand(()->robot.intake.stop())
-//                                ),
-//
-//                                // Shoot artifacts from spike 2
-//                                new ShootCaseCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
+                                // Move to shoot position and stop intake
+                                new ParallelCommandGroup(
+                                        new FollowPathCommand(robot.follower, endPGPToShootPath, true, 1.0),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 1000, 0.75),
+                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
+                                ),
+
+                               new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+
+                                //Shoot artifacts from spike 2
+                                new ParallelCommandGroup(
+                                    new InstantCommand(()->robot.intake.stop()),
+                                    new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 3)
+                                ),
 //
 //                        // Park outside launch zone
                                 new FollowPathCommand(robot.follower, shootToGPPSpikePath),
