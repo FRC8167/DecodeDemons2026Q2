@@ -92,7 +92,8 @@ public class ColorMatch extends SubsystemBase {
             }
         }
         else {
-            return ArtifactColor.NONE;
+//            return ArtifactColor.NONE;
+            return ArtifactColor.UNKNOWN;
         }
 
 
