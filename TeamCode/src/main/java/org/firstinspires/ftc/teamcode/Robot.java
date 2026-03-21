@@ -130,7 +130,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
         if (reset) {
             SpinStatesSingleton.resetInstance();
-            juggler.reset(); //TODO: Implement for slide
+            juggler.reset();
+            slide.reset();
         }
 
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -45,7 +46,7 @@ public class Slide extends SubsystemBase {
         slideMotor.adjustMotorInformation(DefaultMotorInfo.GOBILDA_312RPM);
         slideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         slideMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        slideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         slideMotor.setPositionPIDFCoefficients(kpp);
         slideMotor.setVelocityPIDFCoefficients(kp, ki, kd, kf);
         slideMotor.setTargetPositionTolerance((int) PID_TOLERANCE);
@@ -103,6 +104,10 @@ public class Slide extends SubsystemBase {
         if      (ticks > UP_LIMIT)   setPt = UP_LIMIT;
         else if (ticks < DOWN_LIMIT) setPt = DOWN_LIMIT;
         return setPt;
+    }
+
+    public void reset() {
+        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
 
