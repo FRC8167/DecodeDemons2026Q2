@@ -15,7 +15,6 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.ScanArtifactsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
@@ -107,7 +106,8 @@ public class AutoBlueFar_EXP extends CommandOpMode {
                 new ParallelCommandGroup(
                         // Artifact detection & vision run in background parallel with all else
                         new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
-                        new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+//                        new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+                        robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
@@ -135,7 +135,8 @@ public class AutoBlueFar_EXP extends CommandOpMode {
                                         new InstantCommand(()->robot.juggler.snapToNearestSlot())
                                 ),
 
-                                new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+//                                new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+                                robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
@@ -159,7 +160,8 @@ public class AutoBlueFar_EXP extends CommandOpMode {
                                         new InstantCommand(()->robot.juggler.snapToNearestSlot())
                                 ),
 
-                               new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+//                               new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+                                robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 //Shoot artifacts from spike 2
                                 new ParallelCommandGroup(

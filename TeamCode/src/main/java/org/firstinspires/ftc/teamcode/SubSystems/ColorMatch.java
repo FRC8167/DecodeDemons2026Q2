@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.SubSystems;
 
 import androidx.annotation.NonNull;
 
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -92,8 +94,8 @@ public class ColorMatch extends SubsystemBase {
             }
         }
         else {
-//            return ArtifactColor.NONE;
-            return ArtifactColor.UNKNOWN;
+            return ArtifactColor.NONE;
+//            return ArtifactColor.UNKNOWN;
         }
 
 
@@ -183,5 +185,17 @@ public class ColorMatch extends SubsystemBase {
 
     public void forceUpdateSpinStates(int jugglerIndex) {
         SpinStatesSingleton.getInstance().forceSetByColorMatchColors(getSlotColors(), jugglerIndex);
+    }
+
+    public Command createScanArtifactCommand(JugglerAbsolute juggler) {
+        return new InstantCommand(() -> updateSpinStates(juggler.getSlotIndex()));
+    }
+
+    public Command createScanArtifactCommand_Auto(JugglerAbsolute juggler) {
+        return new InstantCommand(() -> {
+            updateSpinStates(juggler.getSlotIndex());
+            SpinStatesSingleton.getInstance().assumeFull();
+        });
+
     }
 }

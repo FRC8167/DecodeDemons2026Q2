@@ -215,13 +215,18 @@ public class SpinStatesSingleton implements TeamConstants {
         int sensor0SlotNum = rotateColorIndexesToSpinSlots(0, jugglerIndex);
         int sensor1SlotNum = rotateColorIndexesToSpinSlots(1, jugglerIndex);
         int sensor2SlotNum = rotateColorIndexesToSpinSlots(2, jugglerIndex);
+        State sensor0State = State.migrate(colors.slot0);
+        State sensor1State = State.migrate(colors.slot1);
+        State sensor2State = State.migrate(colors.slot2);
 
-        if (getSlot(sensor0SlotNum) == State.UNKNOWN || getSlot(sensor0SlotNum) == State.NONE) //TODO: Adjust to replace known color with new detection
-            setSlot(sensor0SlotNum, State.migrate(colors.slot0));
-        if (getSlot(sensor1SlotNum) == State.UNKNOWN || getSlot(sensor1SlotNum) == State.NONE)
-            setSlot(sensor1SlotNum, State.migrate(colors.slot1));
-        if (getSlot(sensor2SlotNum) == State.UNKNOWN || getSlot(sensor2SlotNum) == State.NONE)
-            setSlot(sensor2SlotNum, State.migrate(colors.slot2));
+
+
+        if (getSlot(sensor0SlotNum) == State.UNKNOWN || getSlot(sensor0SlotNum) == State.NONE || (sensor0State != State.UNKNOWN && sensor0State != State.NONE))
+            setSlot(sensor0SlotNum, sensor0State);
+        if (getSlot(sensor1SlotNum) == State.UNKNOWN || getSlot(sensor1SlotNum) == State.NONE || (sensor1State != State.UNKNOWN && sensor1State != State.NONE))
+            setSlot(sensor1SlotNum, sensor1State);
+        if (getSlot(sensor2SlotNum) == State.UNKNOWN || getSlot(sensor2SlotNum) == State.NONE || (sensor2State != State.UNKNOWN && sensor2State != State.NONE))
+            setSlot(sensor2SlotNum, sensor2State);
     }
 
     public synchronized void deleteByJugglerIndex(int jugglerIndex) {
@@ -274,4 +279,11 @@ public class SpinStatesSingleton implements TeamConstants {
         }
         return stateList.toArray(new State[0]);
     }
+
+    public synchronized void assumeFull() {
+        if (slot0 == State.NONE) slot0 = State.UNKNOWN;
+        if (slot1 == State.NONE) slot1 = State.UNKNOWN;
+        if (slot2 == State.NONE) slot2 = State.UNKNOWN;
+    }
+
 }

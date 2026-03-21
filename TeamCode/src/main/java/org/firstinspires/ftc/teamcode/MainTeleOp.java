@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.Commands.KickCommand;
 import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateToStateCommand;
-import org.firstinspires.ftc.teamcode.Commands.ScanArtifactsCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_Old;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
@@ -172,7 +171,10 @@ public class MainTeleOp extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
 //                .whenPressed(new KickCommand(robot.slide));
-        .whenPressed(new ScanArtifactsCommand(robot.colorMatch, robot.juggler));
+        .whenPressed(
+//                new ScanArtifactsCommand(robot.colorMatch, robot.juggler)
+                robot.colorMatch.createScanArtifactCommand(robot.juggler)
+        );
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
 //                .whenPressed(new NestCommand(robot.slide));
