@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -102,6 +103,37 @@ public class ColorMatch extends SubsystemBase {
 
     }
 
+    public ArtifactColor detectColor_AssumeFull(Slot slot) {
+        RevColorSensorV3 sensor = sensors.get(slot);
+        if (sensor == null) return null;
+
+        float[] hsv = getHSV(slot);
+
+        float hue = hsv[0];
+        float sat = hsv[1];
+        float val = hsv[2];
+        float distance = (float) sensor.getDistance(DistanceUnit.CM);
+        //if (val < 0.15 || sat < 0.35) {return ArtifactColor.UNKNOWN;}
+        // Distance threshold (in CM)
+        double DETECTION_DISTANCE_CM = getDetectionDistanceCm(slot);
+        if (distance < DETECTION_DISTANCE_CM) {
+            if (hue >= GREEN_HUE_MIN && hue <= GREEN_HUE_MAX) {
+                return ArtifactColor.GREEN;
+            } else if (hue >= PURPLE_HUE_MIN && hue <= PURPLE_HUE_MAX) {
+                return ArtifactColor.PURPLE;
+            } else {
+                return ArtifactColor.UNKNOWN;
+            }
+        }
+        else {
+//            return ArtifactColor.NONE;
+            return ArtifactColor.UNKNOWN;
+        }
+
+
+
+    }
+
     private static double getDetectionDistanceCm(Slot slot) {
         double DETECTION_DISTANCE_CM = 5.05;
 
@@ -164,6 +196,14 @@ public class ColorMatch extends SubsystemBase {
         );
     }
 
+    public SlotColors getSlotColors_AssumeFull() {
+        return new SlotColors(
+                detectColor_AssumeFull(Slot.SLOT_0),
+                detectColor_AssumeFull(Slot.SLOT_1),
+                detectColor_AssumeFull(Slot.SLOT_2)
+        );
+    }
+
 
     public int findSlotWithColor(ArtifactColor targetColor) {
         SlotColors slots = getSlotColors();
@@ -183,8 +223,16 @@ public class ColorMatch extends SubsystemBase {
         SpinStatesSingleton.getInstance().updateByColorMatchColors(getSlotColors(), jugglerIndex);
     }
 
+    public void updateSpinStates_Auto(int jugglerIndex) {
+        SpinStatesSingleton.getInstance().updateByColorMatchColors(getSlotColors_AssumeFull(), jugglerIndex);
+    }
+
     public void forceUpdateSpinStates(int jugglerIndex) {
         SpinStatesSingleton.getInstance().forceSetByColorMatchColors(getSlotColors(), jugglerIndex);
+    }
+
+    public void forceUpdateSpinStates_Auto(int jugglerIndex) {
+        SpinStatesSingleton.getInstance().forceSetByColorMatchColors(getSlotColors_AssumeFull(), jugglerIndex);
     }
 
     public Command createScanArtifactCommand(JugglerAbsolute juggler) {
@@ -192,10 +240,6 @@ public class ColorMatch extends SubsystemBase {
     }
 
     public Command createScanArtifactCommand_Auto(JugglerAbsolute juggler) {
-        return new InstantCommand(() -> {
-            updateSpinStates(juggler.getSlotIndex());
-            SpinStatesSingleton.getInstance().assumeFull();
-        });
-
+        return new InstantCommand(() -> updateSpinStates_Auto(juggler.getSlotIndex()));
     }
 }

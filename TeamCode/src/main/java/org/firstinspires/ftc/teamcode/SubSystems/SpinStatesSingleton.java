@@ -280,10 +280,10 @@ public class SpinStatesSingleton implements TeamConstants {
         return stateList.toArray(new State[0]);
     }
 
-    public synchronized void assumeFull() {
-        if (slot0 == State.NONE) slot0 = State.UNKNOWN;
-        if (slot1 == State.NONE) slot1 = State.UNKNOWN;
-        if (slot2 == State.NONE) slot2 = State.UNKNOWN;
-    }
+//    public void assumeFull() { //Should be synchronized?
+//        if (slot0.equals(State.NONE)) slot0 = State.UNKNOWN;
+//        if (slot1.equals(State.NONE)) slot1 = State.UNKNOWN;
+//        if (slot2.equals(State.NONE)) slot2 = State.UNKNOWN;
+//    }
 
 }

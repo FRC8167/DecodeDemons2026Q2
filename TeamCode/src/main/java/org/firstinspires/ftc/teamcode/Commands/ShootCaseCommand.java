@@ -50,7 +50,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
         // Attempt to read the motif
         ColorMatch.ArtifactColor[] motif = vision.getLatchedMotif();
 
-        colorMatch.updateSpinStates(juggler.getSlotIndex());
+//        colorMatch.updateSpinStates(juggler.getSlotIndex());
 
         sequence = buildAutoSequence(motif);
 

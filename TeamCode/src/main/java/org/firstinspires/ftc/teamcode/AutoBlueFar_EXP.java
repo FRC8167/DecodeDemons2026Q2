@@ -184,7 +184,7 @@ public class AutoBlueFar_EXP extends CommandOpMode {
             ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
             // Moved from telemetryM to telemetry
 
-            robot.colorMatch.forceUpdateSpinStates(robot.juggler.getSlotIndex());
+            robot.colorMatch.forceUpdateSpinStates_Auto(robot.juggler.getSlotIndex());
 
 
             if (robot.vision.getFirstSequence() != null) {
@@ -193,9 +193,9 @@ public class AutoBlueFar_EXP extends CommandOpMode {
                 robot.rgbLight.setColor(Color.RED);
             }
             // Detect the slots
-            ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
-            ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
-            ColorMatch.ArtifactColor s2 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+            ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_0);
+            ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_1);
+            ColorMatch.ArtifactColor s2 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_2);
 
             // Check if all slots are known
             boolean ready = s0 != ColorMatch.ArtifactColor.UNKNOWN &&

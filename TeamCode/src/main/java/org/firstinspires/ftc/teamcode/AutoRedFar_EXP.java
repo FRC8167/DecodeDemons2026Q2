@@ -33,12 +33,12 @@ public class AutoRedFar_EXP extends CommandOpMode {
     Robot robot = Robot.getInstance();
     private ElapsedTime timer;
     private final Pose startPose = MirrorUtility.mirror(new Pose(61, 9, Math.toRadians(90)));
-    private final Pose rotatedPose = MirrorUtility.mirror(new Pose(58, 10, Math.toRadians(115)));
+    private final Pose rotatedPose = MirrorUtility.mirror(new Pose(58, 10, Math.toRadians(117)));
     private final Pose artifactsGPPPose = MirrorUtility.mirror(new Pose(42, 35, Math.toRadians(180)));
     private final Pose collectGPPPose = MirrorUtility.mirror(new Pose(16, 35, Math.toRadians(180)));
-    private final Pose shootFarPose = MirrorUtility.mirror(new Pose(56, 12, Math.toRadians(115)));
-    private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(56, 57, Math.toRadians(180)));
-    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 57, Math.toRadians(180)));
+    private final Pose shootFarPose = MirrorUtility.mirror(new Pose(56, 12, Math.toRadians(117)));
+    private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(56, 59, Math.toRadians(180)));
+    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 59, Math.toRadians(180)));
 
     private PathChain rotateToShootPath, shootToGPPSpikePath, eatGPPPath, endGPPToShootPath, shootToPGPSpikePath,
             eatPGPPath, endPGPToShootPath;
@@ -122,12 +122,6 @@ public class AutoRedFar_EXP extends CommandOpMode {
 
 
                                 new ParallelDeadlineGroup(
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
-                                        new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
-                                ),
-
-                                new ParallelDeadlineGroup(
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
                                         new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
                                         new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
@@ -184,7 +178,7 @@ public class AutoRedFar_EXP extends CommandOpMode {
             robot.vision.latchMotif();
             ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
 
-            robot.colorMatch.forceUpdateSpinStates(robot.juggler.getSlotIndex());
+            robot.colorMatch.forceUpdateSpinStates_Auto(robot.juggler.getSlotIndex());
 
 
             if (robot.vision.getFirstSequence() != null) {
@@ -193,9 +187,9 @@ public class AutoRedFar_EXP extends CommandOpMode {
                 robot.rgbLight.setColor(Color.RED);
             }
             // Detect the slots
-            ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
-            ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
-            ColorMatch.ArtifactColor s2 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+            ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_0);
+            ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_1);
+            ColorMatch.ArtifactColor s2 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_2);
 
             // Check if all slots are known
             boolean ready = s0 != ColorMatch.ArtifactColor.UNKNOWN &&

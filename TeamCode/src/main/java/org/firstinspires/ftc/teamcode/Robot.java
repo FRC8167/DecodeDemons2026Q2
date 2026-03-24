@@ -127,6 +127,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         BetterMotor spindexerMotor = new BetterMotor(hardwareMap, "Juggler");
         juggler = new JugglerAbsolute(spindexerMotor);
 //            juggler = new Juggler(spindexerMotor, limitSwitch);
+        slide = new Slide(slideMotor);
 
         if (reset) {
             SpinStatesSingleton.resetInstance();
@@ -146,7 +147,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         intake  = new Intake(intakeMotor);
         popper  = new Popper(popperServoL, popperServoR);
 //        mecanumDrive = new MecanumDrive(driveMotorLF, driveMotorLR, driveMotorRF, driveMotorRR);
-        slide = new Slide(slideMotor);
+
         shooter = new Shooter(shooterMotor);
 
 
