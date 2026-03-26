@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.ParallelDeadlineGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
@@ -17,6 +18,8 @@ import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
@@ -122,17 +125,24 @@ public class AutoRedFar_EXP extends CommandOpMode {
 
 
                                 new ParallelDeadlineGroup(
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
                                         new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
                                         new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
 
                                 // Move to shoot position and stop intake
-                                new ParallelCommandGroup(
+                                new ParallelDeadlineGroup(
                                         new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
-                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1),
+                                        new InstantCommand(() -> robot.shooter.smartVelocity(125)),
+                                        new ParallelDeadlineGroup(
+                                                new WaitCommand(750),
+                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        )
                                 ),
+
+                                new InstantCommand(()->robot.juggler.snapToNearestSlot()),
+
                                 robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 // Shoot artifacts from spike 1
@@ -145,17 +155,22 @@ public class AutoRedFar_EXP extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, shootToPGPSpikePath),
 //
 //                                // Collect artifacts on spike 2
+
                                 new ParallelDeadlineGroup(
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
-                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.75),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
+                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),
                                         new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
-//
+
                                 // Move to shoot position and stop intake
-                                new ParallelCommandGroup(
+                                new ParallelDeadlineGroup(
                                         new FollowPathCommand(robot.follower, endPGPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
-                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1),
+                                        new InstantCommand(() -> robot.shooter.smartVelocity(125)),
+                                        new ParallelDeadlineGroup(
+                                                new WaitCommand(750),
+                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        )
                                 ),
 
                                 robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
