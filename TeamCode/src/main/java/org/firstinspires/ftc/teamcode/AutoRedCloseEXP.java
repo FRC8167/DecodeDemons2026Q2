@@ -130,7 +130,7 @@ public class AutoRedCloseEXP extends CommandOpMode {
                                 //move to launch zone
                                 new FollowPathCommand(robot.follower, latchToShootClosePath, true, 1.0),
 
-                                new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
+//                                new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
                                 robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 //shoot pre-loaded artifacts

@@ -35,11 +35,11 @@ public class AutoBlueCloseEXP extends CommandOpMode {
     private ElapsedTime timer;
     private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(135));
     private final Pose latchPose = new Pose(56, 105, Math.toRadians(80));
-    private final Pose artifactsPPGPose = new Pose(56, 84, Math.toRadians(180));
-    private final Pose collectPPGPose = new Pose(18, 84, Math.toRadians(180));
-    private final Pose shootClosePose = new Pose(56, 78, Math.toRadians(135));
-    private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
-    private final Pose collectPGPPose = new Pose(24, 60, Math.toRadians(180));
+    private final Pose artifactsPPGPose = new Pose(42, 83, Math.toRadians(180));
+    private final Pose collectPPGPose = new Pose(16, 83, Math.toRadians(180));
+    private final Pose shootClosePose = new Pose(54, 78, Math.toRadians(130));
+    private final Pose artifactPGPPose = new Pose(42, 58, Math.toRadians(180));
+    private final Pose collectPGPPose = new Pose(16, 58, Math.toRadians(180));
 
 
 
@@ -80,7 +80,7 @@ public class AutoBlueCloseEXP extends CommandOpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         shootCloseToSpike2Path = robot.follower.pathBuilder()
-                .addPath(new BezierLine(shootClosePose, collectPGPPose))
+                .addPath(new BezierLine(shootClosePose, artifactPGPPose))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
@@ -90,7 +90,7 @@ public class AutoBlueCloseEXP extends CommandOpMode {
                 .build();
         spike2ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPGPPose ,shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(-45))
+                .setConstantHeadingInterpolation(Math.toRadians(135))
                 .build();
     }
 
@@ -115,7 +115,7 @@ public class AutoBlueCloseEXP extends CommandOpMode {
         buildPaths();
         schedule(
                 new ParallelCommandGroup(
-                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null), // robot.shooter),
+                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
                         robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
                         new VisionCommand(robot.vision),
 
@@ -124,12 +124,13 @@ public class AutoBlueCloseEXP extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, startToLatchPath, true),
 
 //                                //latch
+                                new WaitCommand(100),
+
                                 new InstantCommand(()-> robot.vision.latchMotif()),
 
                                 //move to launch zone
                                 new FollowPathCommand(robot.follower, latchToShootClosePath, true, 1.0),
 
-                                new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
                                 robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
 
@@ -279,7 +280,7 @@ public class AutoBlueCloseEXP extends CommandOpMode {
 //        } else {
 //            telemetry.addLine("No target tags (20–24) detected.");
 //        }
-//        telemetry.update();
+        telemetry.update();
     }
 
     @Override

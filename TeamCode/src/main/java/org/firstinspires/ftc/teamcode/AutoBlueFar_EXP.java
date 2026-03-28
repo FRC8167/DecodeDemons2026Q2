@@ -123,16 +123,11 @@ public class AutoBlueFar_EXP extends CommandOpMode {
 
 
                                 new ParallelDeadlineGroup(
-                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
-                                    new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
-                                    new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
-                                ),
-
-                                new ParallelCommandGroup(
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
-                                        new FollowPathCommand(robot.follower, endGPPToShootPath, true, 0.9),
+                                        new FollowPathCommand(robot.follower, eatGPPPath, true, 0.9),
                                         new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
+
 
                                 // Move to shoot position and stop intake
                                 new ParallelDeadlineGroup(
@@ -150,8 +145,8 @@ public class AutoBlueFar_EXP extends CommandOpMode {
 
                                 // Shoot artifacts from spike 1
                                 new ParallelCommandGroup(
-                                    new InstantCommand(()->robot.intake.stop()),
-                                    new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 3)
+                                        new InstantCommand(()->robot.intake.stop()),
+                                        new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 0)
                                 ),
 
                                 // Move to spike 2
@@ -159,15 +154,15 @@ public class AutoBlueFar_EXP extends CommandOpMode {
 //
                                  //collect artifacts on spike 2
                                 new ParallelDeadlineGroup(
-                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1.0),
-                                    new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),
-                                    new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
+                                        new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
 
                                 // Move to shoot position and stop intake
-                                new ParallelCommandGroup(
+                                new ParallelDeadlineGroup(
                                         new FollowPathCommand(robot.follower, endPGPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1.0),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1),
                                         new InstantCommand(() -> robot.shooter.smartVelocity(125)),
                                         new ParallelDeadlineGroup(
                                                 new WaitCommand(750),
@@ -179,8 +174,8 @@ public class AutoBlueFar_EXP extends CommandOpMode {
 
                                 //Shoot artifacts from spike 2
                                 new ParallelCommandGroup(
-                                    new InstantCommand(()->robot.intake.stop()),
-                                    new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 3)
+                                        new InstantCommand(()->robot.intake.stop()),
+                                        new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision, 3)
                                 ),
 //
 //                        // Park outside launch zone

@@ -40,8 +40,9 @@ public class AutoRedFar_EXP extends CommandOpMode {
     private final Pose artifactsGPPPose = MirrorUtility.mirror(new Pose(42, 35, Math.toRadians(180)));
     private final Pose collectGPPPose = MirrorUtility.mirror(new Pose(16, 35, Math.toRadians(180)));
     private final Pose shootFarPose = MirrorUtility.mirror(new Pose(56, 12, Math.toRadians(117)));
-    private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(56, 59, Math.toRadians(180)));
-    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 59, Math.toRadians(180)));
+    private final Pose lastShootFarPose = MirrorUtility.mirror(new Pose(56, 12, Math.toRadians(114)));
+    private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(42, 61, Math.toRadians(180)));
+    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 61, Math.toRadians(180)));
 
     private PathChain rotateToShootPath, shootToGPPSpikePath, eatGPPPath, endGPPToShootPath, shootToPGPSpikePath,
             eatPGPPath, endPGPToShootPath;
@@ -82,8 +83,8 @@ public class AutoRedFar_EXP extends CommandOpMode {
                 .build();
 
         endPGPToShootPath = robot.follower.pathBuilder()
-                .addPath(new BezierLine(collectPGPPose, shootFarPose))
-                .setConstantHeadingInterpolation(shootFarPose.getHeading())
+                .addPath(new BezierLine(collectPGPPose, lastShootFarPose))
+                .setConstantHeadingInterpolation(lastShootFarPose.getHeading())
                 .build();
     }
 
