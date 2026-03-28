@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.ParallelDeadlineGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
@@ -127,14 +128,24 @@ public class AutoBlueFar_EXP extends CommandOpMode {
                                     new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
 
-                                // Move to shoot position and stop intake
                                 new ParallelCommandGroup(
-                                        new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
-                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
+                                        new FollowPathCommand(robot.follower, endGPPToShootPath, true, 0.9),
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
 
-//                                new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
+                                // Move to shoot position and stop intake
+                                new ParallelDeadlineGroup(
+                                        new FollowPathCommand(robot.follower, endGPPToShootPath, true, 1.0),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1),
+                                        new InstantCommand(() -> robot.shooter.smartVelocity(125)),
+                                        new ParallelDeadlineGroup(
+                                                new WaitCommand(750),
+                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        )
+                                ),
+
+                                new InstantCommand(()->robot.juggler.snapToNearestSlot()),
                                 robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 // Shoot artifacts from spike 1
@@ -148,7 +159,7 @@ public class AutoBlueFar_EXP extends CommandOpMode {
 //
                                  //collect artifacts on spike 2
                                 new ParallelDeadlineGroup(
-                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
+                                    new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1.0),
                                     new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),
                                     new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
@@ -156,11 +167,14 @@ public class AutoBlueFar_EXP extends CommandOpMode {
                                 // Move to shoot position and stop intake
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(robot.follower, endPGPToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 0.75),
-                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1.0),
+                                        new InstantCommand(() -> robot.shooter.smartVelocity(125)),
+                                        new ParallelDeadlineGroup(
+                                                new WaitCommand(750),
+                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        )
                                 ),
 
-//                               new ScanArtifactsCommand(robot.colorMatch, robot.juggler),
                                 robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 //Shoot artifacts from spike 2

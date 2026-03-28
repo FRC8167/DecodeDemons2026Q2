@@ -142,7 +142,6 @@ public class AutoRedFar_EXP extends CommandOpMode {
                                 ),
 
                                 new InstantCommand(()->robot.juggler.snapToNearestSlot()),
-
                                 robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 // Shoot artifacts from spike 1
@@ -152,10 +151,9 @@ public class AutoRedFar_EXP extends CommandOpMode {
                                 ),
 
                                 // Move to spike 2
-                                new FollowPathCommand(robot.follower, shootToPGPSpikePath),
+                                new FollowPathCommand(robot.follower, shootToPGPSpikePath, true, 1.0),
 //
 //                                // Collect artifacts on spike 2
-
                                 new ParallelDeadlineGroup(
                                         new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
                                         new FollowPathCommand(robot.follower, eatPGPPath, true, 0.9),
