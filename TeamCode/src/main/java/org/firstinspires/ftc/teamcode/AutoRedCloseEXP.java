@@ -62,7 +62,7 @@ public class AutoRedCloseEXP extends CommandOpMode {
 
         latchToShootClosePath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(latchPose, shootClosePose))
-                .setLinearHeadingInterpolation(latchPose.getHeading(), shootClosePose.getHeading())
+                .setConstantHeadingInterpolation(shootClosePose.getHeading()) //TODO: Figure this crap out
                 .build();
 
         shootCloseToSpike1Path = robot.follower.pathBuilder()
@@ -76,15 +76,15 @@ public class AutoRedCloseEXP extends CommandOpMode {
                 .build();
         spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(45))
+                .setLinearHeadingInterpolation(collectPPGPose.getHeading(), shootClosePose.getHeading())
                 .build();
         parkPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, collectPPGPose))
-                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .setLinearHeadingInterpolation(shootClosePose.getHeading(), collectPPGPose.getHeading())
                 .build();
         shootCloseToSpike2Path = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, artifactPGPPose))
-                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .setLinearHeadingInterpolation(shootClosePose.getHeading(), artifactPGPPose.getHeading())
                 .build();
 
         collectPGPArtifactsPath = robot.follower.pathBuilder()
@@ -92,8 +92,8 @@ public class AutoRedCloseEXP extends CommandOpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
         spike2ToShootPath = robot.follower.pathBuilder()
-                .addPath(new BezierLine(collectPGPPose ,shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(45))
+                .addPath(new BezierLine(collectPGPPose, shootClosePose))
+                .setLinearHeadingInterpolation(collectPGPPose.getHeading(), shootClosePose.getHeading())
                 .build();
     }
 

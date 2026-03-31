@@ -14,10 +14,10 @@ import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
+import org.firstinspires.ftc.teamcode.Cogintilities.PedroUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_Old;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
@@ -51,6 +51,15 @@ public class AutoBlueCloseEXP extends CommandOpMode {
     public void buildPaths() {
         robot.follower.setStartingPose(startPose);
 
+//        startToLatchPath        = PedroUtility.generateLinearBezierLinePath(startPose, latchPose, robot);
+//        latchToShootClosePath   = PedroUtility.generateLinearBezierLinePath(latchPose, shootClosePose, robot);
+//        shootCloseToSpike1Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactsPPGPose, robot);
+//        collectPPGArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactsPPGPose, collectPPGPose, robot);
+//        spike1ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPPGPose, shootClosePose, robot);
+//        parkPath                = PedroUtility.generateLinearBezierLinePath(shootClosePose, collectPPGPose, robot);
+//        shootCloseToSpike2Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactPGPPose, robot);
+//        collectPGPArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactPGPPose, collectPGPPose, robot);
+//        spike2ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPGPPose, shootClosePose, robot);
 
         startToLatchPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(startPose, latchPose))
@@ -73,15 +82,15 @@ public class AutoBlueCloseEXP extends CommandOpMode {
                 .build();
         spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(135))
+                .setLinearHeadingInterpolation(collectPPGPose.getHeading(), shootClosePose.getHeading())
                 .build();
         parkPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, collectPPGPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setLinearHeadingInterpolation(shootClosePose.getHeading(), collectPPGPose.getHeading())
                 .build();
         shootCloseToSpike2Path = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, artifactPGPPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setLinearHeadingInterpolation(shootClosePose.getHeading(), artifactPGPPose.getHeading())
                 .build();
 
         collectPGPArtifactsPath = robot.follower.pathBuilder()
@@ -89,8 +98,8 @@ public class AutoBlueCloseEXP extends CommandOpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         spike2ToShootPath = robot.follower.pathBuilder()
-                .addPath(new BezierLine(collectPGPPose ,shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(135))
+                .addPath(new BezierLine(collectPGPPose, shootClosePose))
+                .setLinearHeadingInterpolation(collectPGPPose.getHeading(), shootClosePose.getHeading())
                 .build();
     }
 
