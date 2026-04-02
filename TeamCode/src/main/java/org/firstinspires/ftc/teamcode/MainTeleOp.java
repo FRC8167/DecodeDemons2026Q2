@@ -12,7 +12,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.State;
 import org.firstinspires.ftc.teamcode.Commands.CancelPedroCommand;
-import org.firstinspires.ftc.teamcode.Commands.DeleteArtifactCommand_EXP;
+import org.firstinspires.ftc.teamcode.Commands.DeleteArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.DriveToPoseCommand;
 import org.firstinspires.ftc.teamcode.Commands.HoldPoseCommand;
@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Commands.KickCommand;
 import org.firstinspires.ftc.teamcode.Commands.NestCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateOneSlotCommand;
 import org.firstinspires.ftc.teamcode.Commands.RotateToStateCommand;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_Old;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSmartSpinUpCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShooterSpinUpCommand;
@@ -131,7 +132,13 @@ public class MainTeleOp extends CommandOpMode {
 
 
         operator.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new InstantCommand(robot.vision::latchMotif));
+                .whenPressed(new InstantCommand(Robot::decrementArtifactsScored));
+
+        operator.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(Robot::incrementArtifactsScored));
+
+        operator.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON)
+                .whenPressed(new InstantCommand(Robot::resetArtifactsScored));
 
 //        operator.getGamepadButton(GamepadKeys.Button.DPAD_UP)
 //                .whenPressed(
@@ -139,7 +146,11 @@ public class MainTeleOp extends CommandOpMode {
 //                );
 
         operator.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                robot.colorMatch.createScanArtifactCommand(robot.juggler),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
+                        )
                 );
 
         operator.getGamepadButton(GamepadKeys.Button.X)
@@ -178,7 +189,7 @@ public class MainTeleOp extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
 //                .whenPressed(new NestCommand(robot.slide));
-        .whenPressed(new DeleteArtifactCommand_EXP(robot.juggler));
+        .whenPressed(new DeleteArtifactCommand(robot.juggler));
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
 //                .whenPressed(new NestCommand(robot.slide));
@@ -213,7 +224,7 @@ public class MainTeleOp extends CommandOpMode {
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> automatedDrive = true),
                                 new DriveToPoseCommand(robot.getShootPose(), driver),
-                                new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
                                 new InstantCommand(()->robot.shooter.stop()),
                                 new CancelPedroCommand(),
                                 new InstantCommand(() -> automatedDrive = false)
@@ -300,6 +311,8 @@ public class MainTeleOp extends CommandOpMode {
 //                }
 //            }
 //        }
+        telemetry.addData("Artifacts Scored", Robot.getArtifactsScored());
+        telemetry.addLine();
 
 //        telemetry.addData("jugggler count", robot.juggler.getCurrentPosition());
 //        telemetry.addData("jugggler target", robot.juggler.getTargetPosition());
@@ -310,7 +323,12 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Distance to Goal", robot.vision.getGoalDistance());
 
 
+
         ColorMatch.ArtifactColor[] motif = robot.vision.getLatchedMotif();
+
+        if (motif == null) {
+            robot.vision.latchMotif();
+        }
 
 
         // Moved from telemetryM to telemetry

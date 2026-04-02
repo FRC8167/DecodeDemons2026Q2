@@ -6,11 +6,11 @@ import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 import org.firstinspires.ftc.teamcode.SubSystems.SpinStatesSingleton;
 
 
-public class DeleteArtifactCommand_EXP extends CommandBase {
+public class DeleteArtifactCommand extends CommandBase {
 
     private final JugglerAbsolute juggler;
 
-    public DeleteArtifactCommand_EXP(JugglerAbsolute juggler) {
+    public DeleteArtifactCommand(JugglerAbsolute juggler) {
         this.juggler = juggler;
     }
 

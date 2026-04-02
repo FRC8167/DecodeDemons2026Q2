@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.State;
+import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
 import org.firstinspires.ftc.teamcode.SubSystems.JugglerAbsolute;
 import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
@@ -24,7 +25,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
     private final
     LimeLightVision vision;
     private SequentialCommandGroup sequence;
-    private final int scoredArtifacts;
+//    private final int scoredArtifacts;
 
     public ShootCaseCommand(
             JugglerAbsolute juggler,
@@ -32,8 +33,8 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             Slide slide,
             Shooter shooter,
             ColorMatch colorMatch,
-            LimeLightVision vision,
-            int scoredArtifacts
+            LimeLightVision vision
+//            int scoredArtifacts
     ) {
         this.juggler = juggler;
 //        this.popper = popper;
@@ -41,7 +42,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
         this.shooter = shooter;
         this.colorMatch = colorMatch;
         this.vision = vision;
-        this.scoredArtifacts = scoredArtifacts;
+//        this.scoredArtifacts = scoredArtifacts;
     }
 
     @Override
@@ -80,7 +81,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             };
         }
 
-        ColorMatch.ArtifactColor[] adjustedMotif = State.sequenceRevert(SpinStatesSingleton.getNextToShoot(scoredArtifacts, State.sequenceMigrate(motif)));
+        ColorMatch.ArtifactColor[] adjustedMotif = State.sequenceRevert(SpinStatesSingleton.getNextToShoot(Robot.getArtifactsScored(), State.sequenceMigrate(motif)));
 
         State[] sequence = State.sequenceMigrate(adjustedMotif);
         State[] bestToShoot = SpinStatesSingleton.getInstance().toBestStatesAvailable(sequence);
@@ -97,7 +98,7 @@ public class ShootCaseCommand extends SequentialCommandGroup {
             seq.addCommands(new KickCommand(slide));
             seq.addCommands(new NestCommand(slide));
 
-            seq.addCommands(new DeleteArtifactCommand_EXP(juggler));
+            seq.addCommands(new DeleteArtifactCommand(juggler));
 
         }
 

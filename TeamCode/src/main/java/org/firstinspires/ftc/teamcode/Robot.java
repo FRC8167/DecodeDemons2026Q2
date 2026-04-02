@@ -7,6 +7,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.hardware.SensorColor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
@@ -70,6 +71,8 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
     public static OpModeType OP_MODE_TYPE; //Note: Is likely unnecessary. TODO: replace with determineOpModeType() method
     static List<LynxModule> ctrlHubs;
 
+    private static int artifactsScored = 0;
+
     public GoBildaPinpointDriver pinpoint;
 
     public Follower follower;
@@ -130,6 +133,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         slide = new Slide(slideMotor);
 
         if (reset) {
+            artifactsScored = 0;
             SpinStatesSingleton.resetInstance();
             juggler.reset();
             slide.reset();
@@ -201,7 +205,25 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
         return OpModeCheckerUtility.getOpModeType(this.getClass());
     }
 
+    public static void setArtifactsScored(int artifactsScored) {
+        Robot.artifactsScored = artifactsScored;
+    }
 
+    public static int getArtifactsScored() {
+        return Robot.artifactsScored;
+    }
+
+    public static void incrementArtifactsScored() {
+        Robot.artifactsScored = Range.clip(Robot.artifactsScored + 1, 0, 9);
+    }
+
+    public static void decrementArtifactsScored() {
+        Robot.artifactsScored = Range.clip(Robot.artifactsScored - 1, 0, 9);
+    }
+
+    public static void resetArtifactsScored() {
+        Robot.artifactsScored = 0;
+    }
 }
 
 

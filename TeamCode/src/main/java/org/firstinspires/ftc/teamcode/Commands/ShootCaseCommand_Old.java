@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.LimeLightVision;
 import org.firstinspires.ftc.teamcode.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.SubSystems.Slide;
 
+@Deprecated
 public class ShootCaseCommand_Old extends SequentialCommandGroup {
 
     private final JugglerAbsolute juggler;

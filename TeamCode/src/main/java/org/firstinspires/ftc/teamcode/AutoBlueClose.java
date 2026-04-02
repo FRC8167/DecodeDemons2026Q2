@@ -10,12 +10,13 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.ParallelDeadlineGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand_Old;
+import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
 import org.firstinspires.ftc.teamcode.Commands.SlowSpinPlusInterruptCommand;
 import org.firstinspires.ftc.teamcode.Commands.VisionCommand;
 import org.firstinspires.ftc.teamcode.SubSystems.ColorMatch;
@@ -33,19 +34,31 @@ public class AutoBlueClose extends CommandOpMode {
     private ElapsedTime timer;
     private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(135));
     private final Pose latchPose = new Pose(56, 105, Math.toRadians(80));
-    private final Pose artifactsPPGPose = new Pose(56, 84, Math.toRadians(180));
-    private final Pose collectPPGPose = new Pose(18, 84, Math.toRadians(180));
-    private final Pose shootClosePose = new Pose(56, 78, Math.toRadians(135));
-//    private final Pose artifactPGPPose = new Pose(56, 60, Math.toRadians(180));
-//    private final Pose collectPGPPose = new Pose(24, 60, Math.toRadians(180));
+    private final Pose artifactsPPGPose = new Pose(42, 83, Math.toRadians(180));
+    private final Pose collectPPGPose = new Pose(16, 83, Math.toRadians(180));
+    private final Pose shootClosePose = new Pose(54, 78, Math.toRadians(130));
+    private final Pose artifactPGPPose = new Pose(42, 58, Math.toRadians(180));
+    private final Pose collectPGPPose = new Pose(16, 58, Math.toRadians(180));
 
 
 
-    private PathChain startToLatchPath, latchToShootClosePath, shootCloseToSpike1Path, collectPPGArtifactsPath, spike1ToShootPath, parkPath;
+    private PathChain startToLatchPath, latchToShootClosePath, shootCloseToSpike1Path, collectPPGArtifactsPath, spike1ToShootPath,
+            shootCloseToSpike2Path, collectPGPArtifactsPath, spike2ToShootPath, parkPath;
+
+
 
     public void buildPaths() {
         robot.follower.setStartingPose(startPose);
 
+//        startToLatchPath        = PedroUtility.generateLinearBezierLinePath(startPose, latchPose, robot);
+//        latchToShootClosePath   = PedroUtility.generateLinearBezierLinePath(latchPose, shootClosePose, robot);
+//        shootCloseToSpike1Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactsPPGPose, robot);
+//        collectPPGArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactsPPGPose, collectPPGPose, robot);
+//        spike1ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPPGPose, shootClosePose, robot);
+//        parkPath                = PedroUtility.generateLinearBezierLinePath(shootClosePose, collectPPGPose, robot);
+//        shootCloseToSpike2Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactPGPPose, robot);
+//        collectPGPArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactPGPPose, collectPGPPose, robot);
+//        spike2ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPGPPose, shootClosePose, robot);
 
         startToLatchPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(startPose, latchPose))
@@ -68,34 +81,30 @@ public class AutoBlueClose extends CommandOpMode {
                 .build();
         spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
-                .setConstantHeadingInterpolation(Math.toRadians(135))
+                .setLinearHeadingInterpolation(collectPPGPose.getHeading(), shootClosePose.getHeading())
                 .build();
         parkPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(shootClosePose, collectPPGPose))
+                .setLinearHeadingInterpolation(shootClosePose.getHeading(), collectPPGPose.getHeading())
+                .build();
+        shootCloseToSpike2Path = robot.follower.pathBuilder()
+                .addPath(new BezierLine(shootClosePose, artifactPGPPose))
+                .setLinearHeadingInterpolation(shootClosePose.getHeading(), artifactPGPPose.getHeading())
+                .build();
+
+        collectPGPArtifactsPath = robot.follower.pathBuilder()
+                .addPath(new BezierLine(artifactPGPPose, collectPGPPose))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
-//        path5 = robot.follower.pathBuilder()
-//                .addPath(new BezierLine(shootClosePose, collectPPGPose))
-//                .setConstantHeadingInterpolation(Math.toRadians(180))
-//                .build();
-//        path6 = robot.follower.pathBuilder()
-//                .addPath(new BezierLine(shootClosePose, artifactPGPPose))
-//                .setConstantHeadingInterpolation(Math.toRadians(180))
-//                .build();
-//        path7 = robot.follower.pathBuilder()
-//                .addPath(new BezierLine(artifactPGPPose, collectPGPPose))
-//                .setConstantHeadingInterpolation(Math.toRadians(180))
-//                .build();
-//        path8 = robot.follower.pathBuilder()
-//                .addPath(new BezierLine(collectPGPPose ,shootClosePose))
-//                .setConstantHeadingInterpolation(Math.toRadians(-45))
-//                .build();
+        spike2ToShootPath = robot.follower.pathBuilder()
+                .addPath(new BezierLine(collectPGPPose, shootClosePose))
+                .setLinearHeadingInterpolation(collectPGPPose.getHeading(), shootClosePose.getHeading())
+                .build();
     }
 
     public void initialize() {
         Robot.OP_MODE_TYPE = Robot.OpModeType.AUTO;
         robot.setAlliance(Robot.Alliance.BLUE);
-
         timer = new ElapsedTime();
         timer.reset();
 
@@ -107,11 +116,15 @@ public class AutoBlueClose extends CommandOpMode {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        buildPaths();
 
+        telemetry.addData("InitCount: ", Robot.initCount);
+        telemetry.update();
+
+        buildPaths();
         schedule(
                 new ParallelCommandGroup(
-                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null), // robot.shooter),
+                        new DetectArtifactCommand(robot.rgbLight, robot.colorMatch, null),
+                        robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
                         new VisionCommand(robot.vision),
 
                         new SequentialCommandGroup(
@@ -119,37 +132,81 @@ public class AutoBlueClose extends CommandOpMode {
                                 new FollowPathCommand(robot.follower, startToLatchPath, true),
 
 //                                //latch
+                                new WaitCommand(100),
+
                                 new InstantCommand(()-> robot.vision.latchMotif()),
 
                                 //move to launch zone
-                                new FollowPathCommand(robot.follower, latchToShootClosePath),
+                                new FollowPathCommand(robot.follower, latchToShootClosePath, true, 1.0),
+
+                                robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
+
 
                                 //shoot pre-loaded artifacts
-                                new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
+                                new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
                                 //new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
                                 //move to spike 1
-                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
+//                                new InstantCommand(()-> robot.shooter.setVelocity(2500)),
                                 new FollowPathCommand(robot.follower, shootCloseToSpike1Path, true, 1.0),
 
                                 new ParallelDeadlineGroup(
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 1.0),
                                         new FollowPathCommand(robot.follower, collectPPGArtifactsPath, true, 0.9),
                                         new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
                                 ),
-                                //Move to shoot position and stop intake
-                                new ParallelCommandGroup(
+                                ///Move to shoot position and stop intake
+                                new ParallelDeadlineGroup(
                                         new FollowPathCommand(robot.follower, spike1ToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2500, 0.75),
-                                        new InstantCommand(()->robot.juggler.snapToNearestSlot())
-                                        ),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1.0),
+                                        new InstantCommand(() -> robot.shooter.smartVelocity(63)),//TODO:  VERIFY
+                                        new ParallelDeadlineGroup(
+                                                new WaitCommand(750),
+                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        )
+                                ),
+
+                                new InstantCommand(()->robot.juggler.snapToNearestSlot()),
+                                robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
 
                                 //shoot artifacts from spike1
                                 new ParallelCommandGroup(
-                                new ShootCaseCommand_Old(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision),
-//                                new ShootLeftoversCommand(robot.juggler, robot.popper, robot.shooter, robot.colorMatch, robot.vision),
-                                new InstantCommand(()->robot.intake.stop())
+                                        new InstantCommand(()->robot.intake.stop()),
+                                        new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
+
+                                ),
+
+                                //move to spike 2
+                                new FollowPathCommand(robot.follower, shootCloseToSpike2Path, true, 1.0),
+
+                                //collect artifacts on spike 2
+                                new ParallelDeadlineGroup(
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
+                                        new FollowPathCommand(robot.follower, collectPGPArtifactsPath, true, 0.9),
+                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                ),
+
+
+                                //Move to shoot position and stop intake
+                                new ParallelDeadlineGroup(
+                                        new FollowPathCommand(robot.follower, spike2ToShootPath, true, 1.0),
+                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1),
+                                        new InstantCommand(() -> robot.shooter.smartVelocity(63)),
+                                        new ParallelDeadlineGroup(
+                                                new WaitCommand(750),
+                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+                                        )
+                                ),
+
+                                robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
+
+                                //Shoot artifacts from spike 2
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()->robot.intake.stop()),
+                                        new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
                                 ),
                                 //park outside launch zone
+
+
                                 new FollowPathCommand(robot.follower, parkPath),
                                 new InstantCommand(()->robot.shooter.stop())
 
@@ -168,9 +225,9 @@ public class AutoBlueClose extends CommandOpMode {
                 robot.rgbLight.setColor(Color.RED);
             }
             // Detect the slots
-            ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_0);
-            ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_1);
-            ColorMatch.ArtifactColor s2 = robot.colorMatch.detectColor(ColorMatch.Slot.SLOT_2);
+            ColorMatch.ArtifactColor s0 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_0);
+            ColorMatch.ArtifactColor s1 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_1);
+            ColorMatch.ArtifactColor s2 = robot.colorMatch.detectColor_AssumeFull(ColorMatch.Slot.SLOT_2);
 
             // Check if all slots are known
             boolean ready = s0 != ColorMatch.ArtifactColor.UNKNOWN &&
@@ -209,10 +266,10 @@ public class AutoBlueClose extends CommandOpMode {
         //AprilTagDetection tag = robot.vision.getFirstTargetTag();
 //        LLResultTypes.FiducialResult tag = robot.vision.getAprilTags().get(0);
         if (robot.vision.getFirstSequence() != null) {
-                robot.rgbLight.setColor(Color.AZURE);
-            } else {
-                robot.rgbLight.setColor(Color.RED);
-            }
+            robot.rgbLight.setColor(Color.AZURE);
+        } else {
+            robot.rgbLight.setColor(Color.RED);
+        }
         robot.follower.update();
         robot.follower.getPose();
         telemetry.addData("X:  ", robot.follower.getPose().getX());
@@ -231,7 +288,7 @@ public class AutoBlueClose extends CommandOpMode {
 //        } else {
 //            telemetry.addLine("No target tags (20–24) detected.");
 //        }
-//        telemetry.update();
+        telemetry.update();
     }
 
     @Override
