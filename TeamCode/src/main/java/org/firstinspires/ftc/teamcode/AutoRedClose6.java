@@ -14,6 +14,7 @@ import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
+import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
@@ -27,38 +28,34 @@ import java.util.Arrays;
 
 
 //@Disabled
-@Autonomous(name="AutoBlueClose" ,preselectTeleOp = "MainTeleOp", group="Competition")
-public class AutoBlueClose extends CommandOpMode {
+@Autonomous(name="AutoRedClose6" ,preselectTeleOp = "MainTeleOp", group="Competition")
+public class AutoRedClose6 extends CommandOpMode {
     Robot robot = Robot.getInstance();
 
+
+    //    private final Pose startPose = MirrorUtility.mirror(new Pose(26.5, 126.5, Math.toRadians(135)));
     private ElapsedTime timer;
-    private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(135));
-    private final Pose latchPose = new Pose(56, 105, Math.toRadians(80));
-    private final Pose artifactsPPGPose = new Pose(42, 83, Math.toRadians(180));
-    private final Pose collectPPGPose = new Pose(16, 83, Math.toRadians(180));
-    private final Pose shootClosePose = new Pose(54, 78, Math.toRadians(130));
-    private final Pose artifactPGPPose = new Pose(42, 58, Math.toRadians(180));
-    private final Pose collectPGPPose = new Pose(16, 58, Math.toRadians(180));
+    private final Pose startPose = MirrorUtility.mirror(new Pose(26.5, 126.5, Math.toRadians(135)));
+    private final Pose latchPose = MirrorUtility.mirror(new Pose(56, 105, Math.toRadians(80)));
+    private final Pose artifactsPPGPose = MirrorUtility.mirror(new Pose(42, 83, Math.toRadians(180)));
+    private final Pose collectPPGPose = MirrorUtility.mirror(new Pose(16, 83, Math.toRadians(180)));
+    private final Pose shootClosePose = MirrorUtility.mirror(new Pose(54, 78, Math.toRadians(130)));
+    private final Pose endParkPose = MirrorUtility.mirror(new Pose(18, 103, Math.toRadians(132)));
+
+//    private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(42, 58, Math.toRadians(180)));
+//    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 58, Math.toRadians(180)));
 
 
 
-    private PathChain startToLatchPath, latchToShootClosePath, shootCloseToSpike1Path, collectPPGArtifactsPath, spike1ToShootPath,
-            shootCloseToSpike2Path, collectPGPArtifactsPath, spike2ToShootPath, parkPath;
+
+    private PathChain startToLatchPath, latchToShootClosePath, shootCloseToSpike1Path, collectPPGArtifactsPath, spike1ToShootPath, parkPath;
+//            shootCloseToSpike2Path, collectPGPArtifactsPath, spike2ToShootPath, parkPath;
 
 
 
     public void buildPaths() {
         robot.follower.setStartingPose(startPose);
 
-//        startToLatchPath        = PedroUtility.generateLinearBezierLinePath(startPose, latchPose, robot);
-//        latchToShootClosePath   = PedroUtility.generateLinearBezierLinePath(latchPose, shootClosePose, robot);
-//        shootCloseToSpike1Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactsPPGPose, robot);
-//        collectPPGArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactsPPGPose, collectPPGPose, robot);
-//        spike1ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPPGPose, shootClosePose, robot);
-//        parkPath                = PedroUtility.generateLinearBezierLinePath(shootClosePose, collectPPGPose, robot);
-//        shootCloseToSpike2Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactPGPPose, robot);
-//        collectPGPArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactPGPPose, collectPGPPose, robot);
-//        spike2ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPGPPose, shootClosePose, robot);
 
         startToLatchPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(startPose, latchPose))
@@ -67,7 +64,7 @@ public class AutoBlueClose extends CommandOpMode {
 
         latchToShootClosePath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(latchPose, shootClosePose))
-                .setLinearHeadingInterpolation(latchPose.getHeading(), shootClosePose.getHeading())
+                .setConstantHeadingInterpolation(shootClosePose.getHeading()) //TODO: Figure this crap out
                 .build();
 
         shootCloseToSpike1Path = robot.follower.pathBuilder()
@@ -77,34 +74,34 @@ public class AutoBlueClose extends CommandOpMode {
 
         collectPPGArtifactsPath= robot.follower.pathBuilder()
                 .addPath(new BezierLine(artifactsPPGPose, collectPPGPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
         spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
                 .setLinearHeadingInterpolation(collectPPGPose.getHeading(), shootClosePose.getHeading())
                 .build();
         parkPath = robot.follower.pathBuilder()
-                .addPath(new BezierLine(shootClosePose, collectPPGPose))
+                .addPath(new BezierLine(shootClosePose, endParkPose))
                 .setLinearHeadingInterpolation(shootClosePose.getHeading(), collectPPGPose.getHeading())
                 .build();
-        shootCloseToSpike2Path = robot.follower.pathBuilder()
-                .addPath(new BezierLine(shootClosePose, artifactPGPPose))
-                .setLinearHeadingInterpolation(shootClosePose.getHeading(), artifactPGPPose.getHeading())
-                .build();
-
-        collectPGPArtifactsPath = robot.follower.pathBuilder()
-                .addPath(new BezierLine(artifactPGPPose, collectPGPPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .build();
-        spike2ToShootPath = robot.follower.pathBuilder()
-                .addPath(new BezierLine(collectPGPPose, shootClosePose))
-                .setLinearHeadingInterpolation(collectPGPPose.getHeading(), shootClosePose.getHeading())
-                .build();
+//        shootCloseToSpike2Path = robot.follower.pathBuilder()
+//                .addPath(new BezierLine(shootClosePose, artifactPGPPose))
+//                .setLinearHeadingInterpolation(shootClosePose.getHeading(), artifactPGPPose.getHeading())
+//                .build();
+//
+//        collectPGPArtifactsPath = robot.follower.pathBuilder()
+//                .addPath(new BezierLine(artifactPGPPose, collectPGPPose))
+//                .setConstantHeadingInterpolation(Math.toRadians(0))
+//                .build();
+//        spike2ToShootPath = robot.follower.pathBuilder()
+//                .addPath(new BezierLine(collectPGPPose, shootClosePose))
+//                .setLinearHeadingInterpolation(collectPGPPose.getHeading(), shootClosePose.getHeading())
+//                .build();
     }
 
     public void initialize() {
         Robot.OP_MODE_TYPE = Robot.OpModeType.AUTO;
-        robot.setAlliance(Robot.Alliance.BLUE);
+        robot.setAlliance(Robot.Alliance.RED);
         timer = new ElapsedTime();
         timer.reset();
 
@@ -175,35 +172,35 @@ public class AutoBlueClose extends CommandOpMode {
 
                                 ),
 
-                                //move to spike 2
-                                new FollowPathCommand(robot.follower, shootCloseToSpike2Path, true, 1.0),
-
-                                //collect artifacts on spike 2
-                                new ParallelDeadlineGroup(
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
-                                        new FollowPathCommand(robot.follower, collectPGPArtifactsPath, true, 0.9),
-                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
-                                ),
+//                                //move to spike 2
+//                                new FollowPathCommand(robot.follower, shootCloseToSpike2Path, true, 1.0),
+//
+//                                //collect artifacts on spike 2
+//                                new ParallelDeadlineGroup(
+//                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 2250, 1),
+//                                        new FollowPathCommand(robot.follower, collectPGPArtifactsPath, true, 0.9),
+//                                        new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+//                                ),
 
 
                                 //Move to shoot position and stop intake
-                                new ParallelDeadlineGroup(
-                                        new FollowPathCommand(robot.follower, spike2ToShootPath, true, 1.0),
-                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1),
-                                        new InstantCommand(() -> robot.shooter.smartVelocity(63)),
-                                        new ParallelDeadlineGroup(
-                                                new WaitCommand(750),
-                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
-                                        )
-                                ),
-
-                                robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
-
-                                //Shoot artifacts from spike 2
-                                new ParallelCommandGroup(
-                                        new InstantCommand(()->robot.intake.stop()),
-                                        new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
-                                ),
+//                                new ParallelDeadlineGroup(
+//                                        new FollowPathCommand(robot.follower, parkPath, true, 1.0),
+//                                        new IntakeCommand(robot.intake, Intake.MotorState.FORWARD, 5000, 1),
+//                                        new InstantCommand(() -> robot.shooter.smartVelocity(63)),
+//                                        new ParallelDeadlineGroup(
+//                                                new WaitCommand(750),
+//                                                new SlowSpinPlusInterruptCommand(robot.juggler, JugglerAbsolute.Direction.CW)
+//                                        )
+//                                ),
+//
+//                                robot.colorMatch.createScanArtifactCommand_Auto(robot.juggler),
+//
+//                                //Shoot artifacts from spike 2
+//                                new ParallelCommandGroup(
+//                                        new InstantCommand(()->robot.intake.stop()),
+//                                        new ShootCaseCommand(robot.juggler, robot.slide, robot.shooter, robot.colorMatch, robot.vision)
+//                                ),
                                 //park outside launch zone
 
 

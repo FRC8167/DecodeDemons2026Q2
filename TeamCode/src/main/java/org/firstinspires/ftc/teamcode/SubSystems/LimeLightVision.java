@@ -24,7 +24,7 @@ public class LimeLightVision extends SubsystemBase implements TeamConstants {
     Position BLUE_GOAL_TARGET = new Position(DistanceUnit.INCH, -60.699807, -57.531366, 38.75, 0);
     Position RED_GOAL_TARGET = new Position(DistanceUnit.INCH, -60.699807, 57.531366, 38.75, 0);
 
-    private ColorMatch.ArtifactColor[] latchedMotif = null;
+    private static ColorMatch.ArtifactColor[] latchedMotif = null;
 
     private final Limelight3A limelight;
 //    IMU imu;
@@ -39,6 +39,10 @@ public class LimeLightVision extends SubsystemBase implements TeamConstants {
         this.limelight.start(); // This tells Limelight to start looking!
         this.limelight.pipelineSwitch(0);
         pipeline = 0;
+    }
+
+    public void resetMotif() {
+        latchedMotif = null;
     }
 
 

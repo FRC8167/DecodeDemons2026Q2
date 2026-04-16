@@ -14,7 +14,6 @@ import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.Cogintilities.Color;
-import org.firstinspires.ftc.teamcode.Cogintilities.MirrorUtility;
 import org.firstinspires.ftc.teamcode.Commands.DetectArtifactCommand;
 import org.firstinspires.ftc.teamcode.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.ShootCaseCommand;
@@ -28,20 +27,18 @@ import java.util.Arrays;
 
 
 //@Disabled
-@Autonomous(name="AutoRedClose" ,preselectTeleOp = "MainTeleOp", group="Competition")
-public class AutoRedClose extends CommandOpMode {
+@Autonomous(name="AutoBlueClose9" ,preselectTeleOp = "MainTeleOp", group="Competition")
+public class AutoBlueClose9 extends CommandOpMode {
     Robot robot = Robot.getInstance();
 
-
-//    private final Pose startPose = MirrorUtility.mirror(new Pose(26.5, 126.5, Math.toRadians(135)));
     private ElapsedTime timer;
-    private final Pose startPose = MirrorUtility.mirror(new Pose(26.5, 126.5, Math.toRadians(135)));
-    private final Pose latchPose = MirrorUtility.mirror(new Pose(56, 105, Math.toRadians(80)));
-    private final Pose artifactsPPGPose = MirrorUtility.mirror(new Pose(42, 83, Math.toRadians(180)));
-    private final Pose collectPPGPose = MirrorUtility.mirror(new Pose(16, 83, Math.toRadians(180)));
-    private final Pose shootClosePose = MirrorUtility.mirror(new Pose(54, 78, Math.toRadians(130)));
-    private final Pose artifactPGPPose = MirrorUtility.mirror(new Pose(42, 58, Math.toRadians(180)));
-    private final Pose collectPGPPose = MirrorUtility.mirror(new Pose(16, 58, Math.toRadians(180)));
+    private final Pose startPose = new Pose(26.5, 126.5, Math.toRadians(135));
+    private final Pose latchPose = new Pose(56, 105, Math.toRadians(80));
+    private final Pose artifactsPPGPose = new Pose(42, 83, Math.toRadians(180));
+    private final Pose collectPPGPose = new Pose(16, 83, Math.toRadians(180));
+    private final Pose shootClosePose = new Pose(54, 78, Math.toRadians(130));
+    private final Pose artifactPGPPose = new Pose(42, 58, Math.toRadians(180));
+    private final Pose collectPGPPose = new Pose(16, 58, Math.toRadians(180));
 
 
 
@@ -53,6 +50,15 @@ public class AutoRedClose extends CommandOpMode {
     public void buildPaths() {
         robot.follower.setStartingPose(startPose);
 
+//        startToLatchPath        = PedroUtility.generateLinearBezierLinePath(startPose, latchPose, robot);
+//        latchToShootClosePath   = PedroUtility.generateLinearBezierLinePath(latchPose, shootClosePose, robot);
+//        shootCloseToSpike1Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactsPPGPose, robot);
+//        collectPPGArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactsPPGPose, collectPPGPose, robot);
+//        spike1ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPPGPose, shootClosePose, robot);
+//        parkPath                = PedroUtility.generateLinearBezierLinePath(shootClosePose, collectPPGPose, robot);
+//        shootCloseToSpike2Path  = PedroUtility.generateLinearBezierLinePath(shootClosePose, artifactPGPPose, robot);
+//        collectPGPArtifactsPath = PedroUtility.generateLinearBezierLinePath(artifactPGPPose, collectPGPPose, robot);
+//        spike2ToShootPath       = PedroUtility.generateLinearBezierLinePath(collectPGPPose, shootClosePose, robot);
 
         startToLatchPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(startPose, latchPose))
@@ -61,7 +67,7 @@ public class AutoRedClose extends CommandOpMode {
 
         latchToShootClosePath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(latchPose, shootClosePose))
-                .setConstantHeadingInterpolation(shootClosePose.getHeading()) //TODO: Figure this crap out
+                .setLinearHeadingInterpolation(latchPose.getHeading(), shootClosePose.getHeading())
                 .build();
 
         shootCloseToSpike1Path = robot.follower.pathBuilder()
@@ -71,7 +77,7 @@ public class AutoRedClose extends CommandOpMode {
 
         collectPPGArtifactsPath= robot.follower.pathBuilder()
                 .addPath(new BezierLine(artifactsPPGPose, collectPPGPose))
-                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         spike1ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPPGPose, shootClosePose))
@@ -88,7 +94,7 @@ public class AutoRedClose extends CommandOpMode {
 
         collectPGPArtifactsPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(artifactPGPPose, collectPGPPose))
-                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         spike2ToShootPath = robot.follower.pathBuilder()
                 .addPath(new BezierLine(collectPGPPose, shootClosePose))
@@ -98,7 +104,7 @@ public class AutoRedClose extends CommandOpMode {
 
     public void initialize() {
         Robot.OP_MODE_TYPE = Robot.OpModeType.AUTO;
-        robot.setAlliance(Robot.Alliance.RED);
+        robot.setAlliance(Robot.Alliance.BLUE);
         timer = new ElapsedTime();
         timer.reset();
 

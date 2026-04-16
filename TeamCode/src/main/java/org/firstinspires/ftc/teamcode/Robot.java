@@ -132,11 +132,14 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 //            juggler = new Juggler(spindexerMotor, limitSwitch);
         slide = new Slide(slideMotor);
 
+        vision = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"));
+
         if (reset) {
             artifactsScored = 0;
             SpinStatesSingleton.resetInstance();
             juggler.reset();
             slide.reset();
+            vision.resetMotif();
         }
 
 
@@ -156,7 +159,7 @@ public class Robot extends com.seattlesolvers.solverslib.command.Robot {
 
 
 //        vision = new Vision(hardwareMap.get(WebcamName.class, "Webcam1"));
-        vision = new LimeLightVision(hardwareMap.get(Limelight3A.class, "limelight"));
+
         rgbLight   = new RGBLight(rgbServo);
         colorMatch = new ColorMatch(slot0Sensor, slot1Sensor, slot2Sensor);
 
